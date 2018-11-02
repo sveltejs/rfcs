@@ -867,7 +867,34 @@ Potentially, this could be alleviated with compiler magic (i.e. detecting multip
 
 ### svelte-extras
 
-TODO
+Most of the methods in [svelte-extras](https://github.com/sveltejs/svelte-extras) no longer make sense. The two that we do want to reimplement are `tween` and `spring`.
+
+Happily, these will no longer involve monkey-patching components:
+
+```html
+<script>
+  import { tween } from 'svelte/animation'; // 🐃
+  import * as eases from 'eases-jsnext';
+
+  export let progress = 0;
+  let tweenedProgress = 0;
+
+  let t;
+
+  onstate(() => {
+    if (t) t.stop();
+
+    t = tween(tweenedProgress, progress, {
+      easing: eases.cubicOut,
+      duration: 200
+    }, value => {
+      tweenedProgress = value;
+    });
+  });
+</script>
+
+<progress value={tweenedProgress}/>
+```
 
 
 ### Examples
