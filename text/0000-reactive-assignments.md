@@ -794,7 +794,7 @@ A major advantage of this proposal over Svelte 2 is that components become far m
 An eventual goal is to be able to use TypeScript in components:
 
 ```html
-<script type="typescript">
+<script lang="typescript">
   export let name: string;
 </script>
 
