@@ -455,7 +455,21 @@ Under this proposal, these options would be expressed by a new `<svelte:meta>` t
 
 ### Script-less components
 
-TODO
+At present it is possible to create components with no `<script>` block:
+
+```html
+<h1>Hello {name}!</h1>
+```
+
+This is convenient and simple, and should be preserved. Under this proposal the above would be equivalent to the following — any value referenced in the markup becomes an exported variable:
+
+```html
+<script>
+  export let name;
+</script>
+
+<h1>Hello {name}!</h1>
+```
 
 
 ### Events
