@@ -582,6 +582,8 @@ This creates consistent behaviour between Svelte components that are compiled to
 
 Of the five **built-in methods** that currently comprise the [component API](https://svelte.technology/guide#component-api) — `get`, `set`, `fire`, `on` and `destroy` — we no longer need the first three. `on` and `destroy` are still necessary.
 
+It would be nice to have some way to differentiate those built-in methods from regular properties so that people don't need to worry about potential conflicts — for that reason, `on` and `destroy` could become (🐃) `$on` and `$destroy`.
+
 In some cases, a component that is designed to be used as a standalone widget will create its own **custom methods**. In Svelte 2, these are lumped in with 'private' (except not really) methods. Under this proposal, custom methods are just exported variables that happen to be functions:
 
 ```html
