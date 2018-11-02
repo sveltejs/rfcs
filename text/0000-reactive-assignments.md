@@ -443,7 +443,7 @@ The default export from a Svelte 2 component can include compiler options — fo
 ```js
 export default {
   namespace: 'svg',
-  tag: 'my-cool-thing
+  tag: 'my-cool-thing'
 };
 ```
 
