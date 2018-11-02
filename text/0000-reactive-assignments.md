@@ -899,7 +899,13 @@ Happily, these will no longer involve monkey-patching components:
 
 ### Examples
 
-TODO
+* markdown editor [current](https://svelte.technology/repl?version=2.15.0&demo=binding-textarea) / [imagined](https://svelte.technology/repl?version=2.15.0&gist=a0443aa0fc68947b5fad8fae1aa63627)
+* media elements [current](https://svelte.technology/repl?version=2.15.0&demo=binding-media-elements) / [imagined](https://svelte.technology/repl?version=2.15.0&gist=8562a70e1a1e708b735b7a50e80b3cfe)
+* nested components [current](https://svelte.technology/repl?version=2.15.0&demo=nested-components) / [imagined](https://svelte.technology/repl?version=2.15.0&gist=cbad006c2197633ac75fc8f31c3670df)
+* SVG clock [current](https://svelte.technology/repl?version=2.15.0&demo=svg-clock) / [imagined](https://svelte.technology/repl?version=2.15.0&gist=758aacc71f506518a70c0e42f0735f6c)
+* Simple transition [current](https://svelte.technology/repl?version=2.15.0&demo=transitions-fade) / [imagined](https://svelte.technology/repl?version=2.15.0&gist=7bd7b4349a27342ca96b58046eb6e765)
+* Custom transition [current](https://svelte.technology/repl?version=2.15.0&demo=transitions-custom) / [imagined](https://svelte.technology/repl?version=2.15.0&gist=2e9830aad338305877d226d80a9d04d4)
+* Temperature converter [current](https://svelte.technology/repl?version=2.15.0&demo=7guis-temperature) / [imagined](https://svelte.technology/repl?version=2.15.0&gist=439fc5e7c89d91a31c9c9c1447434532)
 
 
 ## How we teach this
