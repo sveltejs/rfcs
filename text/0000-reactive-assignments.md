@@ -598,7 +598,20 @@ TODO
 
 ### TypeScript
 
-TODO
+A major advantage of this proposal over Svelte 2 is that components become far more amenable to typechecking and other forms of static analysis. Even without TypeScript, VSCode is able to offer much richer feedback now than with Svelte 2.
+
+An eventual goal is to be able to use TypeScript in components:
+
+```html
+<script type="typescript">
+  export let name: string;
+</script>
+
+<h1>Hello {name}!</h1>
+```
+
+Editor integrations would ideally offer autocompletion and as-you-type typechecking inside the markup. This is not my area of expertise, however, so I would welcome feedback on this proposal from people who are more familiar with the TypeScript compiler API and ecosystem.
+
 
 ### Custom elements
 
