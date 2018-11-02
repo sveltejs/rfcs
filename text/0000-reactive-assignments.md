@@ -607,9 +607,46 @@ peekaboo.show();
 An `export const` would be a signal to the compiler that a property is read-only — in other words, attempting to assign to it would cause an error.
 
 
-### Preload
+### `preload` and `setup`
 
-TODO
+There is a rather awkward mechanism for declaring static properties on a component constructor in Svelte 2 — the `setup` hook:
+
+```html
+<script>
+  export default {
+    setup(Component) {
+      Component.staticMethod = () => {...};
+    }
+  };
+</script>
+```
+
+This is deeply weird, and due to an oversight (that we can't correct without a breaking change) only runs on the client.
+
+Since Sapper requires that components have some way of declaring their data dependencies prior to rendering, and since `setup` is so cumbersome, there is a special case made for `preload`. The `preload` function is attached to components on both client and server, and has no well-defined behaviour; it is purely convention.
+
+We can do better, **but it requires something potentially controversial** — a second `<script>` block that, unlike the one we've been using so far, runs a single time rather than upon every instantiation. Let's call it (🐃) `scope="shared"`:
+
+```html
+<script scope="shared">
+  export function preload({ params }) {
+    return this.fetch(`data/${params.id}.json`).then(r => r.json()).then(things => {
+      return { things };
+    });
+  }
+</script>
+
+<script>
+  export let things;
+</script>
+
+{#each things as thing}
+  <p>{thing}</p>
+{/each}
+```
+
+`things` would be injected into the instance `<script>` block at the same time as props (i.e. between instantiation and first render).
+
 
 ### Server-side rendering
 
