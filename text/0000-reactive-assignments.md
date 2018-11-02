@@ -622,7 +622,70 @@ The `props` compiler option is redundant now that the contract is defined via `e
 
 ### Dependency tracking
 
-TODO
+In Svelte 2, 'computed properties' use compile-time dependency tracking to derive values from state, avoiding recomputation when dependencies haven't changed. These computed properties are 'push-based' rather than 'pull-based', which can result in unnecessary work:
+
+```html
+{#if visible}
+  <p>{bar}</p>
+{/if}
+
+<script>
+  export default {
+    data: () => ({
+      foo: 1,
+      visible: false
+    }),
+
+    computed: {
+      bar: ({ foo }) => expensivelyCalculateBar(foo)
+    }
+  };
+</script>
+```
+
+In the example above, there is no need to calculate `bar` since it is not rendered.
+
+Under this proposal, there is no longer a separate concept of computed properties. Instead, we can just use functions:
+
+```html
+<script>
+  export let foo = 1;
+  export let visible = false;
+
+  const bar = () => foo;
+</script>
+
+{#if visible}
+  <p>{bar()}</p>
+{/if}
+```
+
+Note that we now *invoke* `bar` in the markup. If `foo` were to change while `visible` were true, we would need to update the contents of `<p>`. That means we need to track the values that could affect the return value, resulting in compiled code similar to this:
+
+```js
+function update(changed, ctx) {
+  if (changed.foo) p.textContent = ctx.bar();
+}
+```
+
+In some situations dependency tracking may be impossible — I'm not sure. In those cases, we can simply bail out:
+
+```js
+function update(changed, ctx) {
+  p.textContent = ctx.bar();
+}
+```
+
+Note that this system is now pull-based rather than push-based. One drawback over the current system of computed properties is that values that are referenced multiple times will also be calculated multiple times:
+
+```html
+{#if visible}
+  <p>{bar()} — {bar()}</p>
+{/if}
+```
+
+Potentially, this could be alleviated with compiler magic (i.e. detecting multiple invocations of pure functions with the same arguments, and computing once before rendering) or userland memoization, but it warrants further exploration.
+
 
 ### Examples
 
