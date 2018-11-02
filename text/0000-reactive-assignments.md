@@ -453,6 +453,10 @@ Under this proposal, these options would be expressed by a new `<svelte:meta>` t
 <svelte:meta namespace="svg" tag="my-cool-thing">
 ```
 
+### Script-less components
+
+TODO
+
 
 ### Events
 
@@ -500,7 +504,63 @@ TODO
 
 ### Component API
 
-TODO
+Under this proposal, there is no longer a `this` with state and methods *inside* a component. But there needs to be a way to interact with the component from the outside world.
+
+Instantiating a top-level component probably needn't change (except 🐃 maybe changing `data` to `props`):
+
+```js
+import App from './App.html';
+
+const app = new App({
+  target: document.querySelector('body'),
+  props: {
+    name: 'world'
+  }
+});
+```
+
+Exported properties can be exposed as accessors:
+
+```js
+app.name; // world
+app.name = 'everybody'; triggers a (sync?) update
+```
+
+This creates consistent behaviour between Svelte components that are compiled to custom elements, and those that are not, while also making it easy to understand the component's contract.
+
+Of the five **built-in methods** that currently comprise the [component API](https://svelte.technology/guide#component-api) — `get`, `set`, `fire`, `on` and `destroy` — we no longer need the first three. `on` and `destroy` are still necessary.
+
+In some cases, a component that is designed to be used as a standalone widget will create its own **custom methods**. In Svelte 2, these are lumped in with 'private' (except not really) methods. Under this proposal, custom methods are just exported variables that happen to be functions:
+
+```html
+<script>
+  let visible;
+
+  export function show() {
+    visible = true;
+  }
+
+  export function hide() {
+    visible = false;
+  }
+</script>
+
+<div class="peekaboo">
+  {#if visible}
+    <p>now you see me</p>
+  {/if}
+</div>
+```
+
+```js
+import Peekaboo from './Peekaboo.html';
+
+const peekaboo = new Peekaboo(...);
+peekaboo.show();
+```
+
+An `export const` would be a signal to the compiler that a property is read-only — in other words, attempting to assign to it would cause an error.
+
 
 ### Preload
 
