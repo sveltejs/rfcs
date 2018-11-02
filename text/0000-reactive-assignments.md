@@ -712,7 +712,8 @@ Similarly, in terms of the public component API, it might be necessary for `cust
 
 ### Suspense
 
-TODO
+This proposal isn't directly concerned with [implementing Suspense](https://github.com/sveltejs/svelte/issues/1736), but care should be taken to ensure that Suspense can be implemented atop this proposal without breaking changes.
+
 
 ### TypeScript
 
