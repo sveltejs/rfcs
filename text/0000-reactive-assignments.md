@@ -428,14 +428,6 @@ const Component = defineComponent((__update, __props, __refs) => {
 The same would apply to component refs.
 
 
-### Store
-
-TODO
-
-### Spread props
-
-TODO
-
 ### namespace/tag options
 
 The default export from a Svelte 2 component can include compiler options — for example declaring a namespace (for SVG components) or a tag name (for custom elements):
@@ -666,6 +658,73 @@ It's not clear how this proposal affects standalone components (as opposed to th
 One consequence of the new way of doing things: Svelte no longer lives in `pkg.devDependencies`, but would instead need to become a `dependency`. Not very On Brand but probably a small price to pay.
 
 
+### Store
+
+A [store](https://svelte.technology/guide#state-management) can be attached to a component, and it will be passed down to all its children. This allows components to access (and manipulate) app-level data without needing to pass props around. Svelte 2 provides a convenient `$` syntax for referencing store properties:
+
+```html
+<h1>Hello {$name}!</h1>
+```
+
+Similarly, store methods can be invoked via event listeners:
+
+```html
+<button on:click="$set({ count: count + 1 })">increment</button>
+```
+
+The store can also be accessed programmatically:
+
+```js
+const { foo } = this.store.get();
+this.store.doSomething();
+```
+
+Since there is no longer a `this`, we need to reconsider this approach. At the same time, the `get`/`set`/`on`/`fire` interface (designed to mirror the component API) feels slightly anachronistic in light of the rest of this RFC. A major problem with the store in its current incarnation is its lack of typechecker-friendliness, and the undocumented hoops necessary to jump through to integrate with popular libraries like MobX.
+
+I'm not yet sure how the store fits into this proposal — this is perhaps the biggest unknown at this point.
+
+
+### Spread props
+
+It's convenient to be able to pass down props from a parent to a child component without knowing what they are. In Svelte 2 we can do this — it's hacky but it works:
+
+```html
+<!-- Lazy.html -->
+{#await loader() then mod}
+  <svelte:component this={mod.default} {...props}/>
+{/await}
+
+<script>
+  export default {
+    computed: {
+      props: ({ loader, ...props }) => props
+    }
+  };
+</script>
+```
+
+That opportunity no longer exists in this RFC. Instead we need some other way to express the concept of 'all the properties that were passed into this component'. The best I can come up with is an injected variable with a name like `__props__`:
+
+```html
+<script>
+  import Foo from './Foo.html';
+  import Bar from './Bar.html';
+
+  const subset = () => {
+    const { thingIDontWant, ...everythingElse } = __props__;
+    return everythingElse;
+  };
+</script>
+
+<Foo {...__props__}/>
+<Bar {...subset()}/>
+```
+
+This is inelegant, but I believe the inelegance would affect a small minority of components.
+
+> Since a component's public API ordinarily uses accessors to define the component's contract, it is likely that *inline* components would need to use a privileged non-public API, so that unanticipated props could be passed in. (This is something we should do anyway)
+
+
 ### Sync vs async rendering
 
 One of the things that differentiates Svelte from other frameworks is that updates are synchronous. In other words:
@@ -808,9 +867,12 @@ Potentially, this could be alleviated with compiler magic (i.e. detecting multip
 
 ### svelte-extras
 
+TODO
+
 
 ### Examples
 
+TODO
 
 
 ## How we teach this
