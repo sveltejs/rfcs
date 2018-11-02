@@ -668,7 +668,47 @@ One consequence of the new way of doing things: Svelte no longer lives in `pkg.d
 
 ### Sync vs async rendering
 
-TODO
+One of the things that differentiates Svelte from other frameworks is that updates are synchronous. In other words:
+
+```js
+app.set({ size: 'supersize' });
+console.log(app.refs.box.offsetWidth); // already updated
+```
+
+This is easily understood, and if there is an error during rendering it is easy to isolate the source of the problem since there is usually a short stack trace to the offending `set` call.
+
+But it also has major drawbacks. It can result in the cyclical behaviour observed above, and it provides the framework no opportunity to optimise updates by (for example) batching operations that are likely to result in DOM reads (such as transition or `onupdate` callbacks) separately from the framework-initiated cycle of DOM writes. It also prevents us from implementing ideas like [time slicing](https://reactjs.org/blog/2018/03/01/sneak-peek-beyond-react-16.html).
+
+In addition, while it's possible to batch changes *within a component* (`this.set({ a, b, c })` results in a single update), changes *across* components (or those that affect stores and components together) are not batched. Now that `set` is no longer available, it is important that variable reassignments don't result in a sync update, but rather schedule an update (for the next animation frame, for example).
+
+Exceptions to this rule could be made where appropriate. For example if you're tracking the height of a list...
+
+```html
+<script>
+  import { onupdate } from 'svelte';
+
+  export let items = [];
+  let list;
+  let listHeight = 0;
+
+  onupdate(() => {
+    listHeight = list.offsetHeight;
+  });
+</script>
+
+<p>the list is {listHeight}px tall:</p>
+
+<ul>
+  {#each items as item}
+    <li>{item}</li>
+  {/each}
+</ul>
+```
+
+...then you want the change to `listHeight` to be reflected in the view as soon as all the `onupdate` callbacks have fired, *not* after an animation frame (which would result in lag).
+
+Similarly, in terms of the public component API, it might be necessary for `customElement.foo = 1` to result in a synchronous update.
+
 
 ### Suspense
 
