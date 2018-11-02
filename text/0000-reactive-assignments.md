@@ -512,9 +512,40 @@ Listening to events is currently done like so:
 This effectively becomes `{() => this.doSomething()}`. The shorthand is nice, but it is slightly confusing (the context is implicit, and the right-hand side must be a CallExpression which limits flexibility, although there's an [issue for that](https://github.com/sveltejs/svelte/issues/1766)). In the new model, there are no longer any problems around `this`, so it probably makes sense to allow arbitrary expressions instead.
 
 
-### Component bindings
+### Bindings
 
-TODO
+Element bindings are a convenient shorthand, which I believe we should preserve:
+
+```html
+<input bind:value=name>
+
+<!-- equivalent (Svelte 2) -->
+<input value={name} on:input="set({ name: this.value })">
+
+<!-- equivalent (this proposal) -->
+<input value={name} on:input="{e => name = e.target.value}">
+```
+
+Component bindings are less clear-cut. In the past they've been a source of confusion for the same reason that the lifecycle hook dance causes confusion upon app initialisation. It's possible that the new lifecycle concepts will eliminate those headaches, but this requires further exploration.
+
+The reason we can *consider* removing component bindings is that it's now trivial to pass state-altering functions down to components:
+
+```html
+<script>
+  import Mousecatcher from './Mousecatcher.html';
+
+  let mouse;
+
+  function setPosition(x, y) {
+    mouse = { x, y };
+  }
+</script>
+
+<Mousecatcher {setPosition}>
+  the mouse is at {mouse.x},{mouse.y}
+</Mousecatcher>
+```
+
 
 ### Component API
 
@@ -687,9 +718,10 @@ Note that this system is now pull-based rather than push-based. One drawback ove
 Potentially, this could be alleviated with compiler magic (i.e. detecting multiple invocations of pure functions with the same arguments, and computing once before rendering) or userland memoization, but it warrants further exploration.
 
 
-### Examples
+### svelte-extras
 
-TODO (show how to do equivalent of now-missing things like computed properties)
+
+### Examples
 
 
 
