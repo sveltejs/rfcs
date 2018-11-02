@@ -650,7 +650,14 @@ We can do better, **but it requires something potentially controversial** — a 
 
 ### Server-side rendering
 
-TODO
+The compiler running with the `generate: 'ssr'` option produces completely different code from `generate: 'dom'`. This is because server-rendered components do not have a lifespan — they are rendered, then immediately discarded, so rather than having a concept of 'instances' an SSR component exports a function that given some data creates HTML and CSS.
+
+This does create some subtle behaviour differences however: there is no real place to do any kind of setup work, and `oncreate` (and the other lifecycle hooks) never run. Component bindings are also brittle.
+
+Under this proposal, the code inside the `<script>` block *would* run for server-rendered components, which also means that `ondestroy` would need to run. `onstate` and `onupdate` would be no-ops.
+
+I don't think the API needs to change.
+
 
 ### Standalone components
 
