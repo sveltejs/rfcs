@@ -295,15 +295,15 @@ export function use_interval(fn, ms) {
 
 > This might seem less ergonomic than React Hooks, whereby you can do `const time = useCustomHook()`. The payoff is that you don't need to run that code on every single state change.
 
-There are two other lifecycle functions required — (🐃) `onstate` and (🐃) `onupdate`:
+There are two other lifecycle functions required — (🐃) `onprops` (similar to `onstate` in Svelte v2) and (🐃) `onupdate`:
 
 ```html
 <script>
-  import { onstate, onupdate } from 'svelte';
+  import { onprops, onupdate } from 'svelte';
 
   export let foo;
 
-  onstate(() => {
+  onprops(() => {
     // this callback runs whenever props change
   });
 
@@ -340,17 +340,17 @@ Currently, `onstate` and `onupdate` run before and after every state change. Bec
 </script>
 ```
 
-Under this proposal, the `onstate` callback runs whenever props change but *not* when private state changes. This makes cycles impossible:
+Under this proposal, the `onprops` callback runs whenever props change but *not* when private state changes. This makes cycles impossible:
 
 ```html
 <script>
-  import { onstate } from 'svelte';
+  import { onprops } from 'svelte';
 
   export let temperature = 32;
   let getting = null;
   let previous_temperature;
 
-  onstate(() => {
+  onprops(() => {
     // this assignment will *not* result in the callback
     // firing again
     getting = temperature > previous_temperature
@@ -369,13 +369,13 @@ Any `onupdate` callbacks would run after the view was updated, whether as a resu
 As previously mentioned, `oncreate` is used in Svelte 2 to run code after the initial render has taken place. Strictly speaking it is redundant...
 
 ```js
-import { onstate, onupdate } from 'svelte';
+import { onprops, onupdate } from 'svelte';
 import { once } from 'lodash-es';
 
 export let externalProp;
 let internalProp = 'defined';
 
-onstate(once(() => {
+onprops(once(() => {
   // externalProp is now defined
 }));
 
@@ -384,7 +384,7 @@ onupdate(once(() => {
 }));
 ```
 
-...but we could decide (🐃) to include `oncreate` as a convenience anyway.
+...but we could decide (🐃) to include an `oncreate` equivalent as a convenience anyway. Currently, the favoured name for this function is `onmount`.
 
 
 ---
@@ -661,7 +661,7 @@ The compiler running with the `generate: 'ssr'` option produces completely diffe
 
 This does create some subtle behaviour differences however: there is no real place to do any kind of setup work, and `oncreate` (and the other lifecycle hooks) never run. Component bindings are also brittle.
 
-Under this proposal, the code inside the `<script>` block *would* run for server-rendered components, which also means that `ondestroy` would need to run. `onstate` and `onupdate` would be no-ops.
+Under this proposal, the code inside the `<script>` block *would* run for server-rendered components, which also means that `ondestroy` would need to run. `onprops` and `onupdate` would be no-ops.
 
 I don't think the API needs to change.
 
@@ -894,7 +894,7 @@ Happily, these will no longer involve monkey-patching components:
 
   let t;
 
-  onstate(() => {
+  onprops(() => {
     if (t) t.stop();
 
     t = tween(tweenedProgress, progress, {
