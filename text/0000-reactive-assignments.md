@@ -660,8 +660,6 @@ I don't think the API needs to change.
 
 It's not clear how this proposal affects standalone components (as opposed to those that use shared helpers). Perhaps it doesn't?
 
-One consequence of the new way of doing things: Svelte no longer lives in `pkg.devDependencies`, but would instead need to become a `dependency`. Not very On Brand but probably a small price to pay.
-
 
 ### Store
 
