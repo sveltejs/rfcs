@@ -89,7 +89,7 @@ There are legitimate technical and historical reasons for this design. And some 
 <script>
   import { capitalise } from './utils.js';
   let name = 'world';
-  let len = () => name.length;
+  const len = () => name.length;
 </script>
 
 <h1>Hello {capitalise(name)}!</h1>
