@@ -379,6 +379,11 @@ onupdate(once(() => {
 ...but we could decide (🐃) to include `oncreate` as a convenience anyway.
 
 
+---
+
+The remainder of this section will address how existing Svelte concepts are affected by this RFC. Some things (actions, transitions etc) are unmentioned because they are unaffected, though if items are missing please raise your voice.
+
+
 ### Refs
 
 Refs are references to DOM nodes:
