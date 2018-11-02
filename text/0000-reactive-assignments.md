@@ -615,7 +615,10 @@ Editor integrations would ideally offer autocompletion and as-you-type typecheck
 
 ### Custom elements
 
-TODO
+Svelte would continue to offer a custom element compile target. No real changes would be involved here, since this proposal brings 'vanilla' Svelte components in line with web components viz. property access and event handling.
+
+The `props` compiler option is redundant now that the contract is defined via `export`ed variables. The `tag` option can be set via `<svelte:meta>` as discussed above.
+
 
 ### Dependency tracking
 
