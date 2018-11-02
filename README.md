@@ -11,7 +11,7 @@ The is inspired by (which is to say shamelessly ripped off from) the RFC process
 
 * Fork the RFC repo http://github.com/sveltejs/rfcs
 * Copy 0000-template.md to text/0000-my-feature.md (where 'my-feature' is descriptive. Don't assign an RFC number yet).
-Fill in the RFC. Put care into the details: RFCs that do not present convincing motivation, demonstrate understanding of the impact of the design, or are * disingenuous about the drawbacks or alternatives tend to be poorly-received.
+Fill in the RFC. Put care into the details: **RFCs that do not present convincing motivation, demonstrate understanding of the impact of the design, or are disingenuous about the drawbacks or alternatives tend to be poorly-received.**
 * Submit a pull request. As a pull request the RFC will receive design feedback from the larger community, and the author should be prepared to revise it in response.
 * Build consensus and integrate feedback. RFCs that have broad support are much more likely to make progress than those that don't receive any comments.
 * Eventually, the team will decide whether the RFC is a candidate for inclusion in Svelte.
