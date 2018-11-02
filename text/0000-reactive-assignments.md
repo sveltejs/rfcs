@@ -899,6 +899,8 @@ Happily, these will no longer involve monkey-patching components:
 
 ### Examples
 
+The 'imagined' components are REPL links, but they do not work in the REPL (obviously) — they're just there so it's easy to see the before/after side-by-side.
+
 * markdown editor [current](https://svelte.technology/repl?version=2.15.0&demo=binding-textarea) / [imagined](https://svelte.technology/repl?version=2.15.0&gist=a0443aa0fc68947b5fad8fae1aa63627)
 * media elements [current](https://svelte.technology/repl?version=2.15.0&demo=binding-media-elements) / [imagined](https://svelte.technology/repl?version=2.15.0&gist=8562a70e1a1e708b735b7a50e80b3cfe)
 * nested components [current](https://svelte.technology/repl?version=2.15.0&demo=nested-components) / [imagined](https://svelte.technology/repl?version=2.15.0&gist=cbad006c2197633ac75fc8f31c3670df)
@@ -910,32 +912,30 @@ Happily, these will no longer involve monkey-patching components:
 
 ## How we teach this
 
-> What names and terminology work best for these concepts and why? How is this
-idea best presented? As a continuation of existing Svelte patterns, or as a
-wholly new one?
+The success of this idea hinges on whether we can explain how **reactive assignments** work to developers who aren't compiler nerds. That means lots of examples that emphasise showing the compiled output, so that developers can understand what is happening to their code even if they don't need to care about it day-to-day.
 
-> Would the acceptance of this proposal mean the Svelte guides must be
-re-organized or altered? Does it change how Svelte is taught to new users
-at any level?
+It is also essential to have plentiful examples showing how existing Svelte patterns can be implemented in this new world.
 
-> How should this feature be introduced and taught to existing Svelte
-users?
 
 ## Drawbacks
 
-> Why should we *not* do this? Please consider the impact on teaching Svelte,
-on the integration of this feature with other existing and planned features,
-on the impact of the API churn on existing apps, etc.
+Obviously, this is a breaking change. We're not the React team; we don't have the resources to support two separate paradigms.
 
-> There are tradeoffs to choosing any path, please attempt to identify them here.
+It also introduces some frankly somewhat surprising behaviour. Having spent much of the week thinking about it, and toying with existing components, I do earnestly believe that this approach feels natural once you're over the initial shock, but not everyone is guaranteed to feel that way.
+
+The loss of computed properties as a distinct primitive will be felt by some Svelte users. It's no longer as convenient to use a value that is derived from other derived values, particularly if that value is a function.
+
+Overall though, this solves so many inter-related problems with Svelte that I believe the benefits to be overwhelming.
+
 
 ## Alternatives
 
-> What other designs have been considered? What is the impact of not doing this?
+We toyed with a few alternative concepts:
 
-> This section could also include prior art, that is, how other frameworks in the same domain have solved this problem.
+* Not doing anything, and attempting to fix the niggly edge cases within the current paradigm
+* Adopting something akin to React Hooks. This was met with a negative reaction from the community. Despite some minor ergonomic advantages in certain cases, the downsides of Hooks (the 'rules', the reliance on repeatedly calling user code, etc) were considered greater than the advantages
+* Pursuing a purer vision of reactive programming, akin to [that described by Paul Stovell](http://paulstovell.com/blog/reactive-programming). This would arguably make code more difficult to reason about, not less, and would likely introduce difficult syntactical requirements
 
 ## Unresolved questions
 
-> Optional, but suggested for first drafts. What parts of the design are still
-TBD?
+The major TODOs centre around `Store` and spread properties.
