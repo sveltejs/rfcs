@@ -506,6 +506,8 @@ This would create a `CustomEvent` with an `event.type` of `tick` (or `tock`) and
 
 > 🐃 We could match the arguments to `new CustomEvent(name, opts)` instead — where `detail` is one of the options passed to the constructor alongside things like `bubbles` and `cancelable`
 
+> Note that `new CustomEvent` is unsupported in IE; legacy mode would need to use `document.createEvent('whatever')` instead
+
 As with lifecycle functions, the `dispatch` is bound to the component because of when `createEventDispatcher` is called.
 
 Listening to events is currently done like so:
