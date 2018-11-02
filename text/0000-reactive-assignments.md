@@ -381,7 +381,52 @@ onupdate(once(() => {
 
 ### Refs
 
-TODO (including component refs)
+Refs are references to DOM nodes:
+
+```html
+<canvas ref:canvas {width} {height}></canvas>
+```
+
+In Svelte 2, that element could be accessed (from `oncreate` onwards) as `this.refs.canvas`. Under this proposal, refs are simple variables:
+
+```html
+<script>
+  import { onupdate } from 'svelte';
+
+  let canvas;
+  let ctx;
+
+  onupdate(() => {
+    if (!ctx) ctx = canvas.getContext('2d');
+    draw_some_shapes(ctx);
+  });
+</script>
+```
+
+This could compile to something like the following:
+
+```js
+import { onupdate } from 'svelte';
+
+const Component = defineComponent((__update, __props, __refs) => {
+  let canvas;
+  let ctx;
+
+  onupdate(() => {
+    if (!ctx) ctx = canvas.getContext('2d');
+    draw_some_shapes(ctx);
+  });
+
+  __refs(refs => {
+    canvas = refs.canvas;
+  });
+
+  return () => {};
+}, create_main_fragment);
+```
+
+The same would apply to component refs.
+
 
 ### Store
 
@@ -393,7 +438,21 @@ TODO
 
 ### namespace/tag options
 
-TODO
+The default export from a Svelte 2 component can include compiler options — for example declaring a namespace (for SVG components) or a tag name (for custom elements):
+
+```js
+export default {
+  namespace: 'svg',
+  tag: 'my-cool-thing
+};
+```
+
+Under this proposal, these options would be expressed by a new `<svelte:meta>` tag:
+
+```html
+<svelte:meta namespace="svg" tag="my-cool-thing">
+```
+
 
 ### Events
 
