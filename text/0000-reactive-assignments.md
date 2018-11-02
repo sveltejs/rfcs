@@ -219,7 +219,7 @@ const Component = defineComponent((__update, __props) => {
   });
 
   // this creates the top-level `ctx` variable for `create_main_fragment`
-  return () => { name };
+  return () => ({ name });
 }, create_main_fragment);
 ```
 
