@@ -456,7 +456,43 @@ Under this proposal, these options would be expressed by a new `<svelte:meta>` t
 
 ### Events
 
-TODO
+Svelte 2 components can fire events with `this.fire(eventName, optionalData)`. These events can be listened to programmatically, with `component.on(eventName, callback)`, or declaratively in component markup:
+
+```html
+<Widget on:flubber="doSomething()">
+```
+
+Since there's no more `this`, there's no more `this.fire`, which means we need to rethink events. This gives us an opportunity to align with web components, where `CustomEvent` is used ([issue here](https://github.com/sveltejs/svelte/issues/1655)) — this also gives us event bubbling, which avoids needing to manually propagate events.
+
+The high-level proposal is to introduce a function called `createEventDispatcher` (🐃) that would return a function for dispatching events:
+
+```js
+import { createEventDispatcher } from 'svelte';
+
+const dispatch = createEventDispatcher();
+
+let i = 0;
+const interval = setInterval(() => {
+  dispatch(i++ % 2 ? 'tick' : 'tock', {
+    answer: 42
+  });
+}, 1000);
+```
+
+This would create a `CustomEvent` with an `event.type` of `tick` (or `tock`) and an `event.detail` of `{ answer: 42 }`.
+
+> 🐃 We could match the arguments to `new CustomEvent(name, opts)` instead — where `detail` is one of the options passed to the constructor alongside things like `bubbles` and `cancelable`
+
+As with lifecycle functions, the `dispatch` is bound to the component because of when `createEventDispatcher` is called.
+
+Listening to events is currently done like so:
+
+```html
+<button on:click="doSomething()">click me</button>
+```
+
+This effectively becomes `{() => this.doSomething()}`. The shorthand is nice, but it is slightly confusing (the context is implicit, and the right-hand side must be a CallExpression which limits flexibility, although there's an [issue for that](https://github.com/sveltejs/svelte/issues/1766)). In the new model, there are no longer any problems around `this`, so it probably makes sense to allow arbitrary expressions instead.
+
 
 ### Component bindings
 
