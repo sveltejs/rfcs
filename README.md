@@ -15,9 +15,9 @@ Fill in the RFC. Put care into the details: **RFCs that do not present convincin
 * Submit a pull request. As a pull request the RFC will receive design feedback from the larger community, and the author should be prepared to revise it in response.
 * Build consensus and integrate feedback. RFCs that have broad support are much more likely to make progress than those that don't receive any comments.
 * Eventually, the team will decide whether the RFC is a candidate for inclusion in Svelte.
-RFCs that are candidates for inclusion in Svelte will enter a "final comment period" lasting 3 calendar days. The beginning of this period will be signaled with a * comment and tag on the RFCs pull request.
+RFCs that are candidates for inclusion in Svelte will enter a "final comment period" lasting 3 calendar days. The beginning of this period will be signaled with a comment and tag on the RFCs pull request.
 * An RFC can be modified based upon feedback from the team and community. Significant modifications may trigger a new final comment period.
-An RFC may be rejected by the team after public discussion has settled and comments have been made summarizing the rationale for rejection. A member of the team * should then close the RFCs associated pull request.
+An RFC may be rejected by the team after public discussion has settled and comments have been made summarizing the rationale for rejection. A member of the team should then close the RFCs associated pull request.
 * An RFC may be accepted at the close of its final comment period. A team member will merge the RFCs associated pull request, at which point the RFC will become 'active'.
 
 
