@@ -197,7 +197,7 @@ const Component = defineComponent((__update) => {
 
 Many frameworks (and also web components) have a conceptual distinction between 'props' (values passed *to* a component) and 'state' (values that are internal to the component). Svelte does not. This is a shortcoming.
 
-The proposed solution is to use the `export` keyword to declare a value that can be set from outside as a prop:
+There is a solution to this problem, but brace yourself — this may feel a little weird at first:
 
 ```html
 <script>
@@ -205,6 +205,12 @@ The proposed solution is to use the `export` keyword to declare a value that can
 </script>
 
 <h1>Hello {name}!</h1>
+```
+
+Here, we are exporting a *contract* with the outside world — we are saying that a consumer of this component can specify a value for `name`, but that it will default to `world`:
+
+```html
+<Hello name="everybody"/>
 ```
 
 This would compile to something like the following:
@@ -224,6 +230,8 @@ const Component = defineComponent((__update, __props) => {
 ```
 
 **This is an abuse of syntax**, but no worse than Svelte's existing crime of abusing `export default`. As long as it is well-communicated, it is easy to understand. Using existing syntax, rather than inventing our own, allows us to take full advantage of existing tooling and editor support.
+
+> Ordinarily in JavaScript, `export` means that other consumers of this module can read the value. In a sense, that's true (as we'll learn in the [Component API](#component-api) section), but here it also allows the consumer of this module to *write* the value. That's why we say that we're exporting a *contract* rather than a *value*.
 
 To summarise, there are **3 simple rules** for understanding the code in a Svelte component's `<script>` block:
 
