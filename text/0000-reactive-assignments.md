@@ -38,9 +38,11 @@ Declaring methods is also somewhat cumbersome, and in many editor configurations
 <script>
   export default {
     methods: {
-      // In VSCode, this causes "Property 'get'
-      // does not exist on type {...}
-      const { foo } = this.get();
+      doSomething() {
+        // In VSCode, this causes "Property 'get'
+        // does not exist on type {...}
+        const { foo } = this.get();
+      }
     }
   }
 </script>
