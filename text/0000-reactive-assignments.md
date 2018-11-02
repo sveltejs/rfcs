@@ -236,7 +236,9 @@ To summarise, there are **3 simple rules** for understanding the code in a Svelt
 
 Many components need to respond to *lifecycle events*. These are currently expressed in Svelte via four [lifecycle hooks](https://svelte.technology/guide#lifecycle-hooks) — `onstate`, `oncreate`, `onupdate` and `ondestroy`.
 
-The `oncreate` hook is redundant, since the `<script>` code runs once per instantiation. That code could include setup work that needs to be undone when the component is removed. For that, we import the (🐃) `ondestroy` lifecycle function (no longer called 'hooks', to avoid confusion with React Hooks which have a fundamentally different mechanism):
+The `oncreate` hook runs *after* the initial render, meaning there is no way (in Svelte 2) to run setup code immediately upon instantiation — something this proposal solves. There is still a use for it, as we'll see, but in many cases `oncreate` will be unnecessary.
+
+That setup code could include work that needs to be undone when the component is removed. For that, we import the (🐃) `ondestroy` lifecycle function (no longer called 'hooks', to avoid confusion with React Hooks which have a fundamentally different mechanism):
 
 ```html
 <script>
@@ -356,15 +358,25 @@ Under this proposal, the `onstate` callback runs whenever props change but *not*
 
 Any `onupdate` callbacks would run after the view was updated, whether as a result of prop or state changes. Assignments in an `onupdate` callback would result in a synchronous re-render but would *not* cause the callback to run again. This would allow components to respond to layout changes, for example.
 
-A special `onupdate` case is that you often need to do work a single time once the component is mounted. This could be done in userland...
+As previously mentioned, `oncreate` is used in Svelte 2 to run code after the initial render has taken place. Strictly speaking it is redundant...
 
 ```js
+import { onstate, onupdate } from 'svelte';
+import { once } from 'lodash-es';
+
+export let externalProp;
+let internalProp = 'defined';
+
+onstate(once(() => {
+  // externalProp is now defined
+}));
+
 onupdate(once(() => {
-  doInitialSetup();
+  // initial render has taken place
 }));
 ```
 
-...but it may turn out to be better to have a dedicated function for that.
+...but we could decide (🐃) to include `oncreate` as a convenience anyway.
 
 
 ### Refs
