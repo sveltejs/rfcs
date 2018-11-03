@@ -718,24 +718,26 @@ It's convenient to be able to pass down props from a parent to a child component
 </script>
 ```
 
-That opportunity no longer exists in this RFC. Instead we need some other way to express the concept of 'all the properties that were passed into this component'. The best I can come up with is an injected variable with a name like `__props__`:
+That opportunity no longer exists in this RFC. Instead we need some other way to express the concept of 'all the properties that were passed into this component'. One suggestion is to use the `bind` directive on (🐃) the `<svelte:meta>` element described above:
 
 ```html
+<svelte:meta bind:props/>
+
 <script>
   import Foo from './Foo.html';
   import Bar from './Bar.html';
 
+  let props;
+
   const subset = () => {
-    const { thingIDontWant, ...everythingElse } = __props__;
+    const { thingIDontWant, ...everythingElse } = props;
     return everythingElse;
   };
 </script>
 
-<Foo {...__props__}/>
+<Foo {...props}/>
 <Bar {...subset()}/>
 ```
-
-This is inelegant, but I believe the inelegance would affect a small minority of components.
 
 > Since a component's public API ordinarily uses accessors to define the component's contract, it is likely that *inline* components would need to use a privileged non-public API, so that unanticipated props could be passed in. (This is something we should do anyway)
 
