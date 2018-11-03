@@ -8,8 +8,6 @@
 
 This RFC proposes a radically new component design that solves the biggest problems with Svelte in its current incarnation, resulting in smaller apps and less code to write. It does so by leveraging Svelte's unique position as a compiler to solve the problem of *reactivity* at the language level.
 
-**This RFC is a work-in-progress, and some pieces are missing!**
-
 ## Motivation
 
 Many developers report being intrigued by Svelte, but unwilling to accommodate some of the quirks of its design. For example, using features like nested components or transitions requires that you *register* them, involving unfortunate boilerplate:
