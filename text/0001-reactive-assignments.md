@@ -773,7 +773,7 @@ Exceptions to this rule could be made where appropriate. For example if you're t
 
 <p>the list is {listHeight}px tall:</p>
 
-<ul>
+<ul ref:list>
   {#each items as item}
     <li>{item}</li>
   {/each}
