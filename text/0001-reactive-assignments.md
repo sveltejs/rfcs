@@ -954,4 +954,4 @@ We toyed with a few alternative concepts:
 
 ## Unresolved questions
 
-The major TODOs centre around `Store` and spread properties.
+The major TODO is how `Store` should evolve in this new world.
