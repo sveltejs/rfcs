@@ -151,7 +151,7 @@ button.addEventListener('click', () => {
 });
 ```
 
-`__update` is a framework-provided function that causes the view to update, with knowledge of which values have changed. The implementation of `__update` is unimportant for now, other than to note that it schedules an update **asynchronously** in contrast to Svelte's current model, for reasons to be discussed later.
+`__update` is a framework-provided function that causes the view to update, with knowledge of which values have changed. The implementation of `__update` is unimportant for now, other than to note that it schedules an update **asynchronously** in contrast to Svelte's current model, for reasons to be [discussed later](#sync-vs-async-rendering).
 
 This code transformation also applies to assignments inside the `<script>` block. This component...
 
