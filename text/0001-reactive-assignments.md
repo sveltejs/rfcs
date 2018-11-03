@@ -368,7 +368,7 @@ Under this proposal, the `onprops` callback runs whenever props change but *not*
 
 > Note that `previous_temperature`, if unused in the view, will not get the reactive treatment.
 
-Any `onupdate` callbacks would run after the view was updated, whether as a result of prop or state changes. Assignments in an `onupdate` callback would result in a synchronous re-render but would *not* cause the callback to run again. This would allow components to respond to layout changes, for example.
+Any `onupdate` callbacks would run after the view was updated, whether as a result of prop or state changes. Assignments in an `onupdate` callback would result in an immediate re-render (once all `onupdate` callbacks have run, instead of on the next frame) but would *not* cause the callback to run again. This would allow components to respond to layout changes, for example.
 
 As previously mentioned, `oncreate` is used in Svelte 2 to run code after the initial render has taken place. Strictly speaking it is redundant...
 
