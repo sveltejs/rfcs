@@ -191,6 +191,15 @@ const Component = defineComponent((__update) => {
 **This behaviour might seem surprising, even shocking at first.** Variable assignment does not have side-effects in JavaScript, meaning that this is arguably something else — [SvelteScript](https://mobile.twitter.com/youyuxi/status/1057291776724271104), perhaps. In practice though, developers readily embrace 'magic' that makes their day-to-day lives easier as long as the mechanisms are ultimately easy to understand — something observed with React Hooks, Vue's reactivity system, Immer's approach to immutable data, and countless other examples. This does underscore the need for this code transformation to be well-documented and explained, however.
 
 
+### Mutating objects and arrays
+
+While it's good practice to use immutable data in components, Svelte should not force developers to do so. Assigning to a property of an object or array would have the same basic behaviour — `a.b = c` would trigger an update on `a`. It's possible that changes could be tracked at a more granular level (i.e. tracking `a.b` rather than `a`, so that `<p>{a.d}</p>` is unaffected), but these are implementation details beyond the scope of this RFC.
+
+Calling array methods would *not* trigger updates on those arrays.
+
+> `x = x` can be used to 'force' an update on `x`, in the rare cases it is necessary
+
+
 ### Props
 
 Many frameworks (and also web components) have a conceptual distinction between 'props' (values passed *to* a component) and 'state' (values that are internal to the component). Svelte does not. This is a shortcoming.
