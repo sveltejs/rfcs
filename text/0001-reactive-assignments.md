@@ -636,7 +636,7 @@ There is a rather awkward mechanism for declaring static properties on a compone
 
 This is deeply weird, and due to an oversight (that we can't correct without a breaking change) only runs on the client.
 
-Since Sapper requires that components have some way of declaring their data dependencies prior to rendering, and since `setup` is so cumbersome, there is a special case made for `preload`. The `preload` function is attached to components on both client and server, and has no well-defined behaviour; it is purely convention.
+Since [Sapper](https://sapper.svelte.technology/) requires that components have some way of declaring their data dependencies prior to rendering, and since `setup` is so cumbersome, there is a special case made for `preload`. The `preload` function is attached to components on both client and server, and has no well-defined behaviour; it is purely convention.
 
 We can do better, **but it requires something potentially controversial** — a second `<script>` block that, unlike the one we've been using so far, runs a single time rather than upon every instantiation. Let's call it (🐃) `scope="shared"`:
 
