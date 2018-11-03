@@ -38,7 +38,7 @@ Declaring methods is also somewhat cumbersome, and in many editor configurations
     methods: {
       doSomething() {
         // In VSCode, this causes "Property 'get'
-        // does not exist on type {...}
+        // does not exist on type {...}"
         const { foo } = this.get();
       }
     }
