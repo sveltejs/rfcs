@@ -119,7 +119,7 @@ This proposal outlines a novel (as far as we're aware) solution, while bringing 
 * Simpler, more robust lifecycles
 * A realistic path towards first-class TypeScript support
 * Well-defined contracts between components and their consumers
-* Opportunities to adopt ideas like Suspense
+* Opportunities to adopt ideas like [time slicing and Suspense](https://auth0.com/blog/time-slice-suspense-react16/)
 
 
 ## Detailed design
