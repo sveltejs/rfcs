@@ -837,7 +837,7 @@ In Svelte 2, 'computed properties' use compile-time dependency tracking to deriv
 </script>
 ```
 
-In the example above, there is no need to calculate `bar` since it is not rendered.
+In the example above, there is no real need to calculate `bar` since it is not rendered, but it happens anyway.
 
 Under this proposal, there is no longer a separate concept of computed properties. Instead, we can just use functions:
 
