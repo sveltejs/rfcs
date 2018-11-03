@@ -579,7 +579,7 @@ Exported properties can be exposed as accessors:
 
 ```js
 app.name; // world
-app.name = 'everybody'; triggers a (sync?) update
+app.name = 'everybody'; // triggers a (sync?) update
 ```
 
 This creates consistent behaviour between Svelte components that are compiled to custom elements, and those that are not, while also making it easy to understand the component's contract.
