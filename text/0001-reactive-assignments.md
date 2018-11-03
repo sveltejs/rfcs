@@ -1,5 +1,5 @@
 - Start Date: 2018-11-01
-- RFC PR: https://github.com/sveltejs/rfcs/pull/1
+- RFC PR: https://github.com/sveltejs/rfcs/pull/4
 - Svelte Issue: https://github.com/sveltejs/svelte/issues/1826
 
 # Reactive assignments
