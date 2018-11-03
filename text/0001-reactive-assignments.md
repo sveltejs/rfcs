@@ -136,7 +136,7 @@ Consider a counter component, the workhorse of examples such as these:
 </button>
 ```
 
-> 🐃 For familiarity, we use the current event listener syntax. It may be preferable to use `{() => count += 1}` — a large part of the reason we avoid that currently is because `this` makes it tricky, which is no longer an issue.
+> 🐃 For familiarity, we use the current event listener syntax. It may be preferable to use `{() => count += 1}` — a large part of the reason we avoid that currently is because `this` makes it tricky, which is no longer an issue. [See later discussion](#events)
 
 > (The 🐃 emoji used throughout this document indicates a yak that needs shaving.)
 
