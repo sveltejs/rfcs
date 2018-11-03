@@ -672,11 +672,6 @@ Under this proposal, the code inside the `<script>` block *would* run for server
 I don't think the API needs to change.
 
 
-### Standalone components
-
-It's not clear how this proposal affects standalone components (as opposed to those that use shared helpers). Perhaps it doesn't?
-
-
 ### Store
 
 A [store](https://svelte.technology/guide#state-management) can be attached to a component, and it will be passed down to all its children. This allows components to access (and manipulate) app-level data without needing to pass props around. Svelte 2 provides a convenient `$` syntax for referencing store properties:
