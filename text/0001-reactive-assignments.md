@@ -24,7 +24,7 @@ Many developers report being intrigued by Svelte, but unwilling to accommodate s
   export default {
     components: { Nested },
     transitions: { fade }
-  }
+  };
 </script>
 ```
 
@@ -42,7 +42,7 @@ Declaring methods is also somewhat cumbersome, and in many editor configurations
         const { foo } = this.get();
       }
     }
-  }
+  };
 </script>
 ```
 
