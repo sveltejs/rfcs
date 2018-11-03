@@ -269,19 +269,6 @@ That setup code could include work that needs to be undone when the component is
 
 The `ondestroy` callback is associated with the component instance because it is called during instantiation; no compiler magic is involved. Beyond that (if it is called outside instantiation, an error is thrown), there are no rules or restrictions as to when a lifecycle function is called. Reusability is therefore straightforward:
 
-```html
-<script>
-  import { use_interval, format_time } from './helpers.js';
-
-  let time;
-  use_interval(() => {
-    time = new Date();
-  }, 1000);
-</script>
-
-<p>The time is {format_time(time)}</p>
-```
-
 ```js
 // helpers.js
 import { ondestroy } from 'svelte';
@@ -293,7 +280,18 @@ export function use_interval(fn, ms) {
 }
 ```
 
-> This might seem less ergonomic than React Hooks, whereby you can do `const time = useCustomHook()`. The payoff is that you don't need to run that code on every single state change.
+```html
+<script>
+  import { use_interval, format_time } from './helpers.js';
+
+  let time;
+  use_interval(() => time = new Date(), 1000);
+</script>
+
+<p>The time is {format_time(time)}</p>
+```
+
+> This might seem less ergonomic than React Hooks, whereby you can do `const time = useCustomHook()`. The payoff is that you don't need to run that code on every single state change, and it's easier to see which values in a component are subject to change.
 
 There are two other lifecycle functions required — (🐃) `onprops` (similar to `onstate` in Svelte v2) and (🐃) `onupdate`:
 
