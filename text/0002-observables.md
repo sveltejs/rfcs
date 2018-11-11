@@ -41,7 +41,7 @@ Essentially, the shift is from a single observable store of values to multiple o
 export default new Store({
   user: {
     firstname: 'Fozzie',
-    lastname: 'Bear
+    lastname: 'Bear'
   },
   volume: 0.5
 });
@@ -52,7 +52,7 @@ export default new Store({
 ```js
 export const user = observable({
   firstname: 'Fozzie',
-  lastname: 'Bear
+  lastname: 'Bear'
 });
 
 export const volume = observable(0.5);
