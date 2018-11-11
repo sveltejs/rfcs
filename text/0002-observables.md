@@ -1,5 +1,5 @@
 - Start Date: 2018-11-10
-- RFC PR: (leave this empty)
+- RFC PR: [#5](https://github.com/sveltejs/rfcs/pull/5)
 - Svelte Issue: (leave this empty)
 
 # Svelte observables
