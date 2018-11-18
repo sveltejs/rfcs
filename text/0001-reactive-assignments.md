@@ -131,14 +131,12 @@ Consider a counter component, the workhorse of examples such as these:
   let count = 0;
 </script>
 
-<button on:click="count += 1">
+<button on:click="{() => count += 1}">
   clicks: {count}
 </button>
 ```
 
-> 🐃 For familiarity, we use the current event listener syntax. It may be preferable to use `{() => count += 1}` — a large part of the reason we avoid that currently is because `this` makes it tricky, which is no longer an issue. [See later discussion](#events)
-
-> (The 🐃 emoji used throughout this document indicates a yak that needs shaving.)
+> The quotes around the event handler are unnecessary as far as Svelte is concerned, but included for the sake of non-Svelte-aware syntax highlighting
 
 Here, we have declared a single state variable, `count`, with an initial value of `0`. The code inside the `<script>` block runs **once per component instance, when the instance is created**.
 
@@ -147,7 +145,7 @@ When clicking the button, the text inside the button should update to reflect th
 ```js
 button.addEventListener('click', () => {
   count += 1;
-  __update({ count: true });
+  __update('count');
 });
 ```
 
@@ -163,7 +161,7 @@ This code transformation also applies to assignments inside the `<script>` block
   };
 </script>
 
-<button on:click="incr()">
+<button on:click={incr}>
   clicks: {count}
 </button>
 ```
@@ -183,8 +181,10 @@ const Component = defineComponent((__update) => {
     __update({ count: true });
   };
 
-  // this creates the top-level `ctx` variable for `create_main_fragment`
-  return () => ({ count });
+  return [
+    // this creates the top-level `ctx` variable for `create_main_fragment`
+    () => ({ count })
+  ];
 }, create_main_fragment);
 ```
 
@@ -223,15 +223,15 @@ Here, we are exporting a *contract* with the outside world — we are saying tha
 This would compile to something like the following:
 
 ```js
-const Component = defineComponent((__update, __props) => {
+const Component = defineComponent((__update) => {
   let name = 'world';
 
-  __props((changed, values) => {
-    name = values.name;
-    __update(changed);
-  });
-
-  return () => ({ name });
+  return [
+    () => ({ name }),
+    props => {
+      if ('name' in props) name = props.name;
+    }
+  ];
 }, create_main_fragment);
 ```
 
@@ -251,6 +251,8 @@ To summarise, there are **3 simple rules** for understanding the code in a Svelt
 Many components need to respond to *lifecycle events*. These are currently expressed in Svelte via four [lifecycle hooks](https://svelte.technology/guide#lifecycle-hooks) — `onstate`, `oncreate`, `onupdate` and `ondestroy`.
 
 The `oncreate` hook runs *after* the initial render, meaning there is no way (in Svelte 2) to run setup code immediately upon instantiation — something this proposal solves. There is still a use for it, as we'll see, but in many cases `oncreate` will be unnecessary.
+
+> (The 🐃 emoji used throughout this document indicates a yak that needs shaving.)
 
 That setup code could include work that needs to be undone when the component is removed. For that, we import the (🐃) `ondestroy` lifecycle function (no longer called 'hooks', to avoid confusion with React Hooks which have a fundamentally different mechanism):
 
@@ -297,7 +299,7 @@ export function use_interval(fn, ms) {
 <p>The time is {format_time(time)}</p>
 ```
 
-> This might seem less ergonomic than React Hooks, whereby you can do `const time = useCustomHook()`. The payoff is that you don't need to run that code on every single state change, and it's easier to see which values in a component are subject to change.
+> This might seem less ergonomic than React Hooks, whereby you can do `const time = useCustomHook()`. The payoff is that you don't need to run that code on every single state change, and it's easier to see which values in a component are subject to change, and *when* a specific value is changing.
 
 There are two other lifecycle functions required — (🐃) `onprops` (similar to `onstate` in Svelte v2) and (🐃) `onupdate`:
 
@@ -393,15 +395,39 @@ onupdate(once(() => {
 
 ---
 
-The remainder of this section will address how existing Svelte concepts are affected by this RFC. Some things (actions, transitions etc) are unmentioned because they are unaffected, though if items are missing please raise your voice.
+The remainder of this section will address how existing Svelte concepts are affected by this RFC. Some things (CSS etc) are unmentioned because they are unaffected, though if items are missing please raise your voice.
 
 
-### Refs
+### Directives
 
-Refs are references to DOM nodes:
+In Svelte 2 there are six different kinds of directive:
+
+* `on:[event]` and `on:[event]=[callExpression]`
+* `use:[action]` and `use:[action]=[argument]`
+* `ref:[name]`
+* `in:[transition]`, `out:[transition]` and `transition:[transition]`, and `in:[transition]=[params]` etc
+* `bind:[name]` and `bind:remote=[local]`
+* `class:[name]` and `class:[name]=[expression]`
+
+Currently, directive values do not have curly braces as delimiters. This is an occasional source of confusion (and compiler complexity) that can be resolved by making directives more like attributes:
 
 ```html
-<canvas ref:canvas {width} {height}></canvas>
+<!-- current -->
+<div class:foo="a ? b : c">...</div>
+
+<!-- proposed -->
+<div class:foo="{a ? b : c}">...</div>
+```
+
+Even though this is two extra characters (because we care about syntax highlighting in non-Svelte-aware environments) it's arguably more readable and consistent. This pattern would be used across all directives, but there are particular changes that apply to `ref:` and on:`, discussed below.
+
+
+#### `ref:`
+
+The `ref:` directive is anomalous in that it cannot have a value. This relates to a very common feature request — to be able to set refs inside `each` blocks. We can fix both things — and reduce API surface area — by replacing `ref:x` with `bind:this={x}`:
+
+```html
+<canvas bind:this={canvas} {width} {height}></canvas>
 ```
 
 In Svelte 2, that element could be accessed (from `oncreate` onwards) as `this.refs.canvas`. Under this proposal, refs are simple variables:
@@ -410,6 +436,8 @@ In Svelte 2, that element could be accessed (from `oncreate` onwards) as `this.r
 <script>
   import { onupdate } from 'svelte';
 
+  export let width;
+  export let height;
   let canvas;
   let ctx;
 
@@ -420,12 +448,16 @@ In Svelte 2, that element could be accessed (from `oncreate` onwards) as `this.r
 </script>
 ```
 
-This could compile to something like the following:
+(Since a binding can have any [l-value](https://en.wikipedia.org/wiki/Value_(computer_science)#lrvalue), we can also do `bind:this={array[index]}` inside `each` blocks.)
+
+The example above could compile to something like the following:
 
 ```js
 import { onupdate } from 'svelte';
 
-const Component = defineComponent((__update, __props, __refs) => {
+const Component = defineComponent((__update) => {
+  let width;
+  let height;
   let canvas;
   let ctx;
 
@@ -434,15 +466,81 @@ const Component = defineComponent((__update, __props, __refs) => {
     draw_some_shapes(ctx);
   });
 
-  __refs(refs => {
-    canvas = refs.canvas;
-  });
-
-  return () => {};
+  return [
+    () => ({ width, height }),
+    props => {
+      if ('width' in props) width = props.width;
+      if ('height' in props) height = props.height;
+    },
+    refs => {
+      if ('canvas' in refs) canvas = refs.canvas;
+    }
+  ];
 }, create_main_fragment);
 ```
 
 The same would apply to component refs.
+
+
+#### `on:`
+
+Currently, inline event handlers must be call expressions...
+
+```html
+<button on:click="set({ x: x + 1 })">increment</button>
+```
+
+...and the callee must be either a method of the component, the event, or some other whitelisted thing. It's weird, inconsistent and annoying to learn. Since there are no longer any problems around `this`, we can simplify things greatly by passing functions rather than their call expressions:
+
+```html
+<button on:click="{() => x += 1}">increment</button>
+```
+
+This also allows us to do fairly sophisticated things like this:
+
+```
+<input on:keydown"{e => e.which === 39 ? next(e) : e.which === 37 ? prev(e) : null}">
+```
+
+In Svelte 2, there is a shorthand:
+
+```html
+<!-- these are equivalent: -->
+<div on:click>...</div>
+<div on:click="fire('click', event)">...</div>
+```
+
+It's not yet clear if we should keep this, or replace it entirely with event bubbling, discussed [below](#events).
+
+**Custom events** in Svelte 2 enable you to use user-defined events in addition to built-in DOM events:
+
+```html
+<div on:drag="handleDrag(event)">drag me</div>
+
+<script>
+  export default {
+    events: {
+      drag(node, callback) {
+        // implementation goes here
+      }
+    }
+  };
+</script>
+```
+
+This doesn't translate well to Svelte 3. But we can do something better — we can use actions instead:
+
+```html
+<script>
+  import { drag } from 'svelte/gestures'; // 🐃 ???
+
+  function handle_drag(arg) {...}
+</script>
+
+<div use:drag={handle_drag}>drag me</div>
+```
+
+> The event system itself will be discussed in more detail [below](#events).
 
 
 ### namespace/tag options
@@ -514,21 +612,13 @@ This would create a `CustomEvent` with an `event.type` of `tick` (or `tock`) and
 
 As with lifecycle functions, the `dispatch` is bound to the component because of when `createEventDispatcher` is called.
 
-Listening to events is currently done like so:
-
-```html
-<button on:click="doSomething()">click me</button>
-```
-
-This effectively becomes `{() => this.doSomething()}`. The shorthand is nice, but it is slightly confusing (the context is implicit, and the right-hand side must be a CallExpression which limits flexibility, although there's an [issue for that](https://github.com/sveltejs/svelte/issues/1766)). In the new model, there are no longer any problems around `this`, so it probably makes sense to allow arbitrary expressions instead.
-
 
 ### Bindings
 
 Element bindings are a convenient shorthand, which I believe we should preserve:
 
 ```html
-<input bind:value=name>
+<input bind:value={name}>
 
 <!-- equivalent (Svelte 2) -->
 <input value={name} on:input="set({ name: this.value })">
@@ -557,6 +647,8 @@ The reason we can *consider* removing component bindings is that it's now trivia
 </Mousecatcher>
 ```
 
+> 🐃 One thing we need to figure out — how to respond to a binding value changing
+
 
 ### Component API
 
@@ -579,14 +671,14 @@ Exported properties can be exposed as accessors:
 
 ```js
 app.name; // world
-app.name = 'everybody'; // triggers a (sync?) update
+app.name = 'everybody'; // triggers an update synchronously
 ```
 
 This creates consistent behaviour between Svelte components that are compiled to custom elements, and those that are not, while also making it easy to understand the component's contract.
 
-Of the five **built-in methods** that currently comprise the [component API](https://svelte.technology/guide#component-api) — `get`, `set`, `fire`, `on` and `destroy` — we no longer need the first three. `on` and `destroy` are still necessary.
+Of the five **built-in methods** that currently comprise the [component API](https://svelte.technology/guide#component-api) — `get`, `set`, `fire`, `on` and `destroy` — we no longer need the first three. `on` and `destroy` are still necessary, and we could keep `set` for cases where someone needs to change multiple props at the top-level with a single update.
 
-It would be nice to have some way to differentiate those built-in methods from regular properties so that people don't need to worry about potential conflicts — for that reason, `on` and `destroy` could become (🐃) `$on` and `$destroy`.
+It would be nice to have some way to differentiate those built-in methods from regular properties so that people don't need to worry about potential conflicts — for that reason, `on`, `destroy` and `set` could become (🐃) `$on`, `$destroy` and `$set`.
 
 In some cases, a component that is designed to be used as a standalone widget will create its own **custom methods**. In Svelte 2, these are lumped in with 'private' (except not really) methods. Under this proposal, custom methods are just exported variables that happen to be functions:
 
@@ -617,7 +709,7 @@ const peekaboo = new Peekaboo(...);
 peekaboo.show();
 ```
 
-An `export const` would be a signal to the compiler that a property is read-only — in other words, attempting to assign to it would cause an error.
+An `export const`, `export function` or `export class` would be a signal to the compiler that a property is read-only — in other words, attempting to assign to it would cause an error.
 
 
 ### `preload` and `setup`
@@ -663,13 +755,23 @@ We can do better, **but it requires something potentially controversial** — a 
 
 ### Server-side rendering
 
-The compiler running with the `generate: 'ssr'` option produces completely different code from `generate: 'dom'`. This is because server-rendered components do not have a lifespan — they are rendered, then immediately discarded, so rather than having a concept of 'instances' an SSR component exports a function that given some data creates HTML and CSS.
+The compiler running with the `generate: 'ssr'` option produces completely different code from `generate: 'dom'`. This is because server-rendered components do not have a lifespan — they are rendered, then immediately discarded, so rather than having a concept of 'instances' an SSR component exports a function that, given some data, creates HTML and CSS.
 
 This does create some subtle behaviour differences however: there is no real place to do any kind of setup work, and `oncreate` (and the other lifecycle hooks) never run. Component bindings are also brittle.
 
 Under this proposal, the code inside the `<script>` block *would* run for server-rendered components, which also means that `ondestroy` would need to run. `onprops` and `onupdate` would be no-ops.
 
-I don't think the API needs to change.
+Instead of `generate: 'ssr'` we can simplify things by including SSR code in the same output module as the DOM code, relying on tree-shaking to remove the unused portion:
+
+```js
+// output code
+export default class SomeComponentt {...}
+
+export function $render(data) {
+  // ...
+  return { head, html, css };
+}
+```
 
 
 ### Store
@@ -695,7 +797,7 @@ this.store.doSomething();
 
 Since there is no longer a `this`, we need to reconsider this approach. At the same time, the `get`/`set`/`on`/`fire` interface (designed to mirror the component API) feels slightly anachronistic in light of the rest of this RFC. A major problem with the store in its current incarnation is its lack of typechecker-friendliness, and the undocumented hoops necessary to jump through to integrate with popular libraries like MobX.
 
-I'm not yet sure how the store fits into this proposal — this is perhaps the biggest unknown at this point.
+A proposal for a store replacement exists in the form of [RFC 2](#5).
 
 
 ### Spread props
