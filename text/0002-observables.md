@@ -300,7 +300,7 @@ Of course, some Observables *are* suitable for representing reactive values in a
 function adaptor(observable) {
   return {
     subscribe(fn) {
-      observable.subscribe({
+      const subscriber = observable.subscribe({
         next: fn
       });
 
