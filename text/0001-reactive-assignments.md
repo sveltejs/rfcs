@@ -730,10 +730,10 @@ This is deeply weird, and due to an oversight (that we can't correct without a b
 
 Since [Sapper](https://sapper.svelte.technology/) requires that components have some way of declaring their data dependencies prior to rendering, and since `setup` is so cumbersome, there is a special case made for `preload`. The `preload` function is attached to components on both client and server, and has no well-defined behaviour; it is purely convention.
 
-We can do better, **but it requires something potentially controversial** — a second `<script>` block that, unlike the one we've been using so far, runs a single time rather than upon every instantiation. Let's call it (🐃) `scope="shared"`:
+We can do better, **but it requires something potentially controversial** — a second `<script>` block that, unlike the one we've been using so far, runs a single time rather than upon every instantiation — `context="module"`:
 
 ```html
-<script scope="shared">
+<script context="module">
   export function preload({ params }) {
     return this.fetch(`data/${params.id}.json`).then(r => r.json()).then(things => {
       return { things };
@@ -751,6 +751,23 @@ We can do better, **but it requires something potentially controversial** — a 
 ```
 
 `things` would be injected into the instance `<script>` block at the same time as props (i.e. between instantiation and first render).
+
+Anything exported from `context="module"` would be available to other modules in the normal fashion:
+
+```js
+import Widget, { preload } from './Widget.html';
+
+Promise.resolve(preload(params)).then(props => {
+  widget = new Widget({
+    target,
+    props
+  });
+});
+```
+
+Default exports would be forbidden, since they would conflict with the component itself
+
+> Conceptually, `context="module"` is a place to put any functions that are shared between instances. This wouldn't be necessary day-to-day however, as the compiler can automatically hoist functions that don't reference internal state.
 
 
 ### Server-side rendering
