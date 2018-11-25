@@ -258,7 +258,7 @@ That setup code could include work that needs to be undone when the component is
 
 ```html
 <script>
-  import { ondestroy } from 'svelte';
+  import { onDestroy } from 'svelte';
   import { format_time } from './helpers.js';
 
   let time = new Date();
@@ -267,7 +267,7 @@ That setup code could include work that needs to be undone when the component is
     time = new Date();
   }, 1000);
 
-  ondestroy(() => {
+  onDestroy(() => {
     clearInterval(interval);
   });
 </script>
@@ -279,11 +279,11 @@ The `ondestroy` callback is associated with the component instance because it is
 
 ```js
 // helpers.js
-import { ondestroy } from 'svelte';
+import { onDestroy } from 'svelte';
 
 export function use_interval(fn, ms) {
   const interval = setInterval(fn, ms);
-  ondestroy(() => clearInterval(interval));
+  onDestroy(() => clearInterval(interval));
   fn();
 }
 ```
@@ -305,15 +305,15 @@ There are two other lifecycle functions required — (🐃) `onprops` (similar t
 
 ```html
 <script>
-  import { onprops, onupdate } from 'svelte';
+  import { beforeUpdate, afterUpdate } from 'svelte';
 
   export let foo;
 
-  onprops(() => {
+  beforeUpdate(() => {
     // this callback runs whenever props change
   });
 
-  onupdate(() => {
+  afterUpdate(() => {
     // this callback runs after the view is updated
   });
 </script>
@@ -350,13 +350,13 @@ Under this proposal, the `onprops` callback runs whenever props change but *not*
 
 ```html
 <script>
-  import { onprops } from 'svelte';
+  import { beforeUpdate } from 'svelte';
 
   export let temperature = 32;
   let getting = null;
   let previous_temperature;
 
-  onprops(() => {
+  beforeUpdate(() => {
     // this assignment will *not* result in the callback
     // firing again
     getting = temperature > previous_temperature
@@ -375,17 +375,17 @@ Any `onupdate` callbacks would run after the view was updated, whether as a resu
 As previously mentioned, `oncreate` is used in Svelte 2 to run code after the initial render has taken place. Strictly speaking it is redundant...
 
 ```js
-import { onprops, onupdate } from 'svelte';
+import { beforeUpdate, afterUpdate } from 'svelte';
 import { once } from 'lodash-es';
 
 export let externalProp;
 let internalProp = 'defined';
 
-onprops(once(() => {
+beforeUpdate(once(() => {
   // externalProp is now defined
 }));
 
-onupdate(once(() => {
+afterUpdate(once(() => {
   // initial render has taken place
 }));
 ```
@@ -434,14 +434,14 @@ In Svelte 2, that element could be accessed (from `oncreate` onwards) as `this.r
 
 ```html
 <script>
-  import { onupdate } from 'svelte';
+  import { afterUpdate } from 'svelte';
 
   export let width;
   export let height;
   let canvas;
   let ctx;
 
-  onupdate(() => {
+  afterUpdate(() => {
     if (!ctx) ctx = canvas.getContext('2d');
     draw_some_shapes(ctx);
   });
@@ -453,7 +453,7 @@ In Svelte 2, that element could be accessed (from `oncreate` onwards) as `this.r
 The example above could compile to something like the following:
 
 ```js
-import { onupdate } from 'svelte';
+import { afterUpdate } from 'svelte';
 
 const Component = defineComponent((__update) => {
   let width;
@@ -461,7 +461,7 @@ const Component = defineComponent((__update) => {
   let canvas;
   let ctx;
 
-  onupdate(() => {
+  afterUpdate(() => {
     if (!ctx) ctx = canvas.getContext('2d');
     draw_some_shapes(ctx);
   });
@@ -879,13 +879,13 @@ Exceptions to this rule could be made where appropriate. For example if you're t
 
 ```html
 <script>
-  import { onupdate } from 'svelte';
+  import { afterUpdate } from 'svelte';
 
   export let items = [];
   let list;
   let listHeight = 0;
 
-  onupdate(() => {
+  afterUpdate(() => {
     listHeight = list.offsetHeight;
   });
 </script>
