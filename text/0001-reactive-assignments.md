@@ -301,7 +301,7 @@ export function use_interval(fn, ms) {
 
 > This might seem less ergonomic than React Hooks, whereby you can do `const time = useCustomHook()`. The payoff is that you don't need to run that code on every single state change, and it's easier to see which values in a component are subject to change, and *when* a specific value is changing.
 
-There are two other lifecycle functions required — (🐃) `onprops` (similar to `onstate` in Svelte v2) and (🐃) `onupdate`:
+There are two other lifecycle functions required — (🐃) `beforeUpdate` (similar to `onstate` in Svelte v2) and (🐃) `afterUpdate`:
 
 ```html
 <script>
@@ -346,7 +346,7 @@ Currently, `onstate` and `onupdate` run before and after every state change. Bec
 </script>
 ```
 
-Under this proposal, the `onprops` callback runs whenever props change but *not* when private state changes. This makes cycles impossible:
+Under this proposal, the `beforeUpdate` callback runs whenever props change but *not* when private state changes. This makes cycles impossible:
 
 ```html
 <script>
@@ -776,7 +776,7 @@ The compiler running with the `generate: 'ssr'` option produces completely diffe
 
 This does create some subtle behaviour differences however: there is no real place to do any kind of setup work, and `oncreate` (and the other lifecycle hooks) never run. Component bindings are also brittle.
 
-Under this proposal, the code inside the `<script>` block *would* run for server-rendered components, which also means that `ondestroy` would need to run. `onprops` and `onupdate` would be no-ops.
+Under this proposal, the code inside the `<script>` block *would* run for server-rendered components, which also means that `ondestroy` would need to run. `beforeUpdate` and `afterUpdate` would be no-ops.
 
 Instead of `generate: 'ssr'` we can simplify things by including SSR code in the same output module as the DOM code, relying on tree-shaking to remove the unused portion:
 
@@ -1016,7 +1016,7 @@ Happily, these will no longer involve monkey-patching components:
 
   let t;
 
-  onprops(() => {
+  beforeUpdate(() => {
     if (t) t.stop();
 
     t = tween(tweenedProgress, progress, {
