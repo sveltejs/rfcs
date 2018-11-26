@@ -317,6 +317,13 @@ There are three other lifecycle functions required — `onMount` (similar to `on
 
   onMount(() => {
     // this runs once, after the first `afterUpdate`
+
+    return function() {
+      // this (optional) returned function runs on destroy,
+      // allowing references (to timeouts etc) to stay within
+      // the function, and preventing DOM-specific cleanup
+      // code running in an SSR context
+    };
   });
 </script>
 ```
