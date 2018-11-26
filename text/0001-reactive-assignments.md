@@ -252,9 +252,7 @@ Many components need to respond to *lifecycle events*. These are currently expre
 
 The `oncreate` hook runs *after* the initial render, meaning there is no way (in Svelte 2) to run setup code immediately upon instantiation — something this proposal solves. There is still a use for it, as we'll see, but in many cases `oncreate` will be unnecessary.
 
-> (The 🐃 emoji used throughout this document indicates a yak that needs shaving.)
-
-That setup code could include work that needs to be undone when the component is removed. For that, we import the (🐃) `ondestroy` lifecycle function (no longer called 'hooks', to avoid confusion with React Hooks which have a fundamentally different mechanism):
+That setup code could include work that needs to be undone when the component is removed. For that, we import the `onDestroy` lifecycle function (no longer called 'hooks', to avoid confusion with React Hooks which have a fundamentally different mechanism):
 
 ```html
 <script>
@@ -275,13 +273,13 @@ That setup code could include work that needs to be undone when the component is
 <p>The time is {format_time(time)}</p>
 ```
 
-The `ondestroy` callback is associated with the component instance because it is called during instantiation; no compiler magic is involved. Beyond that (if it is called outside instantiation, an error is thrown), there are no rules or restrictions as to when a lifecycle function is called. Reusability is therefore straightforward:
+The `onDestroy` callback is associated with the component instance because it is called during instantiation; no compiler magic is involved. Beyond that (if it is called outside instantiation, an error is thrown), there are no rules or restrictions as to when a lifecycle function is called. Reusability is therefore straightforward:
 
 ```js
 // helpers.js
 import { onDestroy } from 'svelte';
 
-export function use_interval(fn, ms) {
+export function useInterval(fn, ms) {
   const interval = setInterval(fn, ms);
   onDestroy(() => clearInterval(interval));
   fn();
@@ -290,22 +288,22 @@ export function use_interval(fn, ms) {
 
 ```html
 <script>
-  import { use_interval, format_time } from './helpers.js';
+  import { useInterval, formatTime } from './helpers.js';
 
   let time;
-  use_interval(() => time = new Date(), 1000);
+  useInterval(() => time = new Date(), 1000);
 </script>
 
-<p>The time is {format_time(time)}</p>
+<p>The time is {formatTime(time)}</p>
 ```
 
 > This might seem less ergonomic than React Hooks, whereby you can do `const time = useCustomHook()`. The payoff is that you don't need to run that code on every single state change, and it's easier to see which values in a component are subject to change, and *when* a specific value is changing.
 
-There are two other lifecycle functions required — (🐃) `beforeUpdate` (similar to `onstate` in Svelte v2) and (🐃) `afterUpdate`:
+There are three other lifecycle functions required — `onMount` (similar to `oncreate` in Svelte v2), `beforeUpdate` (similar to `onstate`) and `afterUpdate` (similar to `onupdate`):
 
 ```html
 <script>
-  import { beforeUpdate, afterUpdate } from 'svelte';
+  import { beforeUpdate, afterUpdate, onMount } from 'svelte';
 
   export let foo;
 
@@ -315,6 +313,10 @@ There are two other lifecycle functions required — (🐃) `beforeUpdate` (simi
 
   afterUpdate(() => {
     // this callback runs after the view is updated
+  });
+
+  onMount(() => {
+    // this runs once, after the first `afterUpdate`
   });
 </script>
 ```
@@ -346,7 +348,7 @@ Currently, `onstate` and `onupdate` run before and after every state change. Bec
 </script>
 ```
 
-Under this proposal, the `beforeUpdate` callback runs whenever props change but *not* when private state changes. This makes cycles impossible:
+Under this proposal, `beforeUpdate` callbacks run only once per cycle. This makes infinite loops impossible:
 
 ```html
 <script>
@@ -370,27 +372,7 @@ Under this proposal, the `beforeUpdate` callback runs whenever props change but 
 
 > Note that `previous_temperature`, if unused in the view, will not get the reactive treatment.
 
-Any `onupdate` callbacks would run after the view was updated, whether as a result of prop or state changes. Assignments in an `onupdate` callback would result in an immediate re-render (once all `onupdate` callbacks have run, instead of on the next frame) but would *not* cause the callback to run again. This would allow components to respond to layout changes, for example.
-
-As previously mentioned, `oncreate` is used in Svelte 2 to run code after the initial render has taken place. Strictly speaking it is redundant...
-
-```js
-import { beforeUpdate, afterUpdate } from 'svelte';
-import { once } from 'lodash-es';
-
-export let externalProp;
-let internalProp = 'defined';
-
-beforeUpdate(once(() => {
-  // externalProp is now defined
-}));
-
-afterUpdate(once(() => {
-  // initial render has taken place
-}));
-```
-
-...but we could decide (🐃) to include an `oncreate` equivalent as a convenience anyway. Currently, the favoured name for this function is `onmount`.
+Any `afterUpdate` callbacks would run after the view was updated, whether as a result of prop or state changes. Assignments in an `afterUpdate` callback would result in an immediate re-render (once all `afterUpdate` callbacks have run, instead of on the next frame) but would *not* cause the callback to run again. This would allow components to respond to layout changes, for example.
 
 
 ---
@@ -540,7 +522,9 @@ This doesn't translate well to Svelte 3. But we can do something better — we c
 <div use:drag={handle_drag}>drag me</div>
 ```
 
-> The event system itself will be discussed in more detail [below](#events).
+> (The 🐃 emoji used throughout this document indicates a yak that needs shaving.)
+
+The event system itself will be discussed in more detail [below](#events).
 
 
 ### namespace/tag options
@@ -1008,6 +992,7 @@ Happily, these will no longer involve monkey-patching components:
 
 ```html
 <script>
+  import { beforeUpdate } from 'svelte';
   import { tween } from 'svelte/animation'; // 🐃
   import * as eases from 'eases-jsnext';
 
