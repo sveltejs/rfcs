@@ -197,7 +197,7 @@ function handleClick() {
 
 **This does highlight a limitation** — we're not talking about a 'true' destiny operator, in which the intermediate value of `foo` *would* be available if you were to access it immediately after setting `bar`. Reactive declarations are *eventually* consistent with their inputs. This would be an important thing to communicate clearly.
 
-It also raises the question of what should happen if reactive declaration inputs are updated inside a `beforeRender` handler, immediately after synchronization has happened.
+It also raises the question of what should happen if reactive declaration inputs are updated inside a `beforeUpdate` handler, immediately after synchronization has happened.
 
 
 ### Read-only values
@@ -304,7 +304,7 @@ The obvious problem with this is that `$todos` isn't defined anywhere in the `<s
 
 ## How we teach this
 
-This shouldn't be the first thing that people encounter when learning Svelte — it's sufficiently surprising that a lot of people would be turned off before understanding the value proposition. Instead, the 'vanilla' alternative — updating everything manually in a `beforeRender` function — should probably be taught first, so that the concept ('and now, let's have the compiler do that for us, except more efficiently!') is already familiar.
+This shouldn't be the first thing that people encounter when learning Svelte — it's sufficiently surprising that a lot of people would be turned off before understanding the value proposition. Instead, the 'vanilla' alternative — updating everything manually in a `beforeUpdate` function — should probably be taught first, so that the concept ('and now, let's have the compiler do that for us, except more efficiently!') is already familiar.
 
 When discussing reactive programming, it's useful to refer to existing implementations of the idea, including spreadsheets.
 
@@ -323,14 +323,14 @@ Elements that may be particularly confusing to learn:
 * that reactive declarations don't run immediately upon reassignment of their inputs, but rather as part of the update cycle
 * the use of the `$` prefix to unwrap reactive stores
 
-We also need a well-considered answer to the question about what should happen when inputs are reassigned during `beforeRender`.
+We also need a well-considered answer to the question about what should happen when inputs are reassigned during `beforeUpdate`.
 
 
 ## Alternatives
 
 The 'do nothing' alternative is to rely on function calls — either making their dependencies explicit, or attempting to trace their dependencies. Absent a Sufficiently Smart Compiler, this risks creating significant computational overhead.
 
-Or, we could rely on users to recompute values themselves in `beforeRender`. This is unergonomic, and risks either unnecessary work (recomputing values when inputs haven't changed) or bugs (failing to do so when they have).
+Or, we could rely on users to recompute values themselves in `beforeUpdate`. This is unergonomic, and risks either unnecessary work (recomputing values when inputs haven't changed) or bugs (failing to do so when they have).
 
 Some people propose using magic functions instead, transforming calls to those functions into the code we've already seen:
 
@@ -365,4 +365,4 @@ const stuff = new MyStuff();
 
 ## Unresolved questions
 
-The details of when reactive declarations should be synchronized is up for debate — one suggestion is that it should happen *after* `beforeRender`.
+The details of when reactive declarations should be synchronized is up for debate — one suggestion is that it should happen *after* `beforeUpdate`.
