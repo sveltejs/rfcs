@@ -1,5 +1,5 @@
-- Start Date: (fill me in with today's date, YYYY-MM-DD)
-- RFC PR: (leave this empty)
+- Start Date: 2018-11-28
+- RFC PR: [#8](https://github.com/sveltejs/rfcs/pull/8)
 - Svelte Issue: (leave this empty)
 
 # Reactive declarations
@@ -304,34 +304,65 @@ The obvious problem with this is that `$todos` isn't defined anywhere in the `<s
 
 ## How we teach this
 
-> What names and terminology work best for these concepts and why? How is this
-idea best presented? As a continuation of existing Svelte patterns, or as a
-wholly new one?
+This shouldn't be the first thing that people encounter when learning Svelte — it's sufficiently surprising that a lot of people would be turned off before understanding the value proposition. Instead, the 'vanilla' alternative — updating everything manually in a `beforeRender` function — should probably be taught first, so that the concept ('and now, let's have the compiler do that for us, except more efficiently!') is already familiar.
 
-> Would the acceptance of this proposal mean the Svelte guides must be
-re-organized or altered? Does it change how Svelte is taught to new users
-at any level?
+When discussing reactive programming, it's useful to refer to existing implementations of the idea, including spreadsheets.
 
-> How should this feature be introduced and taught to existing Svelte
-users?
+The naming and terminology are still TBD. 'Reactive declarations' makes sense to me as one leg of the reactive assignments/declarations/stores trinity, but better alternatives may exist. As for the label itself, I don't have a clear favourite, though I'm warming to `reactive:`.
+
 
 ## Drawbacks
 
-> Why should we *not* do this? Please consider the impact on teaching Svelte,
-on the integration of this feature with other existing and planned features,
-on the impact of the API churn on existing apps, etc.
+A lot of people seeing this proposal, particularly those who have an irrational dislike of anything that isn't pure JavaScript (yet will happily use stage 2 features in their JSX...), will instinctively clutch their pearls.
 
-> There are tradeoffs to choosing any path, please attempt to identify them here.
+We shouldn't seek to appease the pearl-clutchers. But it *is* fair to acknowledge that this proposal will surprise people, and steepen Svelte 3's (admittedly shallow) learning curve. It may be that the cost of adding this feature outweighs the benefit for that reason; the only way to know is to gauge people's reactions to this RFC.
+
+Elements that may be particularly confusing to learn:
+
+* that reactive declarations don't run on initialisation (though we could change that)
+* that reactive declarations don't run immediately upon reassignment of their inputs, but rather as part of the update cycle
+* the use of the `$` prefix to unwrap reactive stores
+
+We also need a well-considered answer to the question about what should happen when inputs are reassigned during `beforeRender`.
+
 
 ## Alternatives
 
-> What other designs have been considered? What is the impact of not doing this?
+The 'do nothing' alternative is to rely on function calls — either making their dependencies explicit, or attempting to trace their dependencies. Absent a Sufficiently Smart Compiler, this risks creating significant computational overhead.
 
-> This section could also include prior art, that is, how other frameworks in the same domain have solved this problem.
+Or, we could rely on users to recompute values themselves in `beforeRender`. This is unergonomic, and risks either unnecessary work (recomputing values when inputs haven't changed) or bugs (failing to do so when they have).
 
-(TODO setting values ourselves inside `beforeRender` etc — and why that's unfortunate)
+Some people propose using magic functions instead, transforming calls to those functions into the code we've already seen:
+
+```js
+import { compute } from 'svelte';
+
+let a = 1;
+let b = compute(() => a * 2);
+```
+
+I personally find this very confusing. Since `compute` is just a function, I would expect to be able to compose it, curry it, pass it outside the component and so on, none of which are true.
+
+A final possibility is to make everything a property of a class (rather than standalone variables) and use run time proxy/accessor magic, a la MobX etc...
+
+```js
+@observable
+class MyStuff {
+  @observe
+  a = 1;
+
+  @computed
+  get b() {
+    return this.a + 1;
+  }
+}
+
+const stuff = new MyStuff();
+```
+
+...but this involves considerable overhead, and is massively less ergonomic.
+
 
 ## Unresolved questions
 
-> Optional, but suggested for first drafts. What parts of the design are still
-TBD?
+The details of when reactive declarations should be synchronized is up for debate — one suggestion is that it should happen *after* `beforeRender`.
