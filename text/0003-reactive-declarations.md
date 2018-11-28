@@ -182,7 +182,7 @@ Since reactive declarations are likely to depend on props passed into the compon
 >
 > where `$$prop = (name, fallback) => name in props ? props[name] : fallback`
 
-We also don't want to run them immediately upon every change. Recalculating `foo` after `bar` as updated...
+We also don't want to run them immediately upon every change. Recalculating `foo` after `bar` is updated...
 
 ```js
 compute:foo = expensivelyRecompute(bar, baz);
@@ -257,7 +257,7 @@ One limitation of reactive stores is that it's difficult to mix them with a comp
 -  let hideDone = false;
 -  const filtered = derive(todos, t => hideDone ? !t.done : true);
 +  const hideDone = writable(false);
-+  const filtered = derive([todos, hideDone], (t, hideDone) => hideDone ? !t.done : true);
++  const filtered = derive([todos, hideDone], ([t, hideDone]) => hideDone ? !t.done : true);
 </script>
 
 <h1>Hello {$user.name}!</h1>
@@ -299,7 +299,7 @@ Reactive declarations offer an alternative, if we allow the same treatment of va
 {/each}
 ```
 
-The obvious problem with this is that `$todos` isn't defined anywhere in the `<script>`, which is potentially confusing to humans and computers alike. This is possible solvable with a combination of documentation and linting rules.
+The obvious problem with this is that `$todos` isn't defined anywhere in the `<script>`, which is potentially confusing to humans and computers alike. This is possibly solvable with a combination of documentation and linting rules.
 
 
 ## How we teach this
