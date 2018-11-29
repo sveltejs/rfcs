@@ -14,8 +14,8 @@ This RFC proposes an implementation of the 'destiny operator' inside Svelte comp
   let doubled;
   let quadrupled;
 
-  compute:doubled = count * 2;
-  compute:quadrupled = doubled * 2;
+  $: doubled = count * 2;
+  $: quadrupled = doubled * 2;
 </script>
 
 <p>Twice {count} is {doubled}; twice that is {quadrupled}</p>
@@ -95,18 +95,20 @@ Unfortunately we can't, because that would be invalid JavaScript, and it's impor
 let a = 10;
 let b;
 
-compute:b = a + 1;
+$: b = a + 1;
 ```
 
 This tells the compiler 'run the `b = a + 1` statement whenever `a` changes'.
 
 It's only fair to acknowledge that this is *weird*. Aside from the unfamiliarity of labels (for most of us), we're used to statements running in order, top-to-bottom.
 
-But it's not quite as weird as it might first seem. *Declarations* don't run in order; a class can extend a function constructor that is defined later, and you can freely put your exports at the top of your module and your imports at the bottom if it makes you happy. Seen in this light, `compute:b = a + 1` is a **declaration of equivalence** between `b` and the expression `a + 1`, rather than a statement.
+But it's not quite as weird as it might first seem. *Declarations* don't run in order; a class can extend a function constructor that is defined later, and you can freely put your exports at the top of your module and your imports at the bottom if it makes you happy. Seen in this light, `$: b = a + 1` is a **declaration of equivalence** between `b` and the expression `a + 1`, rather than a statement.
 
 And the concept isn't new — framework designers have invented all sorts of ways to approximate the destiny operator. MobX's `computed` function and decorator, RxJS Observables, and the computed properties in Svelte and Vue are all related ideas. The main difference with this approach is that it's syntactically much lighter, and depends on compile-time dependency tracking rather than (for example) wrapping everything in proxies and accessors.
 
 In fact, it's similar to [Observable](https://beta.observablehq.com/), a platform for reactive programming notebooks. In both cases, expressions run repeatedly (but conservatively) in [topological order](https://beta.observablehq.com/@mbostock/how-observable-runs). The most commonly used analogy is that of a spreadsheet, where cells with formulas automatically stay consistent with the cells that they reference, without needing to update the whole dang worksheet.
+
+> The choice of the `$` character, which overwhelmingly beat other options in a poll, is for three reasons: it's visually distinctive, easy to type, and mirrors the use of the `$` prefix in templates to mark values as reactive, as discussed below.
 
 
 ### The mechanics of reactive declarations
@@ -138,22 +140,22 @@ function init($$self, $$make_dirty) {
 A consequence of this design is that we can update multiple computed values in a single go. For example, one way to compute values for an SVG scatterplot involves iterating over data multiple times...
 
 ```js
-compute:x_scale = get_scale([min_x, max_x], [0, width]);
-compute:y_scale = get_scale([min_y, max_y], [height, 0]);
+$: x_scale = get_scale([min_x, max_x], [0, width]);
+$: y_scale = get_scale([min_y, max_y], [height, 0]);
 
-compute:min_x = Math.min(...points.map(p => p.x));
-compute:max_x = Math.max(...points.map(p => p.x));
-compute:min_y = Math.min(...points.map(p => p.y));
-compute:max_y = Math.max(...points.map(p => p.y));
+$: min_x = Math.min(...points.map(p => p.x));
+$: max_x = Math.max(...points.map(p => p.x));
+$: min_y = Math.min(...points.map(p => p.y));
+$: max_y = Math.max(...points.map(p => p.y));
 ```
 
 ...but we could do it more efficiently (if more verbosely) in a single pass:
 
 ```js
-compute:x_scale = get_scale([min_x, max_x], [0, width]);
-compute:y_scale = get_scale([min_y, max_y], [height, 0]);
+$: x_scale = get_scale([min_x, max_x], [0, width]);
+$: y_scale = get_scale([min_y, max_y], [height, 0]);
 
-compute: {
+$: {
   min_x = Infinity; max_x = -Infinity; min_y = Infinity; max_y = -Infinity; // reset
 
   points.forEach(point => {
@@ -165,7 +167,7 @@ compute: {
 }
 ```
 
-Another consequence is that it's straightforward to include side-effects (`compute: console.log(foo)`). Reasonable people can disagree about whether that is to be encouraged or not. It does suggest that a more 'honest' name (🐃) would be `autorun:` rather than `compute:`, or something to that effect. Other possibilities include `update:`, `reactive:`, `repeat:` and so on.
+Another consequence is that it's straightforward to include side-effects (`$: console.log(foo)`). Reasonable people can disagree about whether that is to be encouraged or not.
 
 
 ### Timing
@@ -178,14 +180,12 @@ Since reactive declarations are likely to depend on props passed into the compon
 >
 > would be transformed by the compiler to something like
 >
->     let foo = $$prop('foo', 'fallback value');
->
-> where `$$prop = (name, fallback) => name in props ? props[name] : fallback`
+>     let { foo = 'fallback value' } = $$props;
 
 We also don't want to run them immediately upon every change. Recalculating `foo` after `bar` is updated...
 
 ```js
-compute:foo = expensivelyRecompute(bar, baz);
+$: foo = expensivelyRecompute(bar, baz);
 
 function handleClick() {
   bar += 1;
@@ -283,7 +283,7 @@ Reactive declarations offer an alternative, if we allow the same treatment of va
   let hideDone = false;
 -  const filtered = derive(todos, t => hideDone ? !t.done : true);
 +  let filtered;
-+  compute:filtered = $todos.filter(t => hideDone ? !t.done : true);
++  $: filtered = $todos.filter(t => hideDone ? !t.done : true);
 </script>
 
 <h1>Hello {$user.name}!</h1>
@@ -313,9 +313,9 @@ The naming and terminology are still TBD. 'Reactive declarations' makes sense to
 
 ## Drawbacks
 
-A lot of people seeing this proposal, particularly those who have an irrational dislike of anything that isn't pure JavaScript (yet will happily use stage 2 features in their JSX...), will instinctively clutch their pearls.
+A lot of people seeing this proposal, particularly those who have an irrational dislike of anything that isn't pure JavaScript (yet will happily use stage 2 features in their JSX, a language where `<></>` is a valid expression...), will instinctively clutch their pearls.
 
-We shouldn't seek to appease the pearl-clutchers. But it *is* fair to acknowledge that this proposal will surprise people, and steepen Svelte 3's (admittedly shallow) learning curve. It may be that the cost of adding this feature outweighs the benefit for that reason; the only way to know is to gauge people's reactions to this RFC.
+We shouldn't seek to appease the pearl-clutchers. But it *is* fair to acknowledge that this proposal will surprise people, and steepen Svelte 3's (admittedly shallow) learning curve. It may be that the cost of adding this feature outweighs the benefit for that reason; the only way to know is to gauge people's reactions to this RFC. (So far, the response has been encouraging, with most of the concern centering on how it will be received beyond the existing Svelte community.)
 
 Elements that may be particularly confusing to learn:
 
