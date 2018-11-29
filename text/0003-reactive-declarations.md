@@ -346,13 +346,10 @@ I personally find this very confusing. Since `compute` is just a function, I wou
 A final possibility is to make everything a property of a class (rather than standalone variables) and use run time proxy/accessor magic, a la MobX etc...
 
 ```js
-@observable
-class MyStuff {
-  @observe
-  a = 1;
+@observable class MyStuff {
+  @observe a = 1;
 
-  @computed
-  get b() {
+  @computed get b() {
     return this.a + 1;
   }
 }
