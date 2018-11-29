@@ -313,9 +313,9 @@ The naming and terminology are still TBD. 'Reactive declarations' makes sense to
 
 ## Drawbacks
 
-A lot of people seeing this proposal, particularly those who have an irrational dislike of anything that isn't pure JavaScript (yet will happily use stage 2 features in their JSX, a language where `<></>` is a valid expression...), will instinctively clutch their pearls.
+A lot of people seeing this proposal, particularly those who have an irrational dislike of anything that isn't pure JavaScript, will instinctively recoil.
 
-We shouldn't seek to appease the pearl-clutchers. But it *is* fair to acknowledge that this proposal will surprise people, and steepen Svelte 3's (admittedly shallow) learning curve. It may be that the cost of adding this feature outweighs the benefit for that reason; the only way to know is to gauge people's reactions to this RFC. (So far, the response has been encouraging, with most of the concern centering on how it will be received beyond the existing Svelte community.)
+We shouldn't seek to appease people whose opinions are already fixed. But it *is* fair to acknowledge that this proposal will surprise people, and steepen Svelte 3's (admittedly shallow) learning curve. It may be that the cost of adding this feature outweighs the benefit for that reason; the only way to know is to gauge people's reactions to this RFC. (So far, the response has been encouraging, with most of the concern centering on how it will be received beyond the existing Svelte community.)
 
 Elements that may be particularly confusing to learn:
 
