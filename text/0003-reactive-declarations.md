@@ -49,7 +49,7 @@ As an indirect consequence of that change, we're able to get rid of all the boil
 
     computed: {
       doubled: ({ count }) => count * 2,
-      quadrupled: ({ doubled }) => count * 2
+      quadrupled: ({ doubled }) => doubled * 2
     }
   };
 </script>
