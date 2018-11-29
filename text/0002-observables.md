@@ -2,7 +2,7 @@
 - RFC PR: [#5](https://github.com/sveltejs/rfcs/pull/5)
 - Svelte Issue: (leave this empty)
 
-# Svelte observables
+# Reactive stores
 
 ## Summary
 
@@ -11,7 +11,7 @@ This RFC proposes a replacement for the existing [Store](https://svelte.technolo
 * Works with the Svelte 3 component design outlined in [RFC 1](https://github.com/sveltejs/rfcs/pull/4)
 * Allows any given component to subscribe to multiple sources of data from outside the component tree, rather than favouring a single app-level megastore
 * Typechecker friendliness
-* Adapts to existing state management systems like [MobX](https://mobx.js.org/) or [TC39 Observables](https://github.com/tc39/proposal-observable), but does not require them
+* Adapts to existing state management systems like [Redux](https://redux.js.org/) or [TC39 Observables](https://github.com/tc39/proposal-observable), but does not require them
 * Concise syntax that eliminates lifecycle boilerplate
 
 
@@ -47,23 +47,21 @@ export default new Store({
 });
 ```
 
-...we have an `observable` (🐃) function:
+...we create a new `writable` value store:
 
 ```js
-export const user = observable({
+export const user = writable({
   firstname: 'Fozzie',
   lastname: 'Bear'
 });
 
-export const volume = observable(0.5);
+export const volume = writable(0.5);
 ```
-
-> The 🐃 emoji, used throughout this document, indicates a yak that needs shaving
 
 Interested parties can read (and write) `user` without caring about `volume`, and vice versa:
 
 ```js
-import { volume } from './observables.js';
+import { volume } from './stores.js';
 
 const audio = document.querySelector('audio');
 
@@ -76,7 +74,7 @@ Inside a component's markup, a convenient shorthand sets up the necessary subscr
 
 ```js
 <script>
-  import { user } from './observables.js';
+  import { user } from './stores.js';
 </script>
 
 <h1>Hello {$user.firstname}!</h1>
@@ -85,27 +83,27 @@ Inside a component's markup, a convenient shorthand sets up the necessary subscr
 This would compile to something like the following:
 
 ```js
-import { ondestroy } from 'svelte';
-import { user } from './observables.js';
+import { onDestroy } from 'svelte';
+import { user } from './stores.js';
 
-const Component = defineComponent((__update) => {
+function init($$self, $$make_dirty) {
   let $user;
-  ondestroy(user.subscribe(value => {
+  onDestroy(user.subscribe(value => {
     $user = value;
-    __update({ $user: true });
+    $$makeDirty('$user');
   }));
 
-  return () => ({ $user });
-}, create_main_fragment);
+  $$self.get = () => ({ $user });
+}
 ```
 
 
-### Observable API
+### Store API
 
-An observable *must* have a `subscribe` method, and it may also have additional methods like `set` and `update` if it isn't read-only:
+A store *must* have a `subscribe` method, and it may also have additional methods like `set` and `update` if it isn't read-only:
 
 ```js
-const number = observable(1);
+const number = writable(1);
 
 const unsubscribe = number.subscribe(value => {
   console.log(`value is ${value}`); // logs 1 immediately
@@ -123,7 +121,7 @@ number.set(4); // does nothing — unsubscribed
 An example implementation of this API:
 
 ```js
-function observable(value) {
+function writable(value) {
   const subscribers = [];
 
   function set(newValue) {
@@ -151,9 +149,9 @@ function observable(value) {
 ```
 
 
-### Read-only observables
+### Read-only stores
 
-Some observables are read-only, created with `readOnlyObservable` (🐃):
+Some stores are read-only, created with `readable`:
 
 ```js
 const unsubscribe = mousePosition.subscribe(pos => {
@@ -166,7 +164,7 @@ mousePosition.set({ x: 100, y: 100 }); // Error: mousePosition.set is not a func
 An example implementation:
 
 ```js
-function readOnlyObservable(start, value) {
+function readable(start, value) {
   const subscribers = [];
   let stop;
 
@@ -198,7 +196,7 @@ function readOnlyObservable(start, value) {
   }
 }
 
-const mousePosition = readOnlyObservable(function start(set) {
+const mousePosition = readable(function start(set) {
   function handler(event) {
     set({
       x: event.clientX,
@@ -213,16 +211,16 @@ const mousePosition = readOnlyObservable(function start(set) {
 });
 ```
 
-### Derived observables
+### Derived stores
 
-An observable can be derived from other observables with `derivedObservable` (🐃):
+A store can be derived from other stores with `derive` (🐃):
 
 ```js
-const a = observable(1);
-const b = observable(2);
-const c = observable(3);
+const a = writable(1);
+const b = writable(2);
+const c = writable(3);
 
-const total = derivedObservable(a, b, c, (a, b, c) => a + b + c);
+const total = derive([a, b, c], ([a, b, c]) => a + b + c);
 
 total.subscribe(value => {
   console.log(`total is ${value}`); // logs 'total is 6'
@@ -234,14 +232,12 @@ c.set(4); // logs 'total is 7'
 Example implementation:
 
 ```js
-function derivedObservable(...args) {
-  const fn = args.pop();
-
+function derive(stores, fn) {
   return readOnlyObservable(set => {
     let inited = false;
     const values = [];
 
-    const unsubscribers = args.map((arg, i) => arg.subscribe(value => {
+    const unsubscribers = stores.map((store, i) => store.subscribe(value => {
       values[i] = value;
       if (inited) set(fn(...values));
     }));
@@ -258,22 +254,22 @@ function derivedObservable(...args) {
 
 > In the example above, `total` is recalculated immediately whenever the values of `a`, `b` or `c` are set. In some situations that's undesirable; you want to be able to set `a`, `b` *and* `c` without `total` being recalculated until you've finished. That could be done by putting the `set(fn(...values))` in a microtask, but that has drawbacks too. (Of course, that could be a decision left to the user.) Is this a fatal flaw in the design — should we strive for pull-based rather than push-based derived values? Or is it fine in reality?
 
-Derived observables are, by nature, also read-only. They could be used, for example, to filter the items in a todo list:
+Derived stores are, by nature, also read-only. They could be used, for example, to filter the items in a todo list:
 
 ```html
 <script>
-  import { derivedObservable } from 'svelte/state'; // 🐃
-  import { todos } from './observables.js';
+  import { writable, derive } from 'svelte/store.js';
+  import { todos } from './stores.js';
 
-  let hideDone = false;
+  const hideDone = writable(false);
 
-  const filtered = derivedObservable(todos, todos => todos.filter(todo => {
+  const filtered = derive([todos, hideDone], (todos, hideDone) => todos.filter(todo => {
     return hideDone ? !todo.done : true;
   }));
 </script>
 
 <label>
-  <input type=checkbox bind:checked=hideDone>
+  <input type=checkbox checked={$hideDone} on:change="{e => hideDone.set(e.target.checked)}">
   hide done
 </label>
 
@@ -285,12 +281,12 @@ Derived observables are, by nature, also read-only. They could be used, for exam
 
 ### Relationship with TC39 Observables
 
-There is a [stage 1 proposal for an Observable object](https://github.com/tc39/proposal-observable) in JavaScript itself. It's quite different from the design documented here, which suggests we might need to come up with an alternative name. For now, I'll distinguish between an 'Observable' (TC39) and an 'observable' (us).
+There is a [stage 1 proposal for an Observable object](https://github.com/tc39/proposal-observable) in JavaScript itself.
 
 Cards on the table: I'm not personally a fan of Observables. I've found them to be confusing and awkward to work with. But there are particular reasons why I don't think they're a good general solution for representing reactive values in a component:
 
 * They don't represent a single value changing over time, but rather a stream of distinct values. This is a subtle but important distinction
-* Two different subscribers to the same observable could receive different values (!), where as in a UI you want two references to the same value to be guaranteed to be consistent
+* Two different subscribers to the same Observable could receive different values (!), where as in a UI you want two references to the same value to be guaranteed to be consistent
 * Observables can 'complete', but declarative components (in Svelte and other frameworks) deliberately do not have a concept of time. The two things are incompatible
 * They have error-handling semantics that are very often redundant (what error could occur when observing the mouse position, for example?). When they're not redundant (e.g. in the case of data coming over the network), errors are perhaps best handled out-of-band, since the goal is to concisely represent the value in a component template
 
@@ -309,10 +305,10 @@ function adaptor(observable) {
   }
 }
 
-const tc39Observable = Observable.of('red', 'green', 'blue');
-const svelteObservable = adaptor(tc39Observable);
+const observable = Observable.of('red', 'green', 'blue');
+const store = adaptor(observable);
 
-const unsubscribe = svelteObservable.subscribe(color => {
+const unsubscribe = store.subscribe(color => {
   console.log(color); // logs red, then green, then blue
 });
 ```
@@ -329,7 +325,7 @@ More broadly, the same technique will work with existing state management librar
 // src/redux.js
 import { createStore } from 'redux';
 
-export const store = createStore((state = 0, action) => {
+export const reduxStore = createStore((state = 0, action) => {
   switch (action.type) {
     case 'INCREMENT':
       return state + 1
@@ -340,27 +336,27 @@ export const store = createStore((state = 0, action) => {
   }
 });
 
-function adaptor(store) {
+function adaptor(reduxStore) {
   return {
     subscribe(fn) {
-      return store.subscribe(() => {
-        fn(store.getState());
+      return reduxStore.subscribe(() => {
+        fn(reduxStore.getState());
       });
     }
   };
 }
 
-export const observable = adaptor(store);
+export const store = adaptor(reduxStore);
 ```
 
 ```html
 <!-- src/Counter.html -->
 <script>
-  import { store, observable } from './redux.js';
+  import { reduxStore, store } from './redux.js';
 </script>
 
-<button on:click="{() => store.dispatch({ type: 'INCREMENT' })}">
-  Clicks: {$observable}
+<button on:click="{() => reduxStore.dispatch({ type: 'INCREMENT' })}">
+  Clicks: {$store}
 </button>
 ```
 
@@ -368,18 +364,19 @@ export const observable = adaptor(store);
 #### Immer
 
 ```js
+import { writable } from 'svelte/store.js';
 import { produce } from 'immer';
 
 function immerObservable(data) {
-  const o = observable(data);
+  const store = writable(data);
 
   function update(fn) {
-    o.update(state => produce(state, fn));
+    store.update(state => produce(state, fn));
   }
 
   return {
     update,
-    subscribe: o.subscribe
+    subscribe: store.subscribe
   };
 }
 
@@ -398,22 +395,23 @@ todos.update(draft => {
 #### Shiz
 
 ```js
+import { readable } from 'svelte/store.js';
 import { value, computed } from 'shiz';
 
 const a = value(1);
 const b = computed([a], ([a]) => a * 2);
 
 function shizObservable(shiz) {
-  return readOnlyObservable(function start(set) {
+  return readable(function start(set) {
     return shiz.on('change', () => {
       set(shiz.get());
     });
   }, shiz.get());
 }
 
-const observable = shizObservable(b);
+const store = shizObservable(b);
 
-const unsubscribe = observable.subscribe(value => {
+const unsubscribe = store.subscribe(value => {
   console.log(value); // logs 2
 });
 
@@ -425,36 +423,28 @@ a.set(2); // logs 4
 
 At present, `Store` gets privileged treatment in [Sapper](https://sapper.svelte.technology) apps. A store instance can be created per-request, for example to contain user data. This store is attached to the component tree at render time, allowing `<span>{$user.name}</span>` to be server-rendered; its data is then passed to a client-side store.
 
-It's essential that this functionality be preserved. I'm not yet sure of the best way to achieve that.
+It's essential that this functionality be preserved. I'm not yet sure of the best way to achieve that. The most promising suggestion is that we use regular props instead, passed into the top-level component. (In some ways this would be more ergonomic, since the user would no longer be responsible for setting up the store client-side.)
 
 > Potential corner-cases to discuss:
 > * What happens if a subscriber causes another subscriber to be removed (e.g. it results in a component subtree being destroyed)?
-> * Is `$user.name` ambiguous (i.e. is `user` the observable, or `user.name`?) and if so how do we resolve the ambiguity
-> * What happens if `$user` is declared in a scope that has an observable `user`? Do we just not subscribe?
-
-
-
-### Where does it go?
-
-This is (🐃) up for debate, but one possibility is that we put these functions in `svelte/state`:
-
-```js
-import { observable, readOnlyObservable, derivedObservable } from 'svelte/state';
-```
+> * Is `$user.name` ambiguous (i.e. is `user` the store, or `user.name`?) and if so how do we resolve the ambiguity
+> * What happens if `$user` is declared in a scope that has a store `user`? Do we just not subscribe?
 
 
 ## How we teach this
 
 As with RFC 1, it's crucial that this be introduced with ample demos of how the `$` prefix works, in terms of the generated code.
 
-It's arguably simpler to teach than the existing store, since it's purely concerned with data, and avoids the 'magic' of auto-attaching. We do need to pick the right terminology though, and I'm open to alternatives to 'observable'.
+It's arguably simpler to teach than the existing store, since it's purely concerned with data, and avoids the 'magic' of auto-attaching.
 
 
 ## Drawbacks
 
 Like RFC 1, this is a breaking change, though RFC 1 will break existing stores anyway. The main reason not to pursue this option would be that the `$` prefix is overly magical, though I believe the convenience outweighs the modest learning curve.
 
-Another potential drawback is that anything that uses an observable (except the markup) must *itself* become observable; they are [red functions](http://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/). But this problem is presumably fundamental, rather than an avoidable consequence of the approach we've happened to choose.
+Another potential drawback is that anything that uses a store (except the markup) must *itself* become a reactive store; they are [red functions](http://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/). But this problem is presumably fundamental, rather than an avoidable consequence of the approach we've happened to choose.
+
+> [RFC 3](https://github.com/sveltejs/rfcs/blob/reactive-declarations/text/0003-reactive-declarations.md) presents an escape hatch to this problem
 
 
 ## Alternatives
@@ -467,6 +457,5 @@ Another potential drawback is that anything that uses an observable (except the 
 
 ## Unresolved questions
 
-* What names to give everything
 * The Sapper question
 * The exact mechanics of how typechecking would work
