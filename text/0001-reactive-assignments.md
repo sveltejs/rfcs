@@ -488,7 +488,7 @@ Currently, inline event handlers must be call expressions...
 This also allows us to do fairly sophisticated things like this:
 
 ```
-<input on:keydown"{e => e.which === 39 ? next(e) : e.which === 37 ? prev(e) : null}">
+<input on:keydown="{e => e.which === 39 ? next(e) : e.which === 37 ? prev(e) : null}">
 ```
 
 In Svelte 2, there is a shorthand:
