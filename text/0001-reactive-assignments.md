@@ -805,7 +805,7 @@ this.store.doSomething();
 
 Since there is no longer a `this`, we need to reconsider this approach. At the same time, the `get`/`set`/`on`/`fire` interface (designed to mirror the component API) feels slightly anachronistic in light of the rest of this RFC. A major problem with the store in its current incarnation is its lack of typechecker-friendliness, and the undocumented hoops necessary to jump through to integrate with popular libraries like MobX.
 
-A proposal for a store replacement exists in the form of [RFC 2](#5).
+A proposal for a store replacement exists in the form of [RFC 2](https://github.com/sveltejs/rfcs/pull/5).
 
 
 ### Spread props
