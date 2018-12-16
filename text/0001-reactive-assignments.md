@@ -604,48 +604,12 @@ This would create a `CustomEvent` with an `event.type` of `tick` (or `tock`) and
 As with lifecycle functions, the `dispatch` is bound to the component because of when `createEventDispatcher` is called.
 
 
-### Bindings
-
-Element bindings are a convenient shorthand, which I believe we should preserve:
-
-```html
-<input bind:value={name}>
-
-<!-- equivalent (Svelte 2) -->
-<input value={name} on:input="set({ name: this.value })">
-
-<!-- equivalent (this proposal) -->
-<input value={name} on:input="{e => name = e.target.value}">
-```
-
-Component bindings are less clear-cut. In the past they've been a source of confusion for the same reason that the lifecycle hook dance causes confusion upon app initialisation. It's possible that the new lifecycle concepts will eliminate those headaches, but this requires further exploration.
-
-The reason we can *consider* removing component bindings is that it's now trivial to pass state-altering functions down to components:
-
-```html
-<script>
-  import Mousecatcher from './Mousecatcher.html';
-
-  let mouse;
-
-  function setPosition(x, y) {
-    mouse = { x, y };
-  }
-</script>
-
-<Mousecatcher {setPosition}>
-  the mouse is at {mouse.x},{mouse.y}
-</Mousecatcher>
-```
-
-> 🐃 One thing we need to figure out — how to respond to a binding value changing
-
 
 ### Component API
 
 Under this proposal, there is no longer a `this` with state and methods *inside* a component. But there needs to be a way to interact with the component from the outside world.
 
-Instantiating a top-level component probably needn't change (except 🐃 maybe changing `data` to `props`):
+Instantiating a top-level component remains the same, except that `data` is renamed to `props` to match the language used elsewhere:
 
 ```js
 import App from './App.html';
@@ -669,7 +633,7 @@ This creates consistent behaviour between Svelte components that are compiled to
 
 Of the five **built-in methods** that currently comprise the [component API](https://svelte.technology/guide#component-api) — `get`, `set`, `fire`, `on` and `destroy` — we no longer need the first three. `on` and `destroy` are still necessary, and we could keep `set` for cases where someone needs to change multiple props at the top-level with a single update.
 
-It would be nice to have some way to differentiate those built-in methods from regular properties so that people don't need to worry about potential conflicts — for that reason, `on`, `destroy` and `set` could become (🐃) `$on`, `$destroy` and `$set`.
+To differentiate those built-in methods from regular properties (so that people don't need to worry about potential conflicts), `on`, `destroy` and `set` become `$on`, `$destroy` and `$set`.
 
 In some cases, a component that is designed to be used as a standalone widget will create its own **custom methods**. In Svelte 2, these are lumped in with 'private' (except not really) methods. Under this proposal, custom methods are just exported variables that happen to be functions:
 
