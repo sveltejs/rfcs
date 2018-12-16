@@ -1010,8 +1010,6 @@ Obviously, this is a breaking change. We're not the React team; we don't have th
 
 It also introduces some frankly somewhat surprising behaviour. Having spent much of the week thinking about it, and toying with existing components, I do earnestly believe that this approach feels natural once you're over the initial shock, but not everyone is guaranteed to feel that way.
 
-The loss of computed properties as a distinct primitive will be felt by some Svelte users. It's no longer as convenient to use a value that is derived from other derived values, particularly if that value is a function.
-
 Overall though, this solves so many inter-related problems with Svelte that I believe the benefits to be overwhelming.
 
 
