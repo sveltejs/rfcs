@@ -138,10 +138,10 @@ function writable(value) {
     subscribers.push(fn);
     fn(value);
 
-    return function() {
+    return () => {
       const index = subscribers.indexOf(fn);
       if (index !== -1) subscribers.splice(index, 1);
-    }
+    };
   }
 
   return { set, update, subscribe };
@@ -188,12 +188,12 @@ function readable(start, value) {
         if (index !== -1) subscribers.splice(index, 1);
 
         if (subscribers.length === 0) {
-          stop();
+          stop && stop();
           stop = null;
         }
       };
     }
-  }
+  };
 }
 
 const mousePosition = readable(function start(set) {
@@ -213,7 +213,7 @@ const mousePosition = readable(function start(set) {
 
 ### Derived stores
 
-A store can be derived from other stores with `derive` (🐃):
+A store can be derived from other stores with `derive`:
 
 ```js
 const a = writable(1);
@@ -233,20 +233,30 @@ Example implementation:
 
 ```js
 function derive(stores, fn) {
-  return readOnlyObservable(set => {
+  const single = !Array.isArray(stores);
+  if (single) stores = [stores];
+
+  const auto = fn.length === 1;
+
+  return readable(set => {
     let inited = false;
     const values = [];
 
+    const sync = () => {
+      const result = fn(single ? values[0] : values, set);
+      if (auto) set(result);
+    }
+
     const unsubscribers = stores.map((store, i) => store.subscribe(value => {
       values[i] = value;
-      if (inited) set(fn(...values));
+      if (inited) sync();
     }));
 
     inited = true;
-    set(fn(...values));
+    sync();
 
     return function stop() {
-      unsubscribers.forEach(fn => fn());
+      run_all(unsubscribers);
     };
   });
 }
