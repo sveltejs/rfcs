@@ -949,47 +949,7 @@ In Svelte 2, 'computed properties' use compile-time dependency tracking to deriv
 
 In the example above, there is no real need to calculate `bar` since it is not rendered, but it happens anyway.
 
-Under this proposal, there is no longer a separate concept of computed properties. Instead, we can just use functions:
-
-```html
-<script>
-  export let foo = 1;
-  export let visible = false;
-
-  const bar = () => foo;
-</script>
-
-{#if visible}
-  <p>{bar()}</p>
-{/if}
-```
-
-Note that we now *invoke* `bar` in the markup. If `foo` were to change while `visible` were true, we would need to update the contents of `<p>`. That means we need to track the values that could affect the return value, resulting in compiled code similar to this:
-
-```js
-function update(changed, ctx) {
-  if (changed.foo) p.textContent = ctx.bar();
-}
-```
-
-In some situations dependency tracking may be impossible — I'm not sure. In those cases, we can simply bail out:
-
-```js
-function update(changed, ctx) {
-  p.textContent = ctx.bar();
-}
-```
-
-Note that this system is now pull-based rather than push-based. One drawback over the current system of computed properties is that values that are referenced multiple times will also be calculated multiple times:
-
-```html
-{#if visible}
-  <p>{bar()} — {bar()}</p>
-{/if}
-```
-
-Potentially, this could be alleviated with compiler magic (i.e. detecting multiple invocations of pure functions with the same arguments, and computing once before rendering) or userland memoization, but it warrants further exploration.
-
+[RFC 3](https://github.com/sveltejs/rfcs/pull/8) proposed a Svelte 3 friendly alternative to computed properties that is more flexible and involves less boilerplate.
 
 ### svelte-extras
 
