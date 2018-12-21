@@ -408,7 +408,7 @@ Currently, directive values do not have curly braces as delimiters. This is an o
 <div class:foo="{a ? b : c}">...</div>
 ```
 
-Even though this is two extra characters (because we care about syntax highlighting in non-Svelte-aware environments) it's arguably more readable and consistent. This pattern would be used across all directives, but there are particular changes that apply to `ref:` and on:`, discussed below.
+Even though this is two extra characters (we preserve the quotes because we care about syntax highlighting in non-Svelte-aware environments) it's arguably more readable and consistent. This pattern would be used across all directives, but there are particular changes that apply to `ref:` and `on:`, discussed below.
 
 
 #### `ref:`
@@ -580,7 +580,7 @@ Svelte 2 components can fire events with `this.fire(eventName, optionalData)`. T
 
 Since there's no more `this`, there's no more `this.fire`, which means we need to rethink events. This gives us an opportunity to align with web components, where `CustomEvent` is used ([issue here](https://github.com/sveltejs/svelte/issues/1655)) — this also gives us event bubbling, which avoids needing to manually propagate events.
 
-The high-level proposal is to introduce a function called `createEventDispatcher` (🐃) that would return a function for dispatching events:
+The high-level proposal is to introduce a function called `createEventDispatcher` that would return a function for dispatching events:
 
 ```js
 import { createEventDispatcher } from 'svelte';
@@ -631,7 +631,7 @@ app.name = 'everybody'; // triggers an update synchronously
 
 This creates consistent behaviour between Svelte components that are compiled to custom elements, and those that are not, while also making it easy to understand the component's contract.
 
-Of the five **built-in methods** that currently comprise the [component API](https://svelte.technology/guide#component-api) — `get`, `set`, `fire`, `on` and `destroy` — we no longer need the first three. `on` and `destroy` are still necessary, and we could keep `set` for cases where someone needs to change multiple props at the top-level with a single update.
+Of the five **built-in methods** that currently comprise the [component API](https://svelte.technology/guide#component-api) — `fire`, `get`, `set`, `on` and `destroy` — we no longer need the first two. `on` and `destroy` are still necessary, and we'll keep `set` for cases where someone needs to change multiple props at the top-level with a single update.
 
 To differentiate those built-in methods from regular properties (so that people don't need to worry about potential conflicts), `on`, `destroy` and `set` become `$on`, `$destroy` and `$set`.
 
@@ -720,7 +720,7 @@ Promise.resolve(preload(params)).then(props => {
 });
 ```
 
-Default exports would be forbidden, since they would conflict with the component itself
+Default exports would be forbidden, since they would conflict with the component itself.
 
 > Conceptually, `context="module"` is a place to put any functions that are shared between instances. This wouldn't be necessary day-to-day however, as the compiler can automatically hoist functions that don't reference internal state.
 
@@ -731,19 +731,9 @@ The compiler running with the `generate: 'ssr'` option produces completely diffe
 
 This does create some subtle behaviour differences however: there is no real place to do any kind of setup work, and `oncreate` (and the other lifecycle hooks) never run. Component bindings are also brittle.
 
-Under this proposal, the code inside the `<script>` block *would* run for server-rendered components, which also means that `ondestroy` would need to run. `beforeUpdate` and `afterUpdate` would be no-ops.
+Under this proposal, the code inside the `<script>` block *would* run for server-rendered components, which also means that `ondestroy` would need to run. `onMount`, `beforeUpdate` and `afterUpdate` would be no-ops.
 
-Instead of `generate: 'ssr'` we can simplify things by including SSR code in the same output module as the DOM code, relying on tree-shaking to remove the unused portion:
-
-```js
-// output code
-export default class SomeComponentt {...}
-
-export function $render(data) {
-  // ...
-  return { head, html, css };
-}
-```
+The API would stay the same as it currently is (we experimented with a method of exporting an SSR `$render` function from a regular component, but it turns out to be impractical for various reasons).
 
 
 ### Store
@@ -812,8 +802,6 @@ That opportunity no longer exists in this RFC. Instead we need some other way to
 <Bar {...subset()}/>
 ```
 
-> Since a component's public API ordinarily uses accessors to define the component's contract, it is likely that *inline* components would need to use a privileged non-public API, so that unanticipated props could be passed in. (This is something we should do anyway)
-
 
 ### Sync vs async rendering
 
@@ -828,7 +816,7 @@ This is easily understood, and if there is an error during rendering it is easy 
 
 But it also has major drawbacks. It can result in the cyclical behaviour observed above, and it provides the framework no opportunity to optimise updates by (for example) batching operations that are likely to result in DOM reads (such as transition or `onupdate` callbacks) separately from the framework-initiated cycle of DOM writes. It also prevents us from implementing ideas like [time slicing](https://reactjs.org/blog/2018/03/01/sneak-peek-beyond-react-16.html).
 
-In addition, while it's possible to batch changes *within a component* (`this.set({ a, b, c })` results in a single update), changes *across* components (or those that affect stores and components together) are not batched. Now that `set` is no longer available, it is important that variable reassignments don't result in a sync update, but rather schedule an update (for the next animation frame, for example).
+In addition, while it's possible to batch changes *within a component* (`this.set({ a, b, c })` results in a single update), changes *across* components (or those that affect stores and components together) are not batched. Now that `set` is no longer available, it is important that variable reassignments don't result in a sync update, but rather schedule an update (in a microtask).
 
 Exceptions to this rule could be made where appropriate. For example if you're tracking the height of a list...
 
@@ -924,7 +912,7 @@ Happily, these will no longer involve monkey-patching components:
 ```html
 <script>
   import { beforeUpdate } from 'svelte';
-  import { tween } from 'svelte/animation'; // 🐃
+  import { tween } from 'svelte/motion';
   import * as eases from 'eases-jsnext';
 
   export let progress = 0;
@@ -987,4 +975,4 @@ We toyed with a few alternative concepts:
 
 ## Unresolved questions
 
-The major TODO is how `Store` should evolve in this new world.
+None, I think.
