@@ -86,11 +86,11 @@ This would compile to something like the following:
 import { onDestroy } from 'svelte';
 import { user } from './stores.js';
 
-function init($$self, $$make_dirty) {
+function init($$self, $$invalidate) {
   let $user;
   onDestroy(user.subscribe(value => {
     $user = value;
-    $$makeDirty('$user');
+    $$invalidate('$user', $user);
   }));
 
   $$self.get = () => ({ $user });
@@ -127,19 +127,21 @@ function writable(value) {
   function set(newValue) {
     if (newValue === value) return;
     value = newValue;
-    subscribers.forEach(fn => fn(value));
+    subscribers.forEach(s => s[1]());
+    subscribers.forEach(s => s[0](value));
   }
 
   function update(fn) {
     set(fn(value));
   }
 
-  function subscribe(fn) {
-    subscribers.push(fn);
-    fn(value);
+  function subscribe(run, invalidate = noop) {
+    const subscriber = [run, invalidate];
+    subscribers.push(subscriber);
+    run(value);
 
     return () => {
-      const index = subscribers.indexOf(fn);
+      const index = subscribers.indexOf(subscriber);
       if (index !== -1) subscribers.splice(index, 1);
     };
   }
@@ -171,20 +173,22 @@ function readable(start, value) {
   function set(newValue) {
     if (newValue === value) return;
     value = newValue;
-    subscribers.forEach(fn => fn(value));
+    subscribers.forEach(s => s[1]());
+    subscribers.forEach(s => s[0](value));
   }
 
   return {
-    subscribe(fn) {
+    subscribe(run, invalidate = noop) {
       if (subscribers.length === 0) {
         stop = start(set);
       }
 
-      subscribers.push(fn);
-      fn(value);
+      const subscriber = [run, invalidate];
+      subscribers.push(subscriber);
+      run(value);
 
       return function() {
-        const index = subscribers.indexOf(fn);
+        const index = subscribers.indexOf(subscriber);
         if (index !== -1) subscribers.splice(index, 1);
 
         if (subscribers.length === 0) {
@@ -237,20 +241,30 @@ function derive(stores, fn) {
   if (single) stores = [stores];
 
   const auto = fn.length === 1;
+  let value = {};
 
   return readable(set => {
     let inited = false;
     const values = [];
 
+    let pending = 0;
+
     const sync = () => {
+      if (pending) return;
       const result = fn(single ? values[0] : values, set);
-      if (auto) set(result);
+      if (auto && (value !== (value = result))) set(result);
     }
 
-    const unsubscribers = stores.map((store, i) => store.subscribe(value => {
-      values[i] = value;
-      if (inited) sync();
-    }));
+    const unsubscribers = stores.map((store, i) => store.subscribe(
+      value => {
+        values[i] = value;
+        pending &= ~(1 << i);
+        if (inited) sync();
+      },
+      () => {
+        pending |= (1 << i);
+      })
+    );
 
     inited = true;
     sync();
