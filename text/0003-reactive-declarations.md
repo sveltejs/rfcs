@@ -57,7 +57,7 @@ As an indirect consequence of that change, we're able to get rid of all the boil
 
 The useful thing about computed properties is that they are only recalculated when their inputs change, side-stepping a common performance problem that affects some frameworks in which derived values must be recalculated on every render. Unlike some other frameworks that implement computed properties, the compiler is able to build a dependency graph of computed properties at *compile time*, enabling it to sort them topologically and generate highly efficient code that doesn't depend on expensive *run time* dependency tracking.
 
-RFC 1 glosses over the loss of computed properties, suggesting that we could simply replace them with functions:
+RFC 1 initially glossed over the loss of computed properties, suggesting that we could simply replace them with functions:
 
 ```html
 <script>
@@ -172,15 +172,7 @@ Another consequence is that it's straightforward to include side-effects (`$: co
 
 ### Timing
 
-Since reactive declarations are likely to depend on props passed into the component from outside, we probably don't want them to run immediately upon instantiation (when props aren't yet available).
-
-> 🐃 There has been some discussion about whether we *should* make props available immediately, rather than waiting until the first update cycle. In other words,
->
->     export let foo = 'fallback value';
->
-> would be transformed by the compiler to something like
->
->     let { foo = 'fallback value' } = $$props;
+Since reactive declarations are ordered topologically, we probably don't want them to run immediately in source order upon instantiation.
 
 We also don't want to run them immediately upon every change. Recalculating `foo` after `bar` is updated...
 
@@ -207,7 +199,7 @@ In Svelte 2, computed properties are read-only — attempting to write to them t
 
 ### Reactive stores
 
-[RFC 2](https://github.com/sveltejs/rfcs/blob/svelte-observables/text/0002-observables.md) introduced a proposal for reactive stores (the naming is TBD; the title of that RFC is 'Svelte observables', but at one point the favoured name was 'sources'. For now I'll refer to them as reactive stores, for alignment with reactive assignments and declarations).
+[RFC 2](https://github.com/sveltejs/rfcs/blob/svelte-observables/text/0002-observables.md) introduced a proposal for reactive stores.
 
 Briefly, the idea is that a reactive store exposes a `subscribe` method that can be used to track a value over time; *writable* stores would also expose methods like `set` and `update`. This allows application state to be stored outside the component tree, where appropriate. Inside templates, stores can be referenced with a `$` prefix that exposes their value:
 
@@ -307,8 +299,6 @@ The obvious problem with this is that `$todos` isn't defined anywhere in the `<s
 This shouldn't be the first thing that people encounter when learning Svelte — it's sufficiently surprising that a lot of people would be turned off before understanding the value proposition. Instead, the 'vanilla' alternative — updating everything manually in a `beforeUpdate` function — should probably be taught first, so that the concept ('and now, let's have the compiler do that for us, except more efficiently!') is already familiar.
 
 When discussing reactive programming, it's useful to refer to existing implementations of the idea, including spreadsheets.
-
-The naming and terminology are still TBD. 'Reactive declarations' makes sense to me as one leg of the reactive assignments/declarations/stores trinity, but better alternatives may exist. As for the label itself, I don't have a clear favourite, though I'm warming to `reactive:`.
 
 
 ## Drawbacks
