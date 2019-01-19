@@ -1,5 +1,5 @@
 - Start Date: 2019-01-19
-- RFC PR: (leave this empty)
+- RFC PR: [#12](https://github.com/sveltejs/rfcs/pull/12)
 - Svelte Issue: (leave this empty)
 
 # Better composition
