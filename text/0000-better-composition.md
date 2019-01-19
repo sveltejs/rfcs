@@ -347,21 +347,21 @@ import { createContext, useContext } from 'react';
 const ThemeContext = createContext('light');
 
 function App() {
-	return (
-		<ThemeContext.Provider value="dark">
-			<ChildComponent/>
-		</ThemeContext.Provider>
-	);
+  return (
+    <ThemeContext.Provider value="dark">
+      <ChildComponent/>
+    </ThemeContext.Provider>
+  );
 }
 
 function ChildComponent() {
-	const theme = useContext(ThemeContext);
+  const theme = useContext(ThemeContext);
 
-	return (
-		<div className={theme}>
-			<p>Current theme is {theme}</p>
-		</div>
-	);
+  return (
+    <div className={theme}>
+      <p>Current theme is {theme}</p>
+    </div>
+  );
 }
 ```
 
