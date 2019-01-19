@@ -254,9 +254,9 @@ Here, `setContext` and `getContext` are functions that must be called during the
 > TODO draw the rest of the owl
 
 
-### Explicit slot context
+### Explicit slot scope
 
-The above example works for *implicit* context, i.e. that shared between components without the app author having to worry about it. Sometimes, we need *explicit* context, such as with the `<VirtualList>` example.
+The above example works for *implicit* context, i.e. that shared between components without the app author having to worry about it. Sometimes, we need *explicit* context, or 'scope', such as with the `<VirtualList>` example.
 
 React can achieve this with the render prop pattern:
 
@@ -312,7 +312,7 @@ For non-default slots, the directive would live on the slotted element:
 In terms of the generated code, the child component would augment its own context with any properties on the slot:
 
 ```js
-const slot_context = Object.assign(component_ctx, {
+const slot_scope = Object.assign(component_ctx, {
   item: ctx.item
 });
 ```
@@ -322,32 +322,52 @@ const slot_context = Object.assign(component_ctx, {
 
 ## How we teach this
 
-> What names and terminology work best for these concepts and why? How is this
-idea best presented? As a continuation of existing Svelte patterns, or as a
-wholly new one?
+Terminology-wise, 'uncontrolled component' and 'context' are terms in fairly widespread use in the React community, and 'slot scope' is used in Vue-land. It makes sense to use the same language.
 
-> Would the acceptance of this proposal mean the Svelte guides must be
-re-organized or altered? Does it change how Svelte is taught to new users
-at any level?
+For the vast majority of users, these changes are purely additive, requiring no real reorganization of existing documentation. The only change (see 'drawbacks') is that `<slot>` no longer behaves exactly like its native HTML equivalent, since we're now able to inject slot scope.
 
-> How should this feature be introduced and taught to existing Svelte
-users?
 
 ## Drawbacks
 
-> Why should we *not* do this? Please consider the impact on teaching Svelte,
-on the integration of this feature with other existing and planned features,
-on the impact of the API churn on existing apps, etc.
+It's tricky to implement, and adds complexity. Then again the current slot mechanism is also somewhat tricky.
 
-> There are tradeoffs to choosing any path, please attempt to identify them here.
+The current method makes it possible to use the slots API programmatically, by passing a `slot: { default, named }` object at initialisation (where `default` and `named` are HTML elements or document fragments). That would no longer be possible if the lifecycle is controlled by the child rather than the parent. Personally I haven't ever used this API, and I'd be surprised if many people have, but it is a drawback nonetheless.
+
+Finally, this proposal moves us away from alignment with web components. A Svelte component that had `<slot>` inside an each block (such as svelte-virtual-list) couldn't realistically be compiled to a web component. It wouldn't be much use as a web component in its current form though.
 
 ## Alternatives
 
-> What other designs have been considered? What is the impact of not doing this?
+The alternative is to do nothing, and rely on existing methods of composition. As we've seen, there are limits to the current approach.
 
-> This section could also include prior art, that is, how other frameworks in the same domain have solved this problem.
+Context could be designed differently. React does it like this:
+
+```js
+import { createContext, useContext } from 'react';
+
+const ThemeContext = createContext('light');
+
+function App() {
+	return (
+		<ThemeContext.Provider value="dark">
+			<ChildComponent/>
+		</ThemeContext.Provider>
+	);
+}
+
+function ChildComponent() {
+	const theme = useContext(ThemeContext);
+
+	return (
+		<div className={theme}>
+			<p>Current theme is {theme}</p>
+		</div>
+	);
+}
+```
+
+In other words, context can be created anywhere inside the component's markup, rather than just in the `<script>` block upon instantation with `setContext`. This is a theoretical benefit but would become unwieldy when using more complex values (such as the context created by the `<Tabs>` component example). 'Context' in this RFC is more than just a simple value; it's potentially a way for related components to communicate with each other, obviating the need for a component to manipulate its children the way that React uncontrolled components typically do.
+
 
 ## Unresolved questions
 
-> Optional, but suggested for first drafts. What parts of the design are still
-TBD?
+Have we named everything correctly?
