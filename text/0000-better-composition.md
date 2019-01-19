@@ -271,7 +271,7 @@ React can achieve this with the render prop pattern:
 }</VirtualList>
 ```
 
-that's a little trickier for us. Perhaps we could achieve the same result with a new directive, `expose` (🐃):
+That's a little trickier for us. Perhaps we could achieve the same result with a new directive, `expose` (🐃):
 
 ```html
 <VirtualList items={things} expose:item>
