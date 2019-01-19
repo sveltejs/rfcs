@@ -82,8 +82,7 @@ Another problem that comes up from time to time: slots can only be used once. Yo
     { name: 'three', number: 3 },
     // ...
     { name: 'six thousand and ninety-two', number: 6092 }
-  ]
-  };
+  ];
 </script>
 
 <VirtualList items={things} component={RowComponent} />
