@@ -6,7 +6,7 @@
 
 ## Summary
 
-> Svelte 3 components can be combined in various ways to do just about anything. But some tasks are unnecessarily difficult or boilerplate-ridden. This RFC proposes a set of changes to the way slotted content behaves to enable more idiomatic and powerful composition patterns.
+Svelte 3 components can be combined in various ways to do just about anything. But some tasks are unnecessarily difficult or boilerplate-ridden. This RFC proposes a set of changes to the way slotted content behaves to enable more idiomatic and powerful composition patterns.
 
 ## Motivation
 
@@ -150,7 +150,7 @@ For a pattern like this to work...
     <h2>Any content 2</h2>
   </TabPanel>
 </Tabs>
-...
+```
 
 ...each `<Tab>` component needs to be able to tell `<Tabs>` (possibly via `<TabList>`, depending on how the component is authored) that it has been selected. It also needs to know its index relative to its siblings, even if it is created after the initial render, or an earlier tab is removed after the initial render.
 
