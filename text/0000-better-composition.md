@@ -269,10 +269,10 @@ React can achieve this with the render prop pattern:
 }</VirtualList>
 ```
 
-That's a little trickier for us. Perhaps we could achieve the same result with a new directive, `expose` (🐃):
+That's a little trickier for us. Perhaps we could achieve the same result with a new directive, `let`:
 
 ```html
-<VirtualList items={things} expose:item>
+<VirtualList items={things} let:item>
   <div>
     <strong>{item.number}</strong>
     <span>{item.name}</span>
@@ -280,7 +280,7 @@ That's a little trickier for us. Perhaps we could achieve the same result with a
 </VirtualList>
 ```
 
-The `expose:item` directive, short for `expose:item={item}`, makes `item` available to child content, in much the same way as `{#each items as item}`. The `<VirtualList>` component would make it available like so:
+The `let:item` directive, short for `let:item={item}`, makes `item` available to child content, in much the same way as `{#each items as item}`. The `<VirtualList>` component would make it available like so:
 
 ```html
 {#each visible as row (row.index)}
@@ -293,7 +293,7 @@ The `expose:item` directive, short for `expose:item={item}`, makes `item` availa
 We could potentially allow destructuring as well:
 
 ```html
-<VirtualList items={things} expose:item="{{ name, number }}">
+<VirtualList items={things} let:item="{{ name, number }}">
   <div>
     <strong>{number}</strong>
     <span>{name}</span>
@@ -304,7 +304,7 @@ We could potentially allow destructuring as well:
 For non-default slots, the directive would live on the slotted element:
 
 ```html
-<div slot="footer" expose:year>
+<div slot="footer" let:year>
   <p>Copyright {year} SvelteJS Inc</p>
 </div>
 ```
