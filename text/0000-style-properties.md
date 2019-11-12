@@ -237,7 +237,13 @@ There are some more salient drawbacks:
 
 ## Alternatives
 
-One alternative is to do nothing: expect people to continue using `:global` and friends for this purpose. It's got us this far.
+
+### Do nothing
+
+Expect people to continue using `:global` and friends for this purpose. It's got us this far.
+
+
+### Do nothing, but encourage the use of custom properties
 
 We could also encourage the use of CSS custom properties for theming without making any changes to Svelte itself, in which case people could get the same end result by wrapping their components in elements that provide custom properties:
 
@@ -249,7 +255,24 @@ We could also encourage the use of CSS custom properties for theming without mak
 
 This has the merit of simplicity and obviousness, and doesn't involve any extra code being generated, but it's also a hack: it signals that we don't consider component themeability to be a problem worth solving properly.
 
+
+### Do nothing, but encourage `style` forwarding
+
+If component authors were in the habit of expecting a `style` prop, and applying it to top-level elements, we could do the same thing like so:
+
+```html
+<Slider style="--rail-color: black; --track-color: red" />
+```
+
+This arguably breaks encapsulation (it's not encouraging you to only pass down custom properties, but *any* styles to an element you don't control), and is contingent on component authors handling it in a consistent way.
+
+
+### Special-case `class`
+
 Another suggestion is to special-case the `class` property, per [#2888](https://github.com/sveltejs/svelte/pull/2888). This is arguably more in line with popular CSS-in-JS solutions. Personally, I think `class` is too blunt an instrument — it breaks encapsulation, allowing component consumers to change styles that they probably shouldn't, while also denying them a predictable interface for targeting individual styles, or setting theme properties globally.
+
+
+### props-in-style
 
 Something else that comes up from time to time is the idea of supporting `{props}` directly in the `<style>`:
 
