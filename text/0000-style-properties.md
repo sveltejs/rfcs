@@ -294,3 +294,5 @@ Aside from being an implementation nightmare, I think the proposal in this RFC i
 ## Unresolved questions
 
 I'm not a big design system user, so I would very much like to get feedback from people who are. Would this solve your problems? What have we missed?
+
+In particular, this takes a different approach from [CSS Shadow Parts](https://drafts.csswg.org/css-shadow-parts-1/), which allows a component consumer to target selected elements, but to then apply arbitrary styles to those elements. I'm personally surprised about that, given the degree to which web component advocates prioritise encapsulation — it seems like a footgun, honestly — but I'd be eager to learn from people with relevant experience. (Note that we'd still be able to emulate that capability with `:global` — really the question is whether it needs to be first-class.)
