@@ -82,94 +82,38 @@ Thirdly, this provides no good way to control theming at an app level. Every tim
 
 ## Detailed design
 
-Style properties — handily distinguishable from regular properties by the leading `--` used by CSS custom properties — are passed down to components through a separate channel. The example at the top of this RFC might be converted to the following JavaScript:
 
-```js
-const slider = new Slider({
-  props: {
-    value: ctx.value,
-    min: 0,
-    max: 100
-  },
-  styles: {
-    '--rail-color': 'black',
-    '--track-color': 'red',
-  }
-});
-```
+**Note: a previous implementation proposal worked by passing styles down as `ctx.$$styles`. This would have worked, but introduced some modest but unfortunate overhead. [It's preserved here](https://gist.github.com/Rich-Harris/6ee465dca7e86e5743cb367ba0ae3bee).**
 
-These properties — `--rail-color` and `--track-color` etc — are essentially part of the interface of `<Slider>`, just like the `value`, `max` and `min` properties are.
-
-Inside the Slider component, these styles would need to be applied to the top-level element — the equivalent of doing this:
+Style properties — handily distinguishable from regular properties by the leading `--` used by CSS custom properties — are essentially syntactic sugar for a wrapper element. The example at the top of this document...
 
 ```html
-<span class="potato-slider" style="--rail-color: black; --track-color: red">
+<Slider
+  bind:value
+  min={0}
+  max={100}
+  --rail-color="black"
+  --track-color="red"
+/>
 ```
 
-In practice that might look something like this:
-
-```js
-// internal helper
-function apply_styles(node, styles) {
-  for (const k in styles) {
-    node.style.setProperty(k, styles[k]);
-  }
-}
-
-function create_main_fragment(ctx) {
-  // ...
-
-  return {
-    c() {
-      span = element("span");
-      apply_styles(span, ctx.$$styles);
-    },
-    // ...
-    p(changed, ctx) {
-      if (changed.$$styles) apply_styles(span, ctx.$$styles);
-    },
-    // ...
-  };
-}
-```
-
-(It would get slightly more complex for cases where there was an existing `style` attribute, particularly if it included a `--rail-color` property or was an opaque `style={styles}` type attribute. But the principle is the same.)
-
-In the SSR case:
-
-```js
-return `<span class="${"potato-slider"}" style="${apply_ssr_styles($$styles)}">...</div>`;
-```
-
-
-### Inheritance
-
-In the same way that custom properties applied to an element affect all descendant elements, custom properties applied to a component would affect all DOM within that component. It could be argued that this breaks encapsulation, but a) it matches the expectations people have from using custom properties to date, b) would in general be more convenient, and c) is more or less out of our hands since that's just how custom properties work.
-
-
-### Multiple top-level elements
-
-A component might have multiple top-level elements. In such cases, it would be necessary to apply the custom properties to all of them.
-
-We could consider omitting them for elements that appear not to use the custom properties, and don't contain any components or any child elements that use them, but this might break expectations: it would be valid to select an element using global (or `:global`) CSS and expect the custom property to be present.
-
-
-### Zero top-level elements
-
-A trickier case is when there are no top-level elements, only components without any surrounding DOM. In these situations we would need to forward styles:
+...desugars to something like this:
 
 ```html
-<TopLevelComponent --foo={bar}>
+<div style="display: contents; --rail-color: black; --track-color: red">
+  <Slider
+    bind:value
+    min={0}
+    max={100}
+  />
+</div>
 ```
 
-```js
-const toplevelcomponent = new TopLevelComponent({
-  props: {...},
-  styles: Object.assign({}, ctx.$$styles, {
-    '--foo': ctx.bar
-  })
-});
-```
+`display: contents` essentially removes the wrapper element from the DOM, but allows it to set inheritable styles including custom properties. [It's easier to show than tell](https://svelte.dev/repl/ea454b5d951141ce989bf9ce46767c71?version=3.14.0). It's supported in [all modern browsers](https://caniuse.com/#feat=css-display-contents) (ignore notes 2 and 3, they don't apply in this situation), including Edge when the Chromium version ships.
+
+In unsupported browsers, there is a chance it would break some layouts (though setting `width: 100%; height: 100%` would fix many of those). Those browsers generally don't support custom properties anyway, so this should probably be considered a modern-browser-only feature.
+
+🐃 It *would* be possible for someone to accidentally target the `<div>`, so it may be preferable to use a made-up element name instead (`<styles>`?). In SVG, there might not be any choice but to use a `<g>`. In 99.9% of cases it wouldn't matter in the least, but it *would* need to be documented.
 
 
 ### Global theming
@@ -245,7 +189,7 @@ Expect people to continue using `:global` and friends for this purpose. It's got
 
 ### Do nothing, but encourage the use of custom properties
 
-We could also encourage the use of CSS custom properties for theming without making any changes to Svelte itself, in which case people could get the same end result by wrapping their components in elements that provide custom properties:
+We could also encourage the use of CSS custom properties for theming without making any changes to Svelte itself, in which case people could get the same end result by manually wrapping their components in elements that provide custom properties:
 
 ```html
 <div style="--rail-color: black; --track-color: red">
@@ -253,7 +197,7 @@ We could also encourage the use of CSS custom properties for theming without mak
 </div>
 ```
 
-This has the merit of simplicity and obviousness, and doesn't involve any extra code being generated, but it's also a hack: it signals that we don't consider component themeability to be a problem worth solving properly.
+This has the merit of simplicity and obviousness, but it's not particularly ergonomic: it signals that we don't consider component themeability to be a problem worth solving properly.
 
 
 ### Do nothing, but encourage `style` forwarding
