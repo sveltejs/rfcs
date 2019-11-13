@@ -174,8 +174,7 @@ It would require a new tutorial chapter and updated documentation.
 There are some more salient drawbacks:
 
 * It relies on something that is inherently global. Different components might 'claim' a given property name. While it's possible to differentiate them at the subtree level, it's not possible to do so globally.
-* The compiler would need to generate extra code for every component (for applying received style properties, and for passing them on to top-level child components), regardless of whether they were actually used, and the helper would be included in everyone's app. (This *could* be avoided with some form of whole-app optimisation.)
-* IE11 doesn't support custom properties, so we'd be pushing the ecosystem towards incompatibility with that browser. Should we care? Probably not. Component authors who wanted to support IE11 would have to provide fallback values, and consumers of those components would have to be okay with those fallbacks.
+* IE11 doesn't support custom properties or `display: contents`, so we'd be pushing the ecosystem towards incompatibility with that browser. Should we care? Probably not. Component authors who wanted to support IE11 would have to provide fallback values, and consumers of those components would have to be okay with those fallbacks.
 * Regular component properties are statically analysable, which could one day allow us to have typechecking and autocompletion when using those components. The same isn't true for style properties. We could imagine some way of changing that (some syntax that lives inside, or on, the `<style>` attribute) but it's extra work that isn't considered here.
 
 
