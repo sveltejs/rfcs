@@ -43,7 +43,7 @@ Suppose further that we want to control (say) the colour of the rail and the tra
 
 Because Svelte deliberately leaves class names intact, it's possible to select `.potato-slider-rail` etc from any stylesheet. But while this can be a useful escape hatch, it's not something to encourage as a method for theming, since it breaks encapsulation (the component has no control over which aspects of its styles can be externally controlled, even while it has complete control over which values are props and which are internal state) and is likely to lead to broken or buggy styles.
 
-It's also brittle, since it treats internal (potentially changeable) implementation details as a public API.
+It's also brittle, since it treats internal (potentially changeable) implementation details as a public API. A good theming solution is explicit about which style properties can be changed externally, just as components are explicit about which props are accessible to consumers.
 
 Furthermore, it becomes more difficult to style components differently based on where they appear in an app.
 
