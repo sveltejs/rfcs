@@ -1,5 +1,5 @@
 - Start Date: 2020-01-01
-- RFC PR: (leave this empty)
+- RFC PR: [#15](https://github.com/sveltejs/rfcs/pull/15)
 - Svelte Issue: (leave this empty)
 
 # Slot Attributes
@@ -195,6 +195,13 @@ Again, the Component author has said "this `<slot/>` needs to have these attribu
 	<div class="card-footer text-muted">2 days ago</div>
 </div>
 ```
+
+| Pass/Fail          | Requirement                             |
+|--------------------|-----------------------------------------|
+| :white_check_mark: | Self-contained component styles         |
+| :white_check_mark: | Does not require internal knowledge     |
+| :white_check_mark: | Slot is configurable from consumer POV  |
+| :white_check_mark: | Slot leaves no trace when unused/empty  |
 
 ## How we teach this
 
