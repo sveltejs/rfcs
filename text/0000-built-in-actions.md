@@ -24,7 +24,13 @@ people should use.
 Much like the `svelte/transition` package a `svelte/action` package could be created.
 You would import them like so: `import { longPress } from 'svelte/action'`.
 In here we would put whatever actions that would make sense to put here. These
-could be actions such as `use:longpress`, `use:clickOutside`, `use:lazyload` and so on.
+could be actions such as: 
+
+- `use:longpress`
+- `use:clickOutside`
+- `use:lazyload`
+- `use:debugFlash`
+
 Determining what actions should and should not be included needs to be discussed.
 
 ## How we teach this
