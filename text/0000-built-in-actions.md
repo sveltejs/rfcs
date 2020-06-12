@@ -29,10 +29,6 @@ Determining what actions should and should not be included needs to be discussed
 
 ## How we teach this
 
-> What names and terminology work best for these concepts and why? How is this
-idea best presented? As a continuation of existing Svelte patterns, or as a
-wholly new one?
-
 There are no real new concepts added by this RFC but I can see how we would probably want
 to add one or two new Tutorials and Examples. The documentation would need to be expanded
 a bit to also show off these actions, much like how transitions are described there.
