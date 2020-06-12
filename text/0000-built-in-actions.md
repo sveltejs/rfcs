@@ -41,7 +41,7 @@ a bit to also show off these actions, much like how transitions are described th
 
 ## Drawbacks
 
-The first one is documentaiton. This would probably require the most work in the short-term
+The first one is documentation. This would probably require the most work in the short-term
 but I think it would be a pretty straight-forward thing once the actual actions that are
 included are decided.
 
