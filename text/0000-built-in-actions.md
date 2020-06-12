@@ -1,6 +1,6 @@
-- Start Date: (fill me in with today's date, YYYY-MM-DD)
-- RFC PR: (leave this empty)
-- Svelte Issue: (leave this empty)
+- Start Date: 2020-06-12
+- RFC PR: 
+- Svelte Issue:
 
 # Built-in Actions
 
