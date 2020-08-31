@@ -24,15 +24,15 @@ While syntax is still WIP and up for debate, I'm thinking something like these w
 
 ```html
 <script context="module">
-    <!-- shared with "dom" and "ssr" -->
+  <!-- shared with "dom" and "ssr" -->
 </script>
 
 <script context="module:dom">
-    <!-- added to "dom" output only -->
+  <!-- added to "dom" output only -->
 </script>
 
 <script context="module:ssr">
-    <!-- added to "ssr" output only -->
+  <!-- added to "ssr" output only -->
 </script>
 ```
 
@@ -42,15 +42,15 @@ While syntax is still WIP and up for debate, I'm thinking something like these w
 
 ```html
 <script context="module">
-    <!-- shared with "dom" and "ssr" -->
+  <!-- shared with "dom" and "ssr" -->
 </script>
 
 <script context="module" output="dom">
-    <!-- added to "dom" output only -->
+  <!-- added to "dom" output only -->
 </script>
 
 <script context="module" output="ssr">
-    <!-- added to "ssr" output only -->
+  <!-- added to "ssr" output only -->
 </script>
 ```
 
@@ -65,15 +65,15 @@ Let's assume you have an `Article` component. It's self-reliant, meaning it fetc
 
 ```html
 <script lang="ts">
-    let post: Article = {};
+  let post: Article = {};
 
-    export let slug: string;
+  export let slug: string;
 </script>
 
 <h1>{post.title}</h1>
 
 <div class="content">
-	{@html post.body}
+  {@html post.body}
 </div>
 ```
 
@@ -81,25 +81,25 @@ Generally, something like this warrants a `preload` function inside a `context=m
 
 ```html
 <script context="module" lang="ts">
-    let loaded = {};
+  let loaded = {};
 
-    export function preload(req: IRequest) {
-        loaded.slug = req.params.slug;
-        return fetch(`.../${loaded.slug}`).then(r => r.json()).then(obj => {
-            loaded.data = obj;
-        });
-	}
+  export function preload(req: IRequest) {
+    loaded.slug = req.params.slug;
+    return fetch(`.../${loaded.slug}`).then(r => r.json()).then(obj => {
+      loaded.data = obj;
+    });
+  }
 </script>
 
 <script lang="ts">
-    let post: IArticle = loaded.data || {};
-    export let slug: string = loaded.slug || '';
+  let post: IArticle = loaded.data || {};
+  export let slug: string = loaded.slug || '';
 </script>
 
 <h1>{post.title}</h1>
 
 <div class="content">
-	{@html post.body}
+  {@html post.body}
 </div>
 ```
 
@@ -116,49 +116,49 @@ This allows the developer of this example to be explicit with the behavioral dis
 
 ```html
 <script context="module:dom" lang="ts">
-    // Still using fetch() for DOM
+  // Still using fetch() for DOM
 
-    let loaded = {};
+  let loaded = {};
 
-    export function preload(req: IRequest) {
-        loaded.slug = req.params.slug;
-        return fetch(`.../${loaded.slug}`).then(r => r.json()).then(obj => {
-            loaded.data = obj;
-        });
-	}
+  export function preload(req: IRequest) {
+    loaded.slug = req.params.slug;
+    return fetch(`.../${loaded.slug}`).then(r => r.json()).then(obj => {
+        loaded.data = obj;
+    });
+  }
 </script>
 
 <script context="module:ssr" lang="ts">
-    // Bring database dependencies for server
-    import sql from 'postgres';
-    import type { IncomingMessage } from 'http';
+  // Bring database dependencies for server
+  import sql from 'postgres';
+  import type { IncomingMessage } from 'http';
 
-    let loaded = {};
+  let loaded = {};
 
-    // Maintain my own preload() contract
-    export async function preload(req: IncomingMessage) {
-        loaded.slug = req.params.slug;
+  // Maintain my own preload() contract
+  export async function preload(req: IncomingMessage) {
+    loaded.slug = req.params.slug;
 
-        const rows = await sql<IArticle>`
-            select * from articles 
-            where slug = ${loaded.slug}
-            and deleted_at is null
-            limt 1
-        `;
+    const rows = await sql<IArticle>`
+      select * from articles 
+      where slug = ${loaded.slug}
+      and deleted_at is null
+      limit 1
+    `;
 
-        if (rows.length) loaded.data = rows[0];
-	}
+    if (rows.length) loaded.data = rows[0];
+  }
 </script>
 
 <script lang="ts">
-    let post: IArticle = loaded.data || {};
-    export let slug: string = loaded.slug || '';
+  let post: IArticle = loaded.data || {};
+  export let slug: string = loaded.slug || '';
 </script>
 
 <h1>{post.title}</h1>
 
 <div class="content">
-	{@html post.body}
+  {@html post.body}
 </div>
 ```
 
@@ -174,14 +174,14 @@ I think it's really as simple as adding the two variants to the `context=module`
 
 ```js
 let module = {
-    default: Component,
-    ...context // context=module
+  default: Component,
+  ...context // context=module
 };
 
 if (has_context('dom') && options.generate === 'dom') {
-    module = { ...module, ...context_dom };
+  module = { ...module, ...context_dom };
 } else if (has_context('ssr') && options.generate === 'ssr') {
-    module = { ...module, ...context_ssr };
+  module = { ...module, ...context_ssr };
 }
 ```
 
