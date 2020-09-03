@@ -4,6 +4,8 @@ This is a place to discuss major changes to Svelte — where 'major' implies sig
 
 Most changes don't need to go through the RFC process and can rely on issues and pull requests.
 
+A huge part of the value on an RFC is defining the problem clearly, collecting use cases, showing how others have solved a problem, etc. Coming up with a design is very iterative and only one part of the process. An RFC can provide tremendous value without the design described in it being accepted.
+
 The is inspired by (which is to say shamelessly ripped off from) the RFC process adopted by [React](https://github.com/reactjs/rfcs), [Ember](https://github.com/emberjs/rfcs) and others. The process itself is subject to change (or even abandonment!) as we gain experience with it.
 
 
