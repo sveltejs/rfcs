@@ -18,7 +18,9 @@
 > hard about it.
 
 > Is there some concrete issue you cannot accomplish without this?
-> What does it look like to accomplish some set of goals today and how could that be improved?
+> What does it look like to accomplish some set of goals today and how could
+> that be improved?
+> Are there any workarounds that are necessary today?
 > Are there open issues on Github where people would be helped by this?
 
 > Please focus on explaining the motivation so that if this RFC is not accepted,
