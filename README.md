@@ -41,4 +41,4 @@ If you are interested in working on the implementation for an 'active' RFC, but 
 
 ## Reviewing RFCs
 
-This is where we differ from other teams using this process — we don't have regular core team meetings, and tend to do all our thinking informally, in the open, when time allows.
+We tend to do our thinking informally, in the open, when time allows. There are a large number of community members relative to a small number of a core contributors who have many responsibilities. You can help ensure your RFC is reviewed in a timely manner by putting in the time to think through the various details discussed in the template. It doesn't scale to push the thinking onto a small number of core contributors. If reviewers raise an issue, don't dismiss it as irrelevant, but take the time to provide examples or data explaining it and coming up with ways that the design might be changed in response. Sometimes answering a single question can be very time consuming (such as setting up a benchmark), but discussions tend to stall out if concerns don't get thoroughly addressed.

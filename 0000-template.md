@@ -17,11 +17,13 @@
 > it easier to do X" then give an example of what that looks like today and what's
 > hard about it.
 
+> Don't assume that others recognize the problem is one that needs to be solved
 > Is there some concrete issue you cannot accomplish without this?
 > What does it look like to accomplish some set of goals today and how could
 > that be improved?
 > Are there any workarounds that are necessary today?
 > Are there open issues on Github where people would be helped by this?
+> Will the change have performance impacts? Can you quantify them?
 
 > Please focus on explaining the motivation so that if this RFC is not accepted,
 > the motivation could be used to develop alternative solutions. In other words,
@@ -45,9 +47,15 @@
 ### Implementation
 
 > Explain the design in enough detail for somebody familiar with the framework to
-understand, and for somebody familiar with the implementation to implement. This
-should get into specifics and corner-cases, and include examples of how the feature
-is used. Any new terminology should be defined here.
+understand, and for somebody familiar with the implementation to implement. Any
+> new terminology should be defined here.
+
+> Explain not just the final design, but also how you arrived at it. What
+> constraints did you face? How does this deal with corner cases?
+
+> Explain how your design fits into the larger picture. What are the other open
+> problems in this area? How does this design fit with potential solutions for those
+> issues?
 
 > Connect your design to the motivations you listed above. When describing a part of
 > the design, share an example of what it would look like to utilize the solution to
