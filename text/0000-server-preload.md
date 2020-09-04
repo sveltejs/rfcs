@@ -64,7 +64,7 @@ Building on @lukeed's work in [#27](https://github.com/sveltejs/rfcs/pull/27), t
 Our blog post component could be rewritten thusly:
 
 ```svelte
-<script context="module server">
+<script context="module ssr">
 	export async function preload(page) {
 		const article = await get_post_somehow(page.params.slug);
 
@@ -79,7 +79,7 @@ Our blog post component could be rewritten thusly:
 </script>
 ```
 
-> 🐃 I leave the question of whether it's `module:ssr`, `module server` or something else entirely to [#27](https://github.com/sveltejs/rfcs/pull/27) — though I'll just throw out the suggestion that having a space-separated list of contexts has a nice future-proof feeling to it
+> 🐃 I leave the question of whether it's `module:ssr`, `module ssr` or something else entirely to [#27](https://github.com/sveltejs/rfcs/pull/27) — though I'll just throw out the suggestion that having a space-separated list of contexts has a nice future-proof feeling to it
 
 When server-rendering this page, Sapper could generate preloaded props trivially:
 
@@ -93,7 +93,7 @@ const props = await Component.preload.call({
 Upon client-side navigation, Sapper would behave as though an implicit preload function had been generated. It would need to make a request to some known path; one logical choice would be to use the same path as for the page itself, but using an `Accept` header to determine whether to return HTML or JSON:
 
 ```svelte
-<script context="module client">
+<script context="module dom">
 	export async function preload(page) {
 		// This function is implicit, you wouldn't have to write it
 		const res = await this.fetch(`blog/${page.params.slug}`, {
@@ -130,7 +130,7 @@ In some cases, you _do_ need different logic on the client as on the server:
 It should be possible to take advantage of a server preload function while retaining that flexibility. One idea: a new `this.load` function for client preloads:
 
 ```svelte
-<script context="module client">
+<script context="module dom">
 	export async function preload(page) {
 		try {
 			const data = await this.load();
@@ -166,7 +166,7 @@ I would argue that this pattern is generally applicable enough that it could com
 > 🐃 Given that, it's possible that we should take the opportunity to have a broader rethink of `preload`, such as whether it should continue to only return data corresponding to props, or should instead return an object with metadata (obviating the need for `this.redirect` and `this.error`, but also adding cache headers, differentiating between pages that can be generated at build time vs server-rendered at runtime, etc):
 
 ```svelte
-<script context="module server">
+<script context="module ssr">
 	export async function load(page) {
 		const article = await get_post_somehow(page.params.slug);
 
