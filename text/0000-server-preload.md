@@ -1,6 +1,6 @@
 
 - Start Date: 2020-09-03
-- RFC PR: (leave this empty)
+- RFC PR: [#31](https://github.com/sveltejs/rfcs/pull/31)
 - Svelte Issue: (leave this empty)
 
 # Server preload
