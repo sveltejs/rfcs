@@ -51,15 +51,15 @@ understand, and for somebody familiar with the implementation to implement. Any
 > new terminology should be defined here.
 
 > Explain not just the final design, but also how you arrived at it. What
-> constraints did you face? How does this deal with corner cases?
+> constraints did you face? Are there corner cases you've come up with solutions for?
 
-> Explain how your design fits into the larger picture. What are the other open
-> problems in this area? How does this design fit with potential solutions for those
-> issues?
+> Explain how your design fits into the larger picture. Are the other open problems
+> in this area you're familiar with? How does this design fit with potential
+> solutions for those issues?
 
 > Connect your design to the motivations you listed above. When describing a part of
-> the design, share an example of what it would look like to utilize the solution to
-> solve the problem.
+> the design, it can be useful to share an example of what it would look like to
+> utilize the implementation as solution to the problem.
 
 ## How we teach this
 
