@@ -1,6 +1,6 @@
 
 - Start Date: (fill me in with today's date, 2020-09-09)
-- RFC PR: (leave this empty)
+- RFC PR: [#32](https://github.com/sveltejs/rfcs/pull/32)
 - Svelte Issue: (leave this empty)
 
 # Local styles
