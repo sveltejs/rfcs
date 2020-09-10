@@ -172,5 +172,4 @@ I think this is more confusing than the special element proposal, and doesn't ma
 
 ## Unresolved questions
 
-* Is `<svelte:template name="...">` right? (What if there was a prop called `name`? Should we use `this` instead, or is that confusing?)
 * Can templates be scoped, or must their names be unique within the component? Must they be defined at the top level of the component, or can they be defined anywhere (and inherit context and styles that apply to their subtrees)?
