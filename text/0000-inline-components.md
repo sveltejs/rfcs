@@ -1,5 +1,5 @@
 - Start Date: 2020-09-09
-- RFC PR: (leave this empty)
+- RFC PR: ([#34](https://github.com/sveltejs/rfcs/pull/34))
 - Svelte Issue: (leave this empty)
 
 # Inline components
@@ -42,7 +42,7 @@ Neither is ideal.
 
 ## Detailed design
 
-With `<svelte:template>` (🐃), combined with new functionality for `<svelte:component>` in which a string `this` attribute is taken to refer to an inline component, we can avoid both the problems articulated above:
+With `<svelte:template>` (🐃), combined with new functionality for `<svelte:component>` — in which a string `this` attribute is taken to refer to an inline component — we can avoid both the problems articulated above:
 
 ```svelte
 <svelte:template name="image" let:image>
