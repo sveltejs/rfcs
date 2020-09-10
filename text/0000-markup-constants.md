@@ -1,8 +1,8 @@
 - Start Date: 2020-09-09
-- RFC PR: (leave this empty)
+- RFC PR: [#33](https://github.com/sveltejs/rfcs/pull/33)
 - Svelte Issue: (leave this empty)
 
-# Markup constants
+# Constants in markup
 
 ## Summary
 
