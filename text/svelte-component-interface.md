@@ -6,7 +6,7 @@
 
 ## Summary
 
-Provide a Svelte component type definition which library authors can use to provide a strongly typed Svelte component which the language server understands:
+Provide a Svelte component type definition which library authors can use to provide a strongly typed Svelte component which the language server understands. Inside a `.d.ts` file:
 
 ```ts
 import { SvelteComponent } from "svelte";
@@ -22,19 +22,27 @@ Currently there is no official and easy way to provide type definitions. Devs wh
 
 ### Usage would look like this:
 
+Inside a `d.ts` file:
+
 ```ts
 import { SvelteComponent } from 'svelte';
 
-export class MyComponent extends SvelteComponent<
-  { propA: boolean },
-  { someEvent: string },
-  { default: { aSlot: number } }
-> {}
+declare module "myModule" {
+  export class MyComponent extends SvelteComponent<
+    { propA: boolean },
+    { someEvent: string },
+    { default: { aSlot: number } }
+  > {}
+}
 ```
 
 This type definition would result in this being correct usage of the component:
 
 ```
+<script>
+  import { MyComponent } from "myModule";
+</script>
+
 <MyComponent propA={true} on:someEvent={e => e.detail.toUpperCase()} let:aSlot={aNumber} />
 ```
 
