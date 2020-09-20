@@ -37,7 +37,7 @@ You start with one event which is from your own typed `createEventDispatcher` an
 <button on:click>Forwarded</button>
 ```
 
-Now you want to ensure that listeing to anything else than `on:own`/`on:click` throws a type error. For that you use the new `<script>` attribute `strictEvents`:
+Now you want to ensure that listening to anything else than `on:own`/`on:click` throws a type error. For that you use the new `<script>` attribute `strictEvents`:
 
 ```html
 <script lang="ts" strictEvents>
@@ -134,7 +134,7 @@ You want to specify some generic connection between props/slots/events. For this
 
 ### ComponentDef
 
-If you want to type all at once, because you like to have the definition on one place or want to better define a generic relationship, you can use the `ComponentDef` interface.
+If you want to type all at once, because you like to have the definition in one place or want to better define a generic relationship, you can use the `ComponentDef` interface.
 
 ```html
 <script lang="ts">
@@ -149,11 +149,9 @@ If you want to type all at once, because you like to have the definition on one 
 ...
 ```
 
-You can also leave out props/events/slots in that interface depending on what you actually use in your component.
-
 ### Summary
 
-As you can see, there would be several options to achieve the same. You can use `ComponentDef` to type all at once, or you can mix and match the other possibilities to only type part of it. The drawback is that there is more than one way to achieve the same goal. But only having `ComponentDef` would be too much typing overhead of you only want to specifically type parts of the component. In general, props, slots and their types are already inferable quite nicely at this point. Only generics and events are where you really would need this.
+As you can see, there would be several options to achieve the same. You can use `ComponentDef` to type all at once, or you can mix and match the other possibilities to only type part of it. The drawback is that there is more than one way to achieve the same goal. But only having `ComponentDef` may be too much typing overhead of you only want to specifically type parts of the component. In general, props, slots and their types are already inferable quite nicely at this point. Only generics and events are where you really would need this.
 
 ### Implementation hurdles
 
