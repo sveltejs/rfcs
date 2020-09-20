@@ -30,7 +30,7 @@ import { SvelteComponent } from 'svelte';
 declare module "myModule" {
   export class MyComponent extends SvelteComponent<
     { propA: boolean },
-    { someEvent: string },
+    { someEvent: CustomEvent<string>; click: MouseEvent },
     { default: { aSlot: number } }
   > {}
 }
@@ -71,7 +71,7 @@ class Svelte2TsxComponent<
 
   $on<K extends keyof Events>(
     event: K,
-    handler: (e: Events[K]) => any
+    handler: (e: Events[K]) => void
   ): () => void; // <-- typed
   $set(props: Partial<Props> & Record<string, any>): void; // <-- typed, Record<string, any> for the $$restProps possibility
   // ...
