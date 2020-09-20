@@ -66,14 +66,14 @@ class Svelte2TsxComponent<
 
   constructor(options: {
     // ...
-    props?: Props; // <-- typed as Props
+    props?: Props & Record<string, any>; // <-- typed as Props, Record<string, any> for the $$restProps possibility
   });
 
   $on<K extends keyof Events>(
     event: K,
     handler: (e: Events[K]) => any
   ): () => void; // <-- typed
-  $set(props: Partial<Props>): void; // <-- typed
+  $set(props: Partial<Props> & Record<string, any>): void; // <-- typed, Record<string, any> for the $$restProps possibility
   // ...
 }
 ```
@@ -102,3 +102,4 @@ We need to provide these type definitions for a clear path forward, so the only 
 ## Unresolved questions
 
 - Anything that can be fine-tuned on the proposed class type definition?
+- Anything that I forgot that is no longer possible/throws a type error when the types are more strict?
