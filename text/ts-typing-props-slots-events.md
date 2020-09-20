@@ -1,0 +1,181 @@
+- Start Date: 2020-09-20
+- RFC PR: 
+- Svelte Issue: https://github.com/sveltejs/language-tools/issues/442
+
+# TypeScript: Typing Props/Events/Slots + Generics
+
+## Summary
+
+Provide possibilites for TypeScript users to strongly type a Svelte component's props/events/slots, including generics. For that, we introduce reserved interfaces named `ComponentProps`, `ComponentEvents`, `ComponentSlots`, `ComponentDef` to type parts or all of them at once. We also introduce `<script>` attributes for generics and for marking a component as having no other events besides the ones defined within.
+
+While this is not a change to Svelte's core, it's still something that needs to be specified so intellisense implementers have something to adhere to.
+
+## Motivation
+
+Using TypeScript with Svelte provides a lot of goodness already, but there are some areas which lack support:
+
+- There is no way currently to tell the intellisense that there's only a fixed set of events one can listen to. You can type `createEventDispatcher` but that does still make it possible to listen to other events
+- There is no way currently to explicitely type slots
+- There is no way currently to use generics
+
+## Detailed design
+
+### Typing events
+
+Use case: You want to strictly type events. Listening to anything outside the defined events should throw a type error.
+
+You start with one event which is from your own typed `createEventDispatcher` and one forwarded event.
+
+```html
+<script lang="ts">
+    import {createEventDispatcher} from "svelte";
+
+    const dispatch = createEventDispatcher<{own: boolean}>();
+</script>
+
+<button on:click={() => dispatch('own', true)}>Own</button>
+<button on:click>Forwarded</button>
+```
+
+Now you want to ensure that listeing to anything else than `on:own`/`on:click` throws a type error. For that you use the new `<script>` attribute `strictEvents`:
+
+```html
+<script lang="ts" strictEvents>
+    import {createEventDispatcher} from "svelte";
+
+    const dispatch = createEventDispatcher<{own: boolean}>();
+</script>
+
+<button on:click={() => dispatch('own', true)}>Own</button>
+<button on:click>Forwarded</button>
+```
+
+Now you add one event which comes from a dispatcher mixin:
+
+```html
+<script lang="ts" strictEvents>
+    import {mixinDispatch} from "somewhere";
+    import {createEventDispatcher} from "svelte";
+
+    const dispatch = createEventDispatcher<{own: boolean}>();
+</script>
+
+<button on:click={() => mixinDispatch.mixinEvent('foo')}>Mixin</button>
+<button on:click={() => dispatch('own', true)}>Own</button>
+<button on:click>Forwarded</button>
+```
+
+In this case `strictEvents` will not work anymore because we cannot know that `mixinDispatch` dispatches events. So now you use the `ComponentEvents` interface.
+
+```html
+<script lang="ts">
+    import {mixinDispatch} from "somewhere";
+    import {createEventDispatcher} from "svelte";
+
+    interface ComponentEvents {
+        mixinEvent: CustomEvent<string>;
+        own: CustomEvent<boolean>;
+        click: MouseEvent;
+    }
+
+    const dispatch = createEventDispatcher<{own: boolean}>();
+</script>
+
+<button on:click={() => mixinDispatch.mixinEvent('foo')}>Mixin</button>
+<button on:click={() => dispatch('own', true)}>Own</button>
+<button on:click>Forwarded</button>
+```
+
+### Typing Slots
+
+This works the same as for typing events.
+
+```html
+<script lang="ts">
+    interface ComponentSlots {
+        default: { prop: boolean; };
+    }
+</script>
+
+<slot prop={true}></slot>
+```
+
+### Typing Props
+
+This works the same as for typing events. You probably won't use that because it's essentially doing the type work twice.
+
+```html
+<script lang="ts">
+    interface ComponentProps {
+        prop: boolean;
+    }
+
+    export let prop: boolean;
+</script>
+```
+
+### Generics
+
+You want to specify some generic connection between props/slots/events. For this you use the `<script>` attribute `generics`. The contents of that attribute have to be valid generic typings.
+
+```html
+<script lang="ts" generics="T extends boolean, X">
+    import {createEventDispatcher} from "svelte";
+
+    export let array1: T[];
+    export let item1: T;
+    export let array2: X[];
+
+    const dispatch = createEventDispatcher<{arrayItemClick: X}>();
+</script>
+
+...
+```
+
+### ComponentDef
+
+If you want to type all at once, because you like to have the definition on one place or want to better define a generic relationship, you can use the `ComponentDef` interface.
+
+```html
+<script lang="ts">
+    // ...
+    interface ComponentDef<T> {
+        props: { items: T[]; someOptionalProp?: string; };
+        events: { itemClick: CustomEvent<T>; };
+        slots: { default: { item: T; }; };
+    }
+</script>
+
+...
+```
+
+You can also leave out props/events/slots in that interface depending on what you actually use in your component.
+
+### Summary
+
+As you can see, there would be several options to achieve the same. You can use `ComponentDef` to type all at once, or you can mix and match the other possibilities to only type part of it. The drawback is that there is more than one way to achieve the same goal. But only having `ComponentDef` would be too much typing overhead of you only want to specifically type parts of the component. In general, props, slots and their types are already inferable quite nicely at this point. Only generics and events are where you really would need this.
+
+### Implementation hurdles
+
+We would need to make sure that we can provide some meaningful errors if the definition and the actual types don't match. So if someone types `ComponentSlots` as `{foo: boolean;}` but does `<slot foo={'aString'}></slot>`, we must highlight that. I have not looked closely into how this can be achieved yet because I want to first have agreement on the API.
+
+## How we teach this
+
+For users: Enhance docs. For intellisense devs: A more formal specification outlining the details.
+
+## Drawbacks
+
+- This will only work for TS users
+- Uncanny-valley-stuff for generics
+- Reserved interface names could collide with existing ones, but I think that's rare. It's also only a breaking change for the language-tools because it does not affect the core of Svelte
+- Many ways to achieve the same goal (interface/generics combinations)
+
+## Alternatives
+
+- Don't do anything and say "well, there are some limits". VueJS for example also cannot deal with generics as far as I know.
+- Only provide parts of this solution: `strictEvents` and `generics`, but from the interfaces only `ComponentDef`, and tell people "if you want to type it, type it all".
+
+## Unresolved questions
+
+- Interface wording ok?
+- Attribute wording ok?
