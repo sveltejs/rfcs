@@ -82,7 +82,7 @@ The Svelte component definition is enhanced with typings for Props, Events, Slot
 
 Obviously it's not ideal to have type-only-properties on the definition, but with a big enough disclaimer/comment on it, this should be okay in my opinion, especially since the `$$`-prefix is already the "internal, don't use this"-notion for other properties/methods.
 
-Regarding "where to put this": This is up to discussion. Currently I think enhancing `SvelteComponentDef` (which is `SvelteComponent` on the outside) with that definition is the best option. This would not be a breaking change to the existing definition because of the `any` type by default for props/events/slots.
+Regarding "where to put this": This is up to discussion. Currently I think enhancing `SvelteComponentDev` (which is `SvelteComponent` on the outside) with that definition is the best option. This would not be a breaking change to the existing definition because of the `any` type by default for props/events/slots.
 
 ## How we teach this
 
