@@ -54,9 +54,9 @@ Inside `language-tools`, we already have such a type definition which is used in
 
 ```ts
 class Svelte2TsxComponent<
-  Props extends {} = any,
-  Events extends {} = any,
-  Slots extends {} = any
+  Props extends Record<string, any> = any,
+  Events extends Record<string, any> = any,
+  Slots extends Record<string, any> = any
 > {
   // The following three exist for type checking capabilities only
   // and do not exist at runtime:
