@@ -116,11 +116,33 @@ This works the same as for typing events. You probably won't use that because it
 
 ### Generics
 
-You want to specify some generic connection between props/slots/events. For this you use the `<script>` attribute `generics`. The contents of that attribute have to be valid generic typings.
+You want to specify some generic connection between props/slots/events. For example you have a component which has an input prop `item`, and an event called `itemChanged`. You want to use this component for arbitrary kinds of item, but you want to make sure that the types for `item` and `itemChanged` are the same. Generics come in handy then. You can read more about them on the [official TypeScript page](https://www.typescriptlang.org/docs/handbook/generics.html).
+
+##### Option 1
+You use a new `<script>` attribute called `generics`. The contents of that attribute have to be valid generic typings.
 
 ```html
 <script lang="ts" generics="T extends boolean, X">
     import {createEventDispatcher} from "svelte";
+
+    export let array1: T[];
+    export let item1: T;
+    export let array2: X[];
+
+    const dispatch = createEventDispatcher<{arrayItemClick: X}>();
+</script>
+
+...
+```
+
+##### Option 2
+You use a new reserved interface called `ComponentGenerics` and do the typing on it, not declaring any properties on it.
+
+```html
+<script lang="ts">
+    import {createEventDispatcher} from "svelte";
+    
+    interface ComponentGenerics<T extends boolean, X> {}
 
     export let array1: T[];
     export let item1: T;
@@ -143,6 +165,34 @@ If you want to type all at once, because you like to have the definition in one 
         props: { items: T[]; someOptionalProp?: string; };
         events: { itemClick: CustomEvent<T>; };
         slots: { default: { item: T; }; };
+    }
+</script>
+
+...
+```
+
+### ComponentDef alternative: Namespace
+
+As an alternative to the `ComponentDef` interface, one could use a namespace and put the interfaces inside it. That would make refactoring easier if you for example start of with typing only the events but want to add more typings to slots later on. This would come at the cost of uncanny-valley-stuff for defining the generics.
+
+```html
+<script lang="ts">
+    // ...
+    declare namespace Component {
+      interface Generics<T> {}
+    
+      interface Events {
+        itemClick: CustomEvent<T>; // use generic T here which will be the one defined in Generics
+      }
+    
+      interface Props {
+        itemClick: CustomEvent<T>;
+        someOptionalProp?: string;
+      }
+    
+      interface Slots {
+        default: { item: T }
+      }
     }
 </script>
 
