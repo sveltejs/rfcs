@@ -19,8 +19,8 @@ This RFC proposes a declarative way to write actions.
 </script>
 
 <style>
-  .red-background() {
-    background.color: red;
+  .red-background {
+    background-color: red;
   }
 </style>
 
