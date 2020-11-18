@@ -9,7 +9,7 @@
 This RFC proposes a declarative way to write actions.
 
 ```html
-<!-- action -->
+<!-- action.svelte -->
 <script context="action">
   // Not used in this example, I just binded the element to demonstrate 
   // actions could still be writter purely imperatively as they are now with "onDestroy", "onUpdate" and "onMount".
@@ -32,6 +32,24 @@ This RFC proposes a declarative way to write actions.
   on:pointerdown={() => {isHeld = true;}}
   on:pointerup={() => {isHeld = false;}}
   bind:this={target}\>
+```
+
+```html
+<!-- Consumer.svelte -->
+<!-- works like current action consumption -->
+<script context="action">
+  import action from "./action.svelte";
+</script>
+
+<style>
+  .blue-text {
+    color: blue;
+  }
+</style>
+
+<div use:action>
+  I am declaratively styled by an action! yey
+</div>
 ```
 
 
