@@ -8,6 +8,8 @@
 
 This RFC proposes a declarative way to write actions.
 
+Action: 
+
 ```html
 <!-- action.svelte -->
 <script context="action">
@@ -35,11 +37,11 @@ This RFC proposes a declarative way to write actions.
   on:pointerdown={() => {isHeld = true;}}
   on:pointerup={() => {isHeld = false;}}
   bind:this={target}\>
-
+```
   
-  
+Consumer component:   
 
-
+```html
 <!-- Consumer.svelte -->
 <!-- works like current action consumption -->
 <script context="action">
