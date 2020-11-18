@@ -15,7 +15,7 @@ Action:
 <script context="action">
   /*
     Not used in this example, I just binded the element to demonstrate 
-    actions could still be writtnr purely imperatively as they are now
+    actions could still be written purely imperatively as they are now
     with "onDestroy", "onUpdate" and "onMount".
   */
   let target;
