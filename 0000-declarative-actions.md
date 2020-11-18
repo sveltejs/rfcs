@@ -31,7 +31,10 @@ Action:
 
 
 <!-- target is an alias to the Element this action is applied to -->
-<!-- ".svelte" files with an action context script may only have one element, a target, and target shall have 0 children.-->
+<!--
+  ".svelte" files with an action context script may only have one element,
+  a target, and target shall have 0 children.
+-->
 <target
   class:red-background={isHeld}
   on:pointerdown={() => {isHeld = true;}}
