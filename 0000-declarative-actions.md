@@ -6,7 +6,34 @@
 
 ## Summary
 
-> One paragraph explanation of the feature.
+This RFC proposes a declarative way to write actions.
+
+```html
+<!-- action -->
+<script context="action">
+  // Not used in this example, I just binded the element to demonstrate 
+  // actions could still be writter purely imperatively as they are now with "onDestroy", "onUpdate" and "onMount".
+  let target;
+  
+  let isHeld = false;
+</script>
+
+<style>
+  .red-background() {
+    background.color: red;
+  }
+</style>
+
+
+<!-- target is an alias to the Element this action is applied to -->
+<!-- ".svelte" files with an action context script may only have one element, a target, and target shall have 0 children.-->
+<target
+  class:red-background={isHeld}
+  on:pointerdown={() => {isHeld = true;}}
+  on:pointerup={() => {isHeld = false;}}
+  bind:this={target}\>
+```
+
 
 ## Motivation
 
