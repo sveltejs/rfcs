@@ -47,7 +47,7 @@ Consumer component:
 ```html
 <!-- Consumer.svelte -->
 <!-- works like current action consumption -->
-<script context="action">
+<script>
   import action from "./action.svelte";
 </script>
 
