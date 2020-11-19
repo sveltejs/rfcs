@@ -2,24 +2,24 @@
 - RFC PR: (leave this empty)
 - Svelte Issue: (leave this empty)
 
-# (RFC title goes here)
+# Declarative Actions
 
 ## Summary
 
 This RFC proposes a declarative way to write actions.
 
-Action: 
+Action:
 
 ```html
 <!-- action.svelte -->
 <script context="action">
   /*
-    Not used in this example, I just binded the element to demonstrate 
+    Not used in this example, I just binded the Element to demonstrate 
     actions could still be written purely imperatively as they are now
-    with "onDestroy", "onUpdate" and "onMount".
+    with 'onDestroy', 'afterUpdate', 'beforeUpdate' and 'onMount'.
   */
   let target;
-  
+
   let isHeld = false;
 </script>
 
@@ -29,20 +29,20 @@ Action:
   }
 </style>
 
-
 <!-- target is an alias to the Element this action is applied to -->
 <!--
   ".svelte" files with an action context script may only have one element,
   a target, and target shall have 0 children.
 -->
 <target
-  class:red-background={isHeld}
-  on:pointerdown={() => {isHeld = true;}}
-  on:pointerup={() => {isHeld = false;}}
-  bind:this={target}\>
+  class:red-background="{isHeld}"
+  on:pointerdown="{() => {isHeld = true}}"
+  on:pointerup="{() => {isHeld = false}}"
+  bind:this="{target}"
+/>
 ```
-  
-Consumer component:   
+
+Consumer component:
 
 ```html
 <!-- Consumer.svelte -->
@@ -57,13 +57,138 @@ Consumer component:
   }
 </style>
 
-<div use:action>
+<div class="blue-text" use:action>
   I am declaratively styled by an action! yey
 </div>
 ```
 
-
 ## Motivation
+
+# Think about how custom variables as props would affect this.
+
+# Action arguments {} -> {{}} desugaring.
+
+Currently, writing an action takes away all Svelte's ergonomics. You can't use directives, you can't use {# ... } blocks and you can't apply styles using css sheets (or `<style></style>` blocks) without somehow including it globally (my particular use case).
+
+As an example of a slightly more complicated action than the one I provided in the [Summary](#Summary), I will use the tutorial's [pannable](https://svelte.dev/tutorial/actions).
+
+Something like:
+
+```javascript
+// pannable.js
+export function pannable(node) {
+  let x;
+  let y;
+
+  function handleMousedown(event) {
+    x = event.clientX;
+    y = event.clientY;
+
+    node.dispatchEvent(
+      new CustomEvent("panstart", {
+        detail: { x, y },
+      })
+    );
+
+    window.addEventListener("mousemove", handleMousemove);
+    window.addEventListener("mouseup", handleMouseup);
+  }
+
+  function handleMousemove(event) {
+    const dx = event.clientX - x;
+    const dy = event.clientY - y;
+    x = event.clientX;
+    y = event.clientY;
+
+    node.dispatchEvent(
+      new CustomEvent("panmove", {
+        detail: { x, y, dx, dy },
+      })
+    );
+  }
+
+  function handleMouseup(event) {
+    x = event.clientX;
+    y = event.clientY;
+
+    node.dispatchEvent(
+      new CustomEvent("panend", {
+        detail: { x, y },
+      })
+    );
+
+    window.removeEventListener("mousemove", handleMousemove);
+    window.removeEventListener("mouseup", handleMouseup);
+  }
+
+  node.addEventListener("mousedown", handleMousedown);
+
+  return {
+    destroy() {
+      node.removeEventListener("mousedown", handleMousedown);
+    },
+  };
+}
+```
+
+Would become:
+
+```html
+<!-- pannable.svelte -->
+<script context="action">
+  let x;
+  let y;
+
+  let windowMousemove;
+  let windowMouseup;
+
+  let target;
+
+  function handleMousemove(event) {
+    const dx = event.clientX - x;
+    const dy = event.clientY - y;
+    x = event.clientX;
+    y = event.clientY;
+
+    target.dispatchEvent(
+      new CustomEvent("panmove", {
+        detail: { x, y, dx, dy },
+      })
+    );
+  }
+
+  function handleMouseup(event) {
+    x = event.clientX;
+    y = event.clientY;
+
+    target.dispatchEvent(
+      new CustomEvent("panend", {
+        detail: { x, y },
+      })
+    );
+
+    windowMousemove = () => {};
+    windowMouseup = () => {};
+  }
+
+  function handleMousedown(event) {
+    x = event.clientX;
+    y = event.clientY;
+
+    target.dispatchEvent(
+      new CustomEvent("panstart", {
+        detail: { x, y },
+      })
+    );
+
+    windowMousemove = handleMousemove;
+    windowMouseup = handleMouseup;
+  }
+</script>
+
+<svelte:window on:mousemove="{windowMousemove}" on:mouseup="{windowMouseup}" />
+<target on:mousedown="{handleMousedown}" bind:this="{target}" />
+```
 
 > Why are we doing this? What use cases does it support?
 
@@ -102,7 +227,7 @@ Consumer component:
 ### Implementation
 
 > Explain the design in enough detail for somebody familiar with the framework to
-understand, and for somebody familiar with the implementation to implement. Any
+> understand, and for somebody familiar with the implementation to implement. Any
 > new terminology should be defined here.
 
 > Explain not just the final design, but also how you arrived at it. What
@@ -119,21 +244,21 @@ understand, and for somebody familiar with the implementation to implement. Any
 ## How we teach this
 
 > What names and terminology work best for these concepts and why? How is this
-idea best presented? As a continuation of existing Svelte patterns, or as a
-wholly new one?
+> idea best presented? As a continuation of existing Svelte patterns, or as a
+> wholly new one?
 
 > Would the acceptance of this proposal mean the Svelte guides must be
-re-organized or altered? Does it change how Svelte is taught to new users
-at any level?
+> re-organized or altered? Does it change how Svelte is taught to new users
+> at any level?
 
 > How should this feature be introduced and taught to existing Svelte
-users?
+> users?
 
 ## Drawbacks
 
-> Why should we *not* do this? Please consider the impact on teaching Svelte,
-on the integration of this feature with other existing and planned features,
-on the impact of the API churn on existing apps, etc.
+> Why should we _not_ do this? Please consider the impact on teaching Svelte,
+> on the integration of this feature with other existing and planned features,
+> on the impact of the API churn on existing apps, etc.
 
 > There are tradeoffs to choosing any path, please attempt to identify them here.
 
