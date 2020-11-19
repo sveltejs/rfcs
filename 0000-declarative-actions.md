@@ -31,7 +31,7 @@ Action:
 
 <!-- target is an alias to the Element this action is applied to -->
 <!--
-  ".svelte" files with an action context script may only have one element,
+  ".svelte" files with an action context script may only have one Element (excluding Special Elements),
   a target, and target shall have 0 children.
 -->
 <target
@@ -136,13 +136,12 @@ Would become:
 ```html
 <!-- pannable.svelte -->
 <script context="action">
+  let target;
+
   let x;
   let y;
 
-  let windowMousemove;
-  let windowMouseup;
-
-  let target;
+  let panning = false;
 
   function handleMousemove(event) {
     const dx = event.clientX - x;
@@ -160,18 +159,17 @@ Would become:
   function handleMouseup(event) {
     x = event.clientX;
     y = event.clientY;
+    panning = false;
 
     target.dispatchEvent(
       new CustomEvent("panend", {
         detail: { x, y },
       })
     );
-
-    windowMousemove = () => {};
-    windowMouseup = () => {};
   }
 
   function handleMousedown(event) {
+    panning = true;
     x = event.clientX;
     y = event.clientY;
 
@@ -186,9 +184,14 @@ Would become:
   }
 </script>
 
-<svelte:window on:mousemove="{windowMousemove}" on:mouseup="{windowMouseup}" />
+<svelte:window
+  on:mousemove="{panning ? handleMousemove: undefined}"
+  on:mouseup="{panning ? handleMouseup: undefined}"
+/>
 <target on:mousedown="{handleMousedown}" bind:this="{target}" />
 ```
+
+The second version
 
 > Why are we doing this? What use cases does it support?
 
