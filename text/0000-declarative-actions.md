@@ -451,7 +451,7 @@ export type Args = {
     fontSizePixels: number;
     color?: string;
 }
-export function parametersExample(node: Node, args: args) {
+export function parametersExample(node: Node, args: Args) {
     const element = node as HTMLElement;
     if (args.color) element.style.setProperty("color", args.color);
     element.style.setProperty("fontSize", args.fontSizePixels + "px");
@@ -481,7 +481,7 @@ Declarative action:
   export let fontSizePixels: number;
 </script>
 
-<target stye="color: {color}; font-size: {fontSizePixels + 'px'};" />
+<target style="color: {color}; font-size: {fontSizePixels + 'px'};" />
 ```
 
 ```html
@@ -570,14 +570,20 @@ I have brought up some already:
 
 More:
 
-1. How should we distinguish Components from Actions?
+1. If we chose the "Data Attributes" approach to parameters could we integrate this with Style Properties? PR [#13](https://github.com/sveltejs/rfcs/pull/13)
+
+   Something like `data:--some-style` could be interpreted as a Style Property. If we don't, it might be hard to receive styles as arguments and use them without overwriting the `styles` attribute without some sort of CSS-in-JS solution.
+
+2. How would constant props work?
+
+3. How should we distinguish Components from Actions?
 
    My idea would be to add `context="action"` to scripts in actions. `context="module"` would still be supported. A single `.svelte` file shouldn't have a script without context and a script with `context="action"`. `<Target />` shouldn't be used in `.svelte` files without a `context="action"` script. Another way could be to force action's files' names to start with a lower case letter.
 
    I'm open to suggestions.
 
-2. This is a personal annoyance. What is the current convention for action names? All lower case? Camel case? What should it be for Declarative Actions?
+4. This is a personal annoyance. What is the current convention for action names? All lower case? Camel case? What should it be for Declarative Actions?
 
-3. Should custom CSS properties, set inside the Action, be available to the children of the component the Action is applied to?
+5. Should custom CSS properties set inside the Action be available to the children of the component the Action is applied to?
 
 ##### I will add more as/if they rise in the pull request.
