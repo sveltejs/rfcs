@@ -69,7 +69,7 @@ Consumer component:
 
 ##### [\*more on the `<target />` Element](<#The\ \`\<target /\>\`\ Element>)
 
-##### [\*\*parameters will slightly vary from current action consumption](#Parameters)
+##### [\*\*parameters will slightly/greatly differ from current action consumption](#Parameters)
 
 ## Motivation
 
@@ -198,7 +198,7 @@ Since most of what you're doing with an action is modifying an Element I don't s
 
 Apart from the ergonomic differences there are also functional differences. As I mentioned [above](#Motivation), being able to use Svelte's extensions to the Markup and being able to style the target Element without bypassing Svelte's style system are benefits of this implementation of actions that are in no way possible with the current one.
 
-### More on CSS
+### More on styling
 
 Personally, styling is my greatest concern. Currently there is no way to abstract styles applied directly to an element cleanly. As of today there are 3 routes you can take:
 
@@ -295,7 +295,7 @@ This option works fine but has the disadvantage of not being able to use Svelte'
 
 ```css
 /* external.css */
-.red-background {
+.abstracted-styles {
   background-color: red;
 }
 ```
@@ -305,7 +305,7 @@ This option works fine but has the disadvantage of not being able to use Svelte'
 <script>
   let target;
   $: {
-    if (target) target.parentElement.style.classList.add("red-background");
+    if (target) target.parentElement.style.classList.add("abstracted-styles");
   }
 </script>
 
@@ -362,6 +362,7 @@ With Declarative Actions it would look like this:
 
 <target class:abstracted-styles="{true}" />
 
+<!------------------------------------------------------------------------------------------- -->
 <!-- I avoided: -->
 <target class="abstracted-styles" />
 <!-- or -->
@@ -397,7 +398,7 @@ Consumer component:
 
 The `<target />` Element should alias to the the Element the action is applied to. Any attributes set in the `<target />` Element should be set in the Element the action is applied to and vice versa.
 
-In the summary I alluded to the fact that `<target />` should be the only Element present in an action, apart from `svelte:window`, `svelte:head` and `svelte:body`. Should this be the case? I could see someone wanting to modify the DOM tree with an Action. Should we encourage this? If someone really needs to do this, they can do so imperatively anyway, but would lose all the goodness of Declarative Actions. We could even allow `<target />` to have children (?!?! iffy). The children could be added at the end/start of the children the Consumer already applied to the action's target. Or could replace them (!?! idk). In my opinion adding elements around the `<Target />` (parents, grandparents, etc.) could be an idea worth discussing but adding children seems too convolute.
+In the summary I alluded to the fact that `<target />` should be the only Element present in an action, apart from `svelte:window`, `svelte:head` and `svelte:body`. Should this be the case? I could see someone wanting to modify the DOM tree with an Action. Should we encourage this? If someone really needs to do this, they can do so imperatively anyway, but would lose all the goodness of Declarative Actions. We could even allow `<target />` to have children (?!?! iffy). The children could be added at the end/start of the children the Element the Action is applied to already has. Or could replace them (!?! idk). In my opinion adding elements around the `<Target />` (parents, grandparents, etc.) could be an idea worth discussing but adding children seems too convolute.
 
 Something like:
 
@@ -447,14 +448,15 @@ Current implementation of actions:
 
 ```javascript
 // parametersExample.ts
-export type Args = {
+export type ArgsType = {
     fontSizePixels: number;
     color?: string;
 }
-export function parametersExample(node: Node, args: Args) {
+
+export function parametersExample(node: Node, args: ArgsType) {
     const element = node as HTMLElement;
     if (args.color) element.style.setProperty("color", args.color);
-    element.style.setProperty("fontSize", args.fontSizePixels + "px");
+    element.style.setProperty("font-size", args.fontSizePixels + "px");
 }
 ```
 
@@ -501,7 +503,7 @@ Declarative action:
 <div use:parametersExample="{fontSizePixels}">1 argument</div>
 ```
 
-Another option would be to rework the parameters completely. An idea I had, which could even potentially be used with the current actions, would be to use [Custom Data Attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*). The action could capture the respectively named Data Attribute. A parameter called `foo` would have the value of an attribute called `data-foo`.
+Another option would be to rework the parameters completely. An idea I had, which could even potentially be used with the current actions, would be to use [Custom Data Attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*). The action could capture the respectively named Data Attribute. A parameter called `foo` would have the value of an attribute called `data-foo` (or even `data-[actionname]-foo` to prevent name collisions, if the consumer wants to use Data Attributes for other purposes, maybe even other actions).
 
 Example Consumer (the Action would be the same as the Declarative Action above):
 
@@ -537,7 +539,7 @@ Example Consumer (the Action would be the same as the Declarative Action above):
 
 ## How we teach this
 
-We should teach this roughly the same as we teach Components with Slots. Though `<Target />` "only accepts one child", since the action is applied with a directive, therefore it can alias to said child.
+We should teach this roughly the same as we teach Components with Slots. Though `<target />` "only accepts one child", since the action is applied with a directive, therefore it can alias to said child.
 
 Current svelte guides shouldn't have to be reorganized since there should be a section for Actions already.
 
@@ -549,13 +551,13 @@ Current svelte guides shouldn't have to be reorganized since there should be a s
 
 - As for teaching, although this is a little more complicated than just a simple function, it shouldn't be that hard to teach/learn (I think ?).
 
-- Performance? I have no clue (could even be a benefit (?!) rather than a drawback since Declarative Actions would be statically analyzable).
+- Performance? I have no clue (it could even be a benefit (?!) rather than a drawback since Declarative Actions would be statically analyzable).
 
 ##### I will add more as/if they rise in the pull request.
 
 ## Alternatives
 
-The only alternative I could come up with was to introduce the `<Target />` Element, as described, and allow its use in Components, which would leave the current Action developer experience (arguably lesser than Declarative Actions) as it is.
+The only alternative I could come up with was to introduce the `<target />` Element, as described, and allow its use in Components, which would leave the current Action developer experience (arguably lesser than Declarative Actions) as it is.
 
 By not making this change, as I mentioned above, it would still be impossible to apply styles directly to an Element defined, styled, etc.. by the consumer.
 
@@ -574,16 +576,19 @@ More:
 
    Something like `data:--some-style` could be interpreted as a Style Property. If we don't, it might be hard to receive styles as arguments and use them without overwriting the `styles` attribute without some sort of CSS-in-JS solution.
 
-2. How would constant props work?
+2. If we chose the "Data Attributes" approach, could we just provide both a directive to set Data Attributes and a directive to set Action parameters and use Data Attributes in the background?
+    Ex.: `data:actionname:parametername={value}`. This way we could obfuscate the parameter names to avoid collisions.
 
-3. How should we distinguish Components from Actions?
+3. How would constant props work?
 
-   My idea would be to add `context="action"` to scripts in actions. `context="module"` would still be supported. A single `.svelte` file shouldn't have a script without context and a script with `context="action"`. `<Target />` shouldn't be used in `.svelte` files without a `context="action"` script. Another way could be to force action's files' names to start with a lower case letter.
+4. How should we distinguish Components from Actions?
+
+   My idea would be to add `context="action"` to scripts in actions. `context="module"` would still be supported. A single `.svelte` file shouldn't have a script without context and a script with `context="action"`. `<target />` shouldn't be used in `.svelte` files without a `context="action"` script. Another way could be to force actions' files' names to start with a lower case letter.
 
    I'm open to suggestions.
 
-4. This is a personal annoyance. What is the current convention for action names? All lower case? Camel case? What should it be for Declarative Actions?
+5. This is a personal annoyance. What is the current convention for action names? All lower case? Camel case? What should it be for Declarative Actions?
 
-5. Should custom CSS properties set inside the Action be available to the children of the component the Action is applied to?
+6. Should custom CSS properties set inside the Action be available to the children of the component the Action is applied to?
 
 ##### I will add more as/if they rise in the pull request.
