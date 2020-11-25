@@ -398,7 +398,7 @@ Consumer component:
 
 The `<target />` Element should alias to the the Element the action is applied to. Any attributes set in the `<target />` Element should be set in the Element the action is applied to and vice versa.
 
-In the summary I alluded to the fact that `<target />` should be the only Element present in an action, apart from `svelte:window`, `svelte:head` and `svelte:body`. Should this be the case? I could see someone wanting to modify the DOM tree with an Action. Should we encourage this? If someone really needs to do this, they can do so imperatively anyway, but would lose all the goodness of Declarative Actions. We could even allow `<target />` to have children (?!?! iffy). The children could be added at the end/start of the children the Element the Action is applied to already has. Or could replace them (!?! idk). In my opinion adding elements around the `<Target />` (parents, grandparents, etc.) could be an idea worth discussing but adding children seems too convolute.
+In the summary I alluded to the fact that `<target />` should be the only Element present in an action, apart from `svelte:window`, `svelte:head` and `svelte:body`. Should this be the case? I could see someone wanting to modify the DOM tree with an Action. Should we encourage this? If someone really needs to do this, they can do so imperatively anyway, but would lose all the goodness of Declarative Actions. We could even allow `<target />` to have children (?!?! iffy). The children could be added at the end/start of the children the Element the Action is applied to already has. Or could replace them (!?! idk). In my opinion adding elements around the `<target />` (parents, grandparents, etc.) could be an idea worth discussing but adding children seems too convolute. Siblings should not be supported in my opinion.
 
 Something like:
 
@@ -545,13 +545,13 @@ Current svelte guides shouldn't have to be reorganized since there should be a s
 
 ## Drawbacks
 
-- This would be a breaking change. Although it may be possible to keep the old actions around (I assume, I'm not well versed in the Svelte internals), it might not be worth the complexity. Having multiple ways to write an action might be more confusing than it needs to be, specially for new users.
+1. This would be a breaking change. Although it may be possible to keep the old actions around (I assume, I'm not well versed in the Svelte internals), it might not be worth the complexity. Having multiple ways to write an action might be more confusing than it needs to be, specially for new users.
 
-- Verbosity. For simple actions that need to be written imperatively anyway, this will be more cumbersome.
+2. Verbosity. For simple actions that need to be written imperatively anyway, this will be more cumbersome.
 
-- As for teaching, although this is a little more complicated than just a simple function, it shouldn't be that hard to teach/learn (I think ?).
+3. As for teaching, although this is a little more complicated than just a simple function, it shouldn't be that hard to teach/learn (I think ?).
 
-- Performance? I have no clue (it could even be a benefit (?!) rather than a drawback since Declarative Actions would be statically analyzable).
+4. Performance? I have no clue (it could even be a benefit (?!) rather than a drawback since Declarative Actions would be statically analyzable).
 
 ##### I will add more as/if they rise in the pull request.
 
@@ -572,23 +572,23 @@ I have brought up some already:
 
 More:
 
-1. If we chose the "Data Attributes" approach to parameters could we integrate this with Style Properties? PR [#13](https://github.com/sveltejs/rfcs/pull/13)
+3. If we chose the "Data Attributes" approach to parameters could we integrate this with Style Properties? PR [#13](https://github.com/sveltejs/rfcs/pull/13)
 
-   Something like `data:--some-style` could be interpreted as a Style Property. If we don't, it might be hard to receive styles as arguments and use them without overwriting the `styles` attribute without some sort of CSS-in-JS solution.
+   Something like `data:--some-style` could be interpreted as a Style Property. If we don't, it might be hard to receive styles as arguments and use them without overwriting the `styles` attribute without using some sort of CSS-in-JS solution.
 
-2. If we chose the "Data Attributes" approach, could we just provide both a directive to set Data Attributes and a directive to set Action parameters and use Data Attributes in the background?
-    Ex.: `data:actionname:parametername={value}`. This way we could obfuscate the parameter names to avoid collisions.
+4. If we chose the "Data Attributes" approach, could we just provide both a directive to set Data Attributes and a directive to set Action parameters and use Data Attributes in the background?
+   Ex.: `data:actionname:parametername={value}`. This way we could obfuscate the parameter names to avoid collisions.
 
-3. How would constant props work?
+5. How would constant props work?
 
-4. How should we distinguish Components from Actions?
+6. How should we distinguish Components from Actions?
 
    My idea would be to add `context="action"` to scripts in actions. `context="module"` would still be supported. A single `.svelte` file shouldn't have a script without context and a script with `context="action"`. `<target />` shouldn't be used in `.svelte` files without a `context="action"` script. Another way could be to force actions' files' names to start with a lower case letter.
 
    I'm open to suggestions.
 
-5. This is a personal annoyance. What is the current convention for action names? All lower case? Camel case? What should it be for Declarative Actions?
+7. This is a personal annoyance. What is the current convention for action names? All lower case? Camel case? What should it be for Declarative Actions?
 
-6. Should custom CSS properties set inside the Action be available to the children of the component the Action is applied to?
+8. Should custom CSS properties set inside the Action be available to the children of the component the Action is applied to?
 
 ##### I will add more as/if they rise in the pull request.
