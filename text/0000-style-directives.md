@@ -2,7 +2,7 @@
 - RFC PR: (leave this empty)
 - Svelte Issue: (leave this empty)
 
-# Style Directives
+# Style Directive
 
 ## Summary
 
