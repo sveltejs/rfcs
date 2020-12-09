@@ -35,7 +35,7 @@ It would be useful — and often less error-prone — to be able to set multiple
 ```svelte
 <div
   style:position="absolute"
-  style:top={position === "absolute" && "20px"}
+  style:top={position === "absolute" ? "20px" : null}
   style:pointer-events={pointerEvents ? null : "none"}
 />
 ```
