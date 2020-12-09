@@ -36,7 +36,7 @@ It would be useful — and often less error-prone — to be able to set multiple
 <div
   style:position="absolute"
   style:top={position === "absolute" && "20px"}
-  style:pointer-events={pointerEvents ? "all" : "none"}
+  style:pointer-events={pointerEvents ? null : "none"}
 />
 ```
 
