@@ -6,7 +6,11 @@
 
 ## Summary
 
-Add a `style:` directive, e.g. `<div style:position="absolute" />`
+Add a `style:` directive:
+
+```svelte
+<div style:position="absolute" style:left="67px" />
+```
 
 ## Motivation
 
