@@ -18,13 +18,13 @@ Currently, when inline style attributes need to be set based on multiple variabl
 
 Constructing these attribute strings can become somewhat clumsy.
 
-For [example](https://github.com/mhkeller/layercake/blob/master/src/LayerCake.svelte#L297-L301):
+For example:
 
 ```svelte
 <div
   style="
-    position:{position};
-    {position === 'absolute' ? 'top:0;right:0;bottom:0;left:0;' : ''}
+    position: {position};
+    {position === 'absolute' ? 'top: 20px;' : ''}
     {pointerEvents === false ? 'pointer-events:none;' : ''}
   "
 />
@@ -35,8 +35,8 @@ It would be useful — and often less error-prone — to be able to set multiple
 ```svelte
 <div
   style:position="absolute"
-  style:pointer-events={pointerEvents}
-  style:left="{left}px"
+  style:top={position === "absolute" && "20px"}
+  style:pointer-events={pointerEvents ? "all" : "none"}
 />
 ```
 
