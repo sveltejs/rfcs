@@ -85,4 +85,5 @@ Technically breaking
 * Is there something better than a Comment Node ? 
 * Should the comment node include a specific word to better describe its intent ? `<!-- declare Foo -->` 
 * Should local components be directly exportable ? `<!-- export Foo [as Bar] -->`
+* * If so, should they be named exports or static properties of the default export ? `Component.Foo`
 * Given that each component scopes its style, should there be a `<style context="module">` shared across all components in the same file ?
