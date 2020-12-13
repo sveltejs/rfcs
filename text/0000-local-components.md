@@ -1,4 +1,4 @@
-- Start Date: (fill me in with today's date, YYYY-MM-DD)
+- Start Date: 2020-12-13
 - RFC PR: ([#44](https://github.com/sveltejs/rfcs/pull/44))
 - Svelte Issue: (leave this empty)
 
