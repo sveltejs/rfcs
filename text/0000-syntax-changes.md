@@ -82,7 +82,7 @@ Why? Well, I mean, look at it! These are functions, they should look like functi
 
 These changes would require some reworking of Svelte documentation, along with a whole new major version.
 
-However, these changes aren't really all that hard to actually grasp. I think teaching this syntax would actually be easier than how the current syntax. I'm not sure what else to say here - none of this is technically 'new'.
+However, these changes aren't really all that hard to actually grasp. I think teaching this syntax would actually be easier than the current syntax. I'm not sure what else to say here - none of this is technically 'new'.
 
 ## Drawbacks
 
