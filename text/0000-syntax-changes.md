@@ -12,9 +12,9 @@ As a preface: When I set out to make this RFC, it accidentally ended up being ab
 
 This, intentionally controversial, RFC proposes several breaking changes to the current Svelte syntax. These changes are to improve the terseness and readability of Svelte templates, improve intuition for newcomers, and to provoke dicussion about the weaknesses of Svelte's current syntax.
 
-The proposed changes involve mustache _blocks_ (e.g. `{#if something} {/if}`), attribute values, and element directives that accept functions (e.g. `use:fn`). Please see the implementation on the specific syntax this RFC proposes, as it won't exactly fit in a short summary.
+The proposed changes involve mustache _blocks_ (e.g. `{#if something} {/if}`), attribute values, and element directives that accept functions (e.g. `use:fn`). Please see "Proposed Changes" to find the specific syntax this RFC proposes, as it won't nicely fit in a short summary.
 
-## Motivation
+## Conceptual Motivation
 
 This RFC has a few principal assertions:
 - Svelte is already incompatible with HTML tooling and should be treated as such
