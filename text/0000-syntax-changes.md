@@ -1,5 +1,5 @@
 - Start Date: 2021-1-24
-- RFC PR:
+- RFC PR: [(#45)](https://github.com/sveltejs/rfcs/pull/45)
 - Svelte Issue:
 
 # Significant changes to syntax for V4
