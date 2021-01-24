@@ -2,7 +2,7 @@
 - RFC PR: (leave this empty)
 - Svelte Issue: (leave this empty)
 
-# Make significant breaking improvements to syntax (primarily removing omnipresent mustache tags)
+# Significant changes to syntax for V4
 
 As a preface: When I set out to make this RFC, it accidentally ended up being about removing a lot of mustache tags. That wasn't my intention though - it was to resolve issues I had with Svelte, which I go into detail about below.
 
@@ -53,10 +53,10 @@ One very personal take on this is that any syntax that would be accepted should 
 
 What does this mean? Well basically, this:
 ```html
-	<!-- current -->
-	<details bind:this={details} class=card-dark {...$$restProps}> </details>
-	<!-- proposed -->
-	<details bind:this=details class='card-dark' {...$$restProps}> </details>
+<!-- current -->
+<details bind:this={details} class=card-dark {...$$restProps}> </details>
+<!-- proposed -->
+<details bind:this=details class='card-dark' {...$$restProps}> </details>
 ```
 Note that in this example you could possibly have `...$$restProps` with no curlies, but that should maybe not be allowed due to `{attributeWithSameNameAsVariable}` not really being practical without using curlies.
 
@@ -69,10 +69,10 @@ Finally, this change does bleed into the previous one a bit, at least conceptual
 ### Element directives that accept a function use a function-like syntax.
 This is to make what these directives are actually doing much clearer and to allow for richer function usage in elements. It looks like this:
 ```html
-	<!-- current -->
-	<div use:onSwipe={{ dir: 'left', callback: swipeHandler}} in:fade={{ duration: 100 }} />
-	<!-- proposed, with changes made to the `onSwipe` function -->
-	<div use:onSwipe('left', swipeHandler) in:fade({ duration: 100 }) />
+<!-- current -->
+<div use:onSwipe={{ dir: 'left', callback: swipeHandler}} in:fade={{ duration: 100 }} />
+<!-- proposed, with changes made to the `onSwipe` function -->
+<div use:onSwipe('left', swipeHandler) in:fade({ duration: 100 }) />
 ```
 Note that `onSwipe` can now take multiple arguments.
 
