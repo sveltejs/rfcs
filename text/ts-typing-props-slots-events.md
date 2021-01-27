@@ -154,6 +154,23 @@ You use a new reserved interface called `ComponentGenerics` and do the typing on
 ...
 ```
 
+#### Option 3
+You use new reserved type called `ComponentGeneric`.
+
+```html
+<script lang="ts">
+    import {createEventDispatcher} from "svelte";
+
+    type T = ComponentGeneric<boolean>; // extends boolean
+    type X = ComponentGeneric; // any
+
+    export let array1: T[];
+    export let item1: T;
+    export let array2: X[];
+    const dispatch = createEventDispatcher<{arrayItemClick: X}>();
+</script>
+```
+
 ### ComponentDef
 
 If you want to type all at once, because you like to have the definition in one place or want to better define a generic relationship, you can use the `ComponentDef` interface.
