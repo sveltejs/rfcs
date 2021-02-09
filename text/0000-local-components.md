@@ -26,7 +26,7 @@ To solve those, @Rich-Harris has put forth a collection of RFCS:
 
 Now all of those combined barely make up for a pseudocomponent, yet they introduce and bend several concepts in the framework, and issue 5) would still require an external component
 
-**_Each of those issues can be and is currently solved by making a new Component_**, we just don't like spreading them across several files
+**_Each of those issues can and is currently solved by making a new Component_**, we just don't like spreading them across several files
 
 ## Detailed design
 
