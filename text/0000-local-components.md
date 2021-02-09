@@ -44,7 +44,7 @@ A `.svelte` file is composed of a script context module and a Svelte Component t
 
 ```
 
-The proposed design is simple: `.svelte` files may define named Svelte Components in series using a top-level Comment block. 
+The proposed design is simple: Allow `.svelte` files to define named Svelte Components in series using a top-level Comment block. 
 
 ```xml
 <script context="module">
@@ -65,25 +65,32 @@ The proposed design is simple: `.svelte` files may define named Svelte Component
 ```
 Everything above the first named Component (if any) stays the default export.
 
-The `Foo` variable works exactly as if that file imported `import Foo from "./Foo.svelte"`, so `Foo` cannot access anything from the default Component,  it's all on its own with its own style, script and content.
+The `Foo` variable works exactly as if that file imported `import Foo from "./Foo.svelte"`, `Foo` cannot access anything from the default Component,  it's all on its own with its own style, script and content.
 
-The only thing that is different from a conventional import is that `Foo` has access to the script module and can use the other named Components present in the file if any.
+The only thing difference from a conventional import is that `Foo` has access to the script module & can instantiate other named Components present in the file if any.
 
+The benefits of this design are multiple
+ * Incredibly simple and straightforward
+ * Doesn't add indentation
+ * Compatible with Typescript
+ * Easy to implement & maintain
+ * Doesn't introduce new concepts
+ * Doesn't fragment Component features
 
 ## How we teach this
 
 This RFC does not introduce any kind of directive, special element or new concept. 
 
-If your component needs to be split into parts, just write it underneath.
+If your component needs to be split into parts, just write it underneath!
 
 ## Drawbacks
 
-Technically breaking
+Someone out there could be using that Component declaration synthax for something else, so it is technically breaking.
 
 ## Unresolved questions
 
 * Is there something better than a Comment Node ? 
 * Should the comment node include a specific word to better describe its intent ? `<!-- declare Foo -->` 
 * Should local components be directly exportable ? `<!-- export Foo [as Bar] -->`
-* * If so, should they be named exports or static properties of the default export ? `Component.Foo`
+  * If so, should they be named exports or static properties of the default Component ? `Component.Foo`
 * Given that each component scopes its style, should there be a `<style context="module">` shared across all components in the same file ?
