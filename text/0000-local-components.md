@@ -16,6 +16,7 @@ Each Component requires creating a brand new `.svelte` file, but sometimes a Com
 3. a node uses completely different attributes/directives depending on a condition
 4. a variable from a `let:` slot prop, an `#await` resolved promise or a `#each` value is transformed then used more than once
 5. an `#each` block needs its own script for `$`subscriptions or lifecycle
+6. a Component is too large and requires to be broken down for readability sake
 
 Having to spread tiny parts of a Component across several files is unfortunate as it leads to duplicate component names, cluttered folders and quite the refactoring hazard
 
