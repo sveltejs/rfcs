@@ -70,7 +70,7 @@ The `Foo` variable works exactly as if that file imported `import Foo from "./Fo
 
 The only thing difference from a conventional import is that `Foo` has access to the script module & can instantiate other named Components present in the file if any.
 
-The benefits of this design are multiple
+There's many benefits to this approach :
  * Incredibly simple and straightforward
  * Doesn't add indentation
  * Compatible with Typescript
