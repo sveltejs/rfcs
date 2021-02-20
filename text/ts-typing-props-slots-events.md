@@ -6,7 +6,7 @@
 
 ## Summary
 
-Provide possibilites for TypeScript users to strongly type a Svelte component's props/events/slots, including generics. For that, we introduce reserved interfaces named `ComponentProps`, `ComponentEvents`, `ComponentSlots`, `ComponentDef` to type parts or all of them at once. We also introduce `<script>` attributes for generics and for marking a component as having no other events besides the ones defined within.
+Provide possibilites for TypeScript users to strongly type a Svelte component's props/events/slots, including generics. For that, we introduce reserved interfaces named `ComponentProps`, `ComponentEvents`, `ComponentSlots`. We also introduce a concept for generics and a `<script>` attribute for marking a component as having no other events besides the ones defined within.
 
 While this is not a change to Svelte's core, it's still something that needs to be specified so intellisense implementers have something to adhere to.
 
@@ -17,6 +17,7 @@ Using TypeScript with Svelte provides a lot of goodness already, but there are s
 - There is no way currently to tell the intellisense that there's only a fixed set of events one can listen to. You can type `createEventDispatcher` but that does still make it possible to listen to other events
 - There is no way currently to explicitely type slots
 - There is no way currently to use generics
+- There is no way currently to make a component implement some specified interface and have this checked by types
 
 ## Detailed design
 
@@ -118,7 +119,24 @@ This works the same as for typing events. You probably won't use that because it
 
 You want to specify some generic connection between props/slots/events. For example you have a component which has an input prop `item`, and an event called `itemChanged`. You want to use this component for arbitrary kinds of item, but you want to make sure that the types for `item` and `itemChanged` are the same. Generics come in handy then. You can read more about them on the [official TypeScript page](https://www.typescriptlang.org/docs/handbook/generics.html).
 
-##### Option 1
+#### Solution
+You use new reserved type called `ComponentGeneric`.
+
+```html
+<script lang="ts">
+    import {createEventDispatcher} from "svelte";
+
+    type T = ComponentGeneric<boolean>; // extends boolean
+    type X = ComponentGeneric; // any
+
+    export let array1: T[];
+    export let item1: T;
+    export let array2: X[];
+    const dispatch = createEventDispatcher<{arrayItemClick: X}>();
+</script>
+```
+
+##### Discarded alternative 1
 You use a new `<script>` attribute called `generics`. The contents of that attribute have to be valid generic typings.
 
 ```html
@@ -135,7 +153,9 @@ You use a new `<script>` attribute called `generics`. The contents of that attri
 ...
 ```
 
-##### Option 2
+Discarded because it is invalid TypeScript without additional transformations.
+
+##### Discarded alternative 2
 You use a new reserved interface called `ComponentGenerics` and do the typing on it, not declaring any properties on it.
 
 ```html
@@ -154,24 +174,10 @@ You use a new reserved interface called `ComponentGenerics` and do the typing on
 ...
 ```
 
-#### Option 3
-You use new reserved type called `ComponentGeneric`.
+Discarded because it is invalid TypeScript without additional transformations.
 
-```html
-<script lang="ts">
-    import {createEventDispatcher} from "svelte";
 
-    type T = ComponentGeneric<boolean>; // extends boolean
-    type X = ComponentGeneric; // any
-
-    export let array1: T[];
-    export let item1: T;
-    export let array2: X[];
-    const dispatch = createEventDispatcher<{arrayItemClick: X}>();
-</script>
-```
-
-### ComponentDef
+### ComponentDef (likely discarded)
 
 If you want to type all at once, because you like to have the definition in one place or want to better define a generic relationship, you can use the `ComponentDef` interface.
 
@@ -188,7 +194,9 @@ If you want to type all at once, because you like to have the definition in one 
 ...
 ```
 
-### ComponentDef alternative: Namespace
+This is likely not a good idea because you then can achieve typing a component in multiple ways, which introduces maintenance overhead for implementations.
+
+#### Discarded ComponentDef alternative: Namespace
 
 As an alternative to the `ComponentDef` interface, one could use a namespace and put the interfaces inside it. That would make refactoring easier if you for example start of with typing only the events but want to add more typings to slots later on. This would come at the cost of uncanny-valley-stuff for defining the generics.
 
@@ -216,6 +224,8 @@ As an alternative to the `ComponentDef` interface, one could use a namespace and
 ...
 ```
 
+This is discarded because it provides no real benefit over the three-seperate-interfaces-solution.
+
 ### Summary
 
 As you can see, there would be several options to achieve the same. You can use `ComponentDef` to type all at once, or you can mix and match the other possibilities to only type part of it. The drawback is that there is more than one way to achieve the same goal. But only having `ComponentDef` may be too much typing overhead of you only want to specifically type parts of the component. In general, props, slots and their types are already inferable quite nicely at this point. Only generics and events are where you really would need this.
@@ -233,12 +243,13 @@ For users: Enhance docs. For intellisense devs: A more formal specification outl
 - This will only work for TS users
 - Uncanny-valley-stuff for generics
 - Reserved interface names could collide with existing ones, but I think that's rare. It's also only a breaking change for the language-tools because it does not affect the core of Svelte
-- Many ways to achieve the same goal (interface/generics combinations)
+- If we implement `SvelteComponentDef`, then there are multiple ways to achieve the same goal (interface/generics combinations)
 
 ## Alternatives
 
 - Don't do anything and say "well, there are some limits". VueJS for example also cannot deal with generics as far as I know.
-- Only provide parts of this solution: `strictEvents` and `generics`, but from the interfaces only `ComponentDef`, and tell people "if you want to type it, type it all".
+- Only provide parts of this solution: `strictEvents` and generics, and from the interfaces only `ComponentDef`, and tell people "if you want to type it, type it all".
+- Shorter interface name alternatives: `Props` / `Events` / `Slots` / `Generic`. More likely that they clash with existing definitions?
 
 ## Unresolved questions
 
