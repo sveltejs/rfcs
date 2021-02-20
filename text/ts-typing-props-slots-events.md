@@ -128,6 +128,11 @@ You use new reserved type called `ComponentGeneric`.
 
     type T = ComponentGeneric<boolean>; // extends boolean
     type X = ComponentGeneric; // any
+    
+    // you can use generics inside the other interfaces
+    interface ComponentSlots {
+        default: { aSlot: T }
+    }
 
     export let array1: T[];
     export let item1: T;
