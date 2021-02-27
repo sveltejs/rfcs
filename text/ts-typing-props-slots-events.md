@@ -6,7 +6,7 @@
 
 ## Summary
 
-Provide possibilites for TypeScript users to strongly type a Svelte component's props/events/slots, including generics. For that, we introduce reserved interfaces named `ComponentProps`, `ComponentEvents`, `ComponentSlots`. We also introduce a concept for generics and a `<script>` attribute for marking a component as having no other events besides the ones defined within.
+Provide possibilites for TypeScript users to strongly type a Svelte component's props/events/slots, including generics. For that, we introduce reserved interfaces named `$$Props`, `$$Events`, `$$Slots`. We also introduce a concept for generics and a `<script>` attribute for marking a component as having no other events besides the ones defined within.
 
 While this is not a change to Svelte's core, it's still something that needs to be specified so intellisense implementers have something to adhere to.
 
@@ -66,14 +66,14 @@ Now you add one event which comes from a dispatcher mixin:
 <button on:click>Forwarded</button>
 ```
 
-In this case `strictEvents` will not work anymore because we cannot know that `mixinDispatch` dispatches events. So now you use the `ComponentEvents` interface.
+In this case `strictEvents` will not work anymore because we cannot know that `mixinDispatch` dispatches events. So now you use the `$$Events` interface.
 
 ```html
 <script lang="ts">
     import {mixinDispatch} from "somewhere";
     import {createEventDispatcher} from "svelte";
 
-    interface ComponentEvents {
+    interface $$Events {
         mixinEvent: CustomEvent<string>;
         own: CustomEvent<boolean>;
         click: MouseEvent;
@@ -93,7 +93,7 @@ This works the same as for typing events.
 
 ```html
 <script lang="ts">
-    interface ComponentSlots {
+    interface $$Slots {
         default: { prop: boolean; };
     }
 </script>
@@ -107,7 +107,7 @@ This works the same as for typing events. You probably won't use that because it
 
 ```html
 <script lang="ts">
-    interface ComponentProps {
+    interface $$Props {
         prop: boolean;
     }
 
@@ -120,17 +120,17 @@ This works the same as for typing events. You probably won't use that because it
 You want to specify some generic connection between props/slots/events. For example you have a component which has an input prop `item`, and an event called `itemChanged`. You want to use this component for arbitrary kinds of item, but you want to make sure that the types for `item` and `itemChanged` are the same. Generics come in handy then. You can read more about them on the [official TypeScript page](https://www.typescriptlang.org/docs/handbook/generics.html).
 
 #### Solution
-You use new reserved type called `ComponentGeneric`.
+You use new reserved type called `$$Generic`.
 
 ```html
 <script lang="ts">
     import {createEventDispatcher} from "svelte";
 
-    type T = ComponentGeneric<boolean>; // extends boolean
-    type X = ComponentGeneric; // any
+    type T = $$Generic<boolean>; // extends boolean
+    type X = $$Generic; // any
     
     // you can use generics inside the other interfaces
-    interface ComponentSlots {
+    interface $$Slots {
         default: { aSlot: T }
     }
 
@@ -161,13 +161,13 @@ You use a new `<script>` attribute called `generics`. The contents of that attri
 Discarded because it is invalid TypeScript without additional transformations.
 
 ##### Discarded alternative 2
-You use a new reserved interface called `ComponentGenerics` and do the typing on it, not declaring any properties on it.
+You use a new reserved interface called `$$Generics` and do the typing on it, not declaring any properties on it.
 
 ```html
 <script lang="ts">
     import {createEventDispatcher} from "svelte";
     
-    interface ComponentGenerics<T extends boolean, X> {}
+    interface $$Generics<T extends boolean, X> {}
 
     export let array1: T[];
     export let item1: T;
@@ -237,7 +237,7 @@ As you can see, there would be several options to achieve the same. You can use 
 
 ### Implementation hurdles
 
-We would need to make sure that we can provide some meaningful errors if the definition and the actual types don't match. So if someone types `ComponentSlots` as `{foo: boolean;}` but does `<slot foo={'aString'}></slot>`, we must highlight that. I have not looked closely into how this can be achieved yet because I want to first have agreement on the API.
+We would need to make sure that we can provide some meaningful errors if the definition and the actual types don't match. So if someone types `$$Slots` as `{foo: boolean;}` but does `<slot foo={'aString'}></slot>`, we must highlight that. I have not looked closely into how this can be achieved yet because I want to first have agreement on the API.
 
 ## How we teach this
 
@@ -254,7 +254,7 @@ For users: Enhance docs. For intellisense devs: A more formal specification outl
 
 - Don't do anything and say "well, there are some limits". VueJS for example also cannot deal with generics as far as I know.
 - Only provide parts of this solution: `strictEvents` and generics, and from the interfaces only `ComponentDef`, and tell people "if you want to type it, type it all".
-- Shorter interface name alternatives: `Props` / `Events` / `Slots` / `Generic`. More likely that they clash with existing definitions?
+- Interface name alternatives: `Props` / `Events` / `Slots` / `Generic`. More likely that they clash with existing definitions. `ComponentProps` / ... - too verbose.
 
 ## Unresolved questions
 
