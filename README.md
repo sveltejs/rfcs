@@ -2,7 +2,7 @@
 
 This is a place to discuss major changes to Svelte — where 'major' implies significant changes either to public interfaces or internal implementation details, particularly those that could be controversial or involve breaking changes.
 
-Most changes don't need to go through the RFC process and can rely on issues and pull requests.
+Most changes don't need to go through the Request for Comments (RFC) process and can rely on issues and pull requests.
 
 A huge part of the value on an RFC is defining the problem clearly, collecting use cases, showing how others have solved a problem, etc. Coming up with a design is very iterative and only one part of the process. An RFC can provide tremendous value without the design described in it being accepted.
 
