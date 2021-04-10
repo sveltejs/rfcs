@@ -82,7 +82,7 @@ Purpose of this component is to control styling and directives depending on the 
 
 However, this approach is not good _enough_ because in order to add another input type you have to duplicate markup (which means at least 4 unnecessary lines of markup for each type. And that's not counting duplicated attributes).
 
-It is also possible to _remake_ this example code by combining all attributes and directives in one input:
+It is also possible to _remake_ this example by combining all attributes and directives in one input:
 
 ```svelte
 <input
@@ -123,7 +123,7 @@ Situation can be improved a bit by moving some javascript to `script` tag
 />
 ```
 
-However, this seems more like **_avoiding the problem_** instead of **_solving_** it.
+_However_, this seems more like **_avoiding the problem_** instead of **_solving_** it.
 
 I propose to implement a `return:condition` directive that can help solve such problems.
 
@@ -142,6 +142,7 @@ This is how the original example would have looked if it had been reworked with 
 
     return:isNormal
 
+    type="number"
     bind:value={$someStore[property]}
 />
 ```
@@ -179,6 +180,7 @@ I will explain how this directive might work using input from previous section a
 
     return:isNormal
 
+    type="number"
     bind:value={$someStore[property]}
 />
 ```
@@ -203,7 +205,7 @@ object["placeholder"] = placeholder
 Note that old `placeholder` value before `return:` directive has been replaced by new value.<br/>
 It's valid syntax(according to my understanding of this directive).
 
-However, this use case will still give **`Attributes need to be unique`** error :
+However, this use case will still give **`Attributes need to be unique`** error:
 
 ```svelte
 <input
@@ -217,18 +219,18 @@ However, this use case will still give **`Attributes need to be unique`** error 
 />
 ```
 ---
-And lastly, if `isNormal` is falsy, `bind:value` is applied to the tag(**done!**).
+And lastly, if `isNormal` is falsy, `bind:value` is applied to the tag and `type` changed to `number`(**done!**).
 Otherwise, all previous attributes are assigned to the tag(**done!**)
 
 That's all for now. If you have any questions about the behavior of this directive I can tell you my opinion
 
 > Will the change have performance impacts? Can you quantify them?
 
-The directive itself costs practically nothing in terms of performance. (Almost) All calculations can be even performed at compile time and, maybe, it's even possible to reduce bundle size.
+The directive itself costs practically nothing in terms of performance. (Almost) All calculations can even be performed at compile time and, maybe, it's even possible to reduce bundle size.
 
-However, depending on how it's implemented, there could be situations where performance could drop.
+However, depending on its implementation, there may be situations in which performance may decrease.
 
-If `return:` directive is implemented as an action ( only executed when an element is created ), there will be no problem, however there will be fewer uses for it.
+If `return:` directive is only executed when an element is created, there will be no problem, however there will be fewer uses for it.
 
 If it will be called every time `condition` changes, then in this example:
 
@@ -273,8 +275,8 @@ You can call this label as you like. It only performs a descriptive role.
 ></div>
 ```
 
-> When `light` is falsy `data-light` attribute is added to the tag.
-> When `light` is truthy initially or after it was falsy - `data-light` disappears or `data-dark` appears.
+> When `light` is truthy `data-light` attribute is added to the tag.
+> When `light` is falsy initially or after it was falsy - `data-light` disappears or `data-dark` appears.
 
 **Even shorter (to be discussed)**. When `return:` shares a condition with `class:condition` directive
 ```svelte
@@ -283,11 +285,11 @@ You can call this label as you like. It only performs a descriptive role.
     data-dark="It's dark >:)"
 ></div>
 ```
-Which is equivalent to **Second** mode, but shorter.
+Which is equivalent to **Shorthand** option, but shorter.
 
-In my opinion, this implementation fits well with the Svelte design, but you can suggest your own options.
+In my opinion, this implementation fits well with the Svelte design, but you can suggest your options.
 
-This directive will be especially useful for UI library developers, but it can be useful in any kind of project.
+This directive will be especially useful for UI library developers, although it can be useful in any project.
 
 ## How we teach this
 
@@ -295,16 +297,16 @@ This directive will be especially useful for UI library developers, but it can b
 idea best presented? As a continuation of existing Svelte patterns, or as a
 wholly new one?
 
-Described in
-**Detailed design -> Technical Background**
-and in
-**Detailed design -> Implementation -> Options**
+Described in<br/>
+**Detailed design -> Technical Background**<br/>
+and in<br/>
+**Detailed design -> Implementation -> Options**<br/>
 
 > Would the acceptance of this proposal mean the Svelte guides must be
 re-organized or altered? Does it change how Svelte is taught to new users
 at any level?
 
-If a person begins to learn svelte after learning any programming language - no
+If a person begins to learn Svelte after learning any programming language - no
 
 ## Drawbacks
 
