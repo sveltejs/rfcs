@@ -10,7 +10,7 @@
 
 ## Motivation
 
-There are situations when it's needed to set a group of attributes or directives for a tag only by a certain condition.
+There are situations when it's needed to set a group of attributes or directives to a tag only when a certain condition is truthy.
 
 Here is an [example of app with simple Input component](https://svelte.dev/repl/b90be4c311f04cac9736d420743199ad?version=3.37.0), written using `{#if}`.
 
@@ -20,7 +20,7 @@ Purpose of this component is to control styling and directives depending on the 
 
 > _Script and style tags will be used in all following examples, but won't be specified to reduce size of the RFC_
 
-```html
+```svelte
 <script>
     import { someStore } from "./store.js";
 
@@ -80,10 +80,11 @@ Purpose of this component is to control styling and directives depending on the 
 </style>
 ```
 
-However, this approach is not good because in order to add another input type you have to duplicate markup (which means at least 4 unnecessary lines of markup for each type. And that's not counting duplicated attributes).
+However, this approach is not good _enough_ because in order to add another input type you have to duplicate markup (which means at least 4 unnecessary lines of markup for each type. And that's not counting duplicated attributes).
 
 It is also possible to _remake_ this example code by combining all attributes and directives in one input:
-```html
+
+```svelte
 <input
     type={!isNumber ? "text" : "number"}
     class:hasBorder={(isNormal || isNumber) && hasBorder}
@@ -101,7 +102,7 @@ However, the whole process is more like encryption than refactoring and this kin
 
 Situation can be improved a bit by moving some javascript to `script` tag
 
-```html
+```svelte
 <script>
     // imports and exports
 
@@ -128,7 +129,7 @@ I propose to implement a `return:condition` directive that can help solve such p
 
 This is how the original example would have looked if it had been reworked with this directive:
 
-```html
+```svelte
 <input
     type="text"
     placeholder="No value and placeholder"
@@ -155,7 +156,7 @@ This directive is quite similar to how javascript and programming languages as s
 
 It's just `if(condition) return;`
 
-The only difference is that if `condition` is truthy, then processing of all following attributes stops(instead of code) and all (except duplicated) previous attributes and directives are applied to the tag.
+The only difference is that if `condition` is truthy, then processing of all following attributes stops and all (except duplicated) previous attributes and directives are applied to the tag.
 
 > How do different libraries or frameworks implement this feature?
 
@@ -165,7 +166,7 @@ Svelte is (officially) first* :wink:
 
 I will explain how this directive might work using input from previous section as an example.
 
-```html
+```svelte
 <input
     type="text"
     placeholder="No value and placeholder"
@@ -204,7 +205,7 @@ It's valid syntax(according to my understanding of this directive).
 
 However, this use case will still give **`Attributes need to be unique`** error :
 
-```html
+```svelte
 <input
     type="text"
     placeholder="No placeholder"
@@ -231,7 +232,7 @@ If `return:` directive is implemented as an action ( only executed when an eleme
 
 If it will be called every time `condition` changes, then in this example:
 
-```html
+```svelte
 <script>
     export let left = false;
 </script>
@@ -255,7 +256,7 @@ However, this behavior is not covered as with `class:` directive, so this should
 **Full**. When all conditions are placed in curly brackets after a certain label.
 You can call this label as you like. It only performs a descriptive role.
 
-```HTML
+```svelte
 <div
     class:light
     return:darkness-shall-not-pass={!light}
@@ -264,7 +265,7 @@ You can call this label as you like. It only performs a descriptive role.
 ```
 
 **Shorthand**. When there is no curly brackets and condition-variable is the label itself (as in `class:condition` syntax)
-```HTML
+```svelte
 <div
     class:light
     return:light
@@ -276,7 +277,7 @@ You can call this label as you like. It only performs a descriptive role.
 > When `light` is falsy initially or after it was truthy - `data-light` disappears or `data-dark` appears.
 
 **Even shorter (to be discussed)**. When `return:` shares a condition with `class:condition` directive
-```HTML
+```svelte
 <div
     return:class:light
     data-dark="It's dark >:)"
