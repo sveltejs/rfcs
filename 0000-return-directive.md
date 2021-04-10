@@ -275,8 +275,8 @@ You can call this label as you like. It only performs a descriptive role.
 ></div>
 ```
 
-> When `light` is truthy `data-light` attribute is added to the tag.
-> When `light` is falsy initially or after it was falsy - `data-light` disappears or `data-dark` appears.
+> When `light` is truthy `data-light` attribute is added to the tag.<br/>
+> When `light` is falsy initially or after it was truthy - `data-light` disappears or `data-dark` appears.
 
 **Even shorter (to be discussed)**. When `return:` shares a condition with `class:condition` directive
 ```svelte
