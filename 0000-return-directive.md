@@ -190,7 +190,7 @@ First, two values are assigned to this object:
 object["type"] = "text";
 object["placeholder"] = "No value and placeholder";
 ```
-If condition(`!isNormal && !isNumber`) is falsy, then existing attributes are assigned to the tag(**done!**).
+If condition(`!isNormal && !isNumber`) is truthy, then existing attributes are assigned to the tag(**done!**).
 
 Otherwise, new attributes and directives are assigned to object
 >Don't forget that this is just an example!
@@ -200,7 +200,7 @@ object["value"] = value,
 object["placeholder"] = placeholder
 ```
 ---
-Note that old `placeholder` value before `return:` directive has been replaced by new value.
+Note that old `placeholder` value before `return:` directive has been replaced by new value.<br/>
 It's valid syntax(according to my understanding of this directive).
 
 However, this use case will still give **`Attributes need to be unique`** error :
@@ -217,7 +217,7 @@ However, this use case will still give **`Attributes need to be unique`** error 
 />
 ```
 ---
-And lastly, if isNormal is truthy, bind:value is applied to the tag(**done!**).
+And lastly, if `isNormal` is falsy, `bind:value` is applied to the tag(**done!**).
 Otherwise, all previous attributes are assigned to the tag(**done!**)
 
 That's all for now. If you have any questions about the behavior of this directive I can tell you my opinion
@@ -273,8 +273,8 @@ You can call this label as you like. It only performs a descriptive role.
 ></div>
 ```
 
-> When `light` is truthy `data-light` attribute is added to the tag.
-> When `light` is falsy initially or after it was truthy - `data-light` disappears or `data-dark` appears.
+> When `light` is falsy `data-light` attribute is added to the tag.
+> When `light` is truthy initially or after it was falsy - `data-light` disappears or `data-dark` appears.
 
 **Even shorter (to be discussed)**. When `return:` shares a condition with `class:condition` directive
 ```svelte
