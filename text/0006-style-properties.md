@@ -1,6 +1,6 @@
 - Start Date: 2019-11-12
 - RFC PR: [#13](https://github.com/sveltejs/rfcs/pull/13)
-- Svelte Issue: (leave this empty)
+- Svelte Issue: [#5628](https://github.com/sveltejs/svelte/issues/5628)
 
 # Passing CSS custom properties to components
 
