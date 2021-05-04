@@ -21,10 +21,12 @@
 
 > With switch statements you do not have to reference your varible multiple times
 > and possibly use more resources than required. That's the main benefit to
-> switch statements in programming, performance!
+> switch statements in programming, performance. Although with modern hardware the
+> benefits of switch statements speed are probably 1ms or less it may be beneficial
+> to lower end hardware.
 
-> My reasoning for adding this is mainly syntactic sugar (lots of else if blocks are ugly), 
-> but the performance benefits of a switch statement are real.
+> My reasoning for adding this is mainly syntactic sugar (lots of else if blocks are ugly, 
+> but the performance benefits of a switch statement very are real, but very minimal.
 
 ## Detailed design
 ```
