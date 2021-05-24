@@ -58,7 +58,7 @@ With built-in support for interpolating JS in the style tag, we can alleviate th
 
 ### Technical Background
 
-There is currently a [feature request](https://github.com/sveltejs/svelte/issues/3815) which was closed in favor of the [style properties RFC](https://github.com/sveltejs/rfcs/pull/13). Though in my honest opinion, that RFC did not really answer the goal of the feature request, which was to pass variables into the style tag within a component.
+There is currently a [feature request](https://github.com/sveltejs/svelte/issues/758) which was closed in favor of the [style properties RFC](https://github.com/sveltejs/rfcs/pull/13). Though in my honest opinion, that RFC did not really answer the goal of the feature request, which was to pass variables into the style tag within a component.
 
 There isn't an existing implementation of this feature (I'm aware of) in any library/framework yet, this could be the first of its kind.
 
