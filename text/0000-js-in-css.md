@@ -104,6 +104,10 @@ For completeness, here's the input and the expected high-level output that Svelt
 </style>
 ```
 
+#### Why `js()`
+
+`js()` was chosen as it's the least web-breaking feature and plays in the same area as `calc()` and `var()`, so most preprocessors would've took into account of this function syntax. There's also a [CSS Houdini draft](https://github.com/w3c/css-houdini-drafts/issues/857) that further expands on custom CSS functions, so there could be a future where this would be a standard syntax.
+
 #### Experiment caveats
 
 The preprocessor however has caveats that a full built-in Svelte integration can solve:
