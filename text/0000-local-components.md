@@ -68,7 +68,7 @@ Everything above the first named Component (if any) stays the default export.
 
 The `Foo` variable works exactly as if that file imported `import Foo from "./Foo.svelte"`, `Foo` cannot access anything from the default Component,  it's all on its own with its own style, script and content.
 
-The only thing difference from a conventional import is that `Foo` has access to the script module & can instantiate other named Components present in the file if any.
+The only difference from a conventional import is that `Foo` has access to the script module & can instantiate other named Components present in the file if any.
 
 There's many benefits to this approach :
  * Incredibly simple and straightforward
