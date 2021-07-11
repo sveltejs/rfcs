@@ -44,7 +44,7 @@ Additionally, `svelte/preprocess` exports new utility functions which essentiall
 ### extractStyles
 
 ```typescript
-function extractStyles(code: string): {
+function extractStyles(code: string): Array<{
   start: number;
   end: number;
   content: { text: string; start: number; end: number };
@@ -54,8 +54,7 @@ function extractStyles(code: string): {
     start: number;
     end: number;
   }>;
-};
-```
+}>;
 
 extracts the style tags from the source code, each with start/end position, content and attributes
 
