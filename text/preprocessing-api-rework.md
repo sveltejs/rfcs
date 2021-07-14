@@ -124,3 +124,4 @@ None that I can think of right now
 
 - We could expand the functionality of `extractScripts`/`extractStyles`. Right now, every script/style is processed, not just the top level ones. Enhance the Svelte parser with a mode that only parses the top level script/style locations, but not its contents?
 - What about preprocessors inside moustache tags? Should the Svelte parser be adjusted for an opt-in parsing mode where a Javascript-like syntax for moustache tags is assumed to extract its contents and provide this as another utility function for preprocessing? (https://github.com/sveltejs/svelte/issues/4701)
+- Other preprocessor utils that are of use, for example doing the opposite of `extractScripts`/`extractStyles` and provide a `replaceMarkup` function (https://github.com/sveltejs/svelte/issues/5005)?
