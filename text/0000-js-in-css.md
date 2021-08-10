@@ -60,7 +60,7 @@ With built-in support for interpolating JS in the style tag, we can alleviate th
 
 There is currently a [feature request](https://github.com/sveltejs/svelte/issues/758) which was closed in favor of the [style properties RFC](https://github.com/sveltejs/rfcs/pull/13). Though in my honest opinion, that RFC did not really answer the goal of the feature request, which was to pass variables into the style tag within a component.
 
-There isn't an existing implementation of this feature (I'm aware of) in any library/framework yet, this could be the first of its kind.
+Recently, a similar style interpolation feature had also [landed in Vue 3.2](https://github.com/vuejs/rfcs/pull/231) and it was well-received by the community. As many ideas and concerns has been spurred and addressed there, we can follow its footsteps and implement our own variant.
 
 ### Implementation
 
@@ -106,7 +106,7 @@ For completeness, here's the input and the expected high-level output that Svelt
 
 #### Why `js()`
 
-`js()` was chosen as it's the least web-breaking feature and plays in the same area as `calc()` and `var()`, so most preprocessors would've took into account of this function syntax. There's also a [CSS Houdini draft](https://github.com/w3c/css-houdini-drafts/issues/857) that further expands on custom CSS functions, so there could be a future where this would be a standard syntax.
+`js()` was chosen as it's the least web-breaking feature and plays in the same area as `calc()` and `var()`, so most preprocessors would've took into account of this function syntax. Vue 3.2 also uses a similar `v-bind()` syntax, which the decision was likely carefully made. There's also a [CSS Houdini draft](https://github.com/w3c/css-houdini-drafts/issues/857) that further expands on custom CSS functions, so there could be a future where this would be a standard syntax.
 
 #### Experiment caveats
 
