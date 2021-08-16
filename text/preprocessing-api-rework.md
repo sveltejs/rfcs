@@ -24,7 +24,17 @@ The solution for a better preprocessing API therefore should be
 
 ## Detailed design
 
-The preprocessor API no longer is split up into three parts. Instead of expecting an object with `{script, style, markup}` functions, it expects a function to which is handed the complete source code, and that's it:
+The preprocessor API no longer is split up into three parts. Instead of expecting an object with `{script, style, markup}` functions, it expects an object with these properties:
+
+```typescript
+{
+  name: 'a string', // sometimes it's good to know from a preprocessor library persepective what preprocessor you are dealing with
+  preprocess: function,
+  // possibly more options later on
+}
+```
+
+The `preprocess` function to which the complete source code is handed looks like this:
 
 ```typescript
 result: {
@@ -34,7 +44,7 @@ result: {
     (input: { code: string, filename: string }) => Promise<{
 			code: string,
 			dependencies?: Array<string>,
-            map?: any
+			map?: any
 		}>
 )
 ```
@@ -47,6 +57,7 @@ Additionally, `svelte/preprocess` exports new utility functions which essentiall
 function extractStyles(code: string): Array<{
   start: number;
   end: number;
+  itTopLevel?: boolean;
   content: { text: string; start: number; end: number };
   attributes: Array<{
     name: string;
@@ -55,8 +66,9 @@ function extractStyles(code: string): Array<{
     end: number;
   }>;
 }>;
+```
 
-extracts the style tags from the source code, each with start/end position, content and attributes
+extracts the style tags from the source code, each with start/end position, content and attributes. `isTopLevel` would require a parser which has to make some assumptions about the code being "standard JS/HTML-syntax compliant" (in the sense of opening closing brackets match etc). Pending PR for such a parser here: https://github.com/sveltejs/svelte/pull/6611 . We could make using that parser the default, with a fallback to the old regex-approach in case of an error, in which case `isTopLevel` would be `undefined`, not `true` or `false`.
 
 ### extractScripts
 
@@ -67,8 +79,8 @@ Same as `extractStyles` but for scripts
 ```typescript
 function replaceInCode(
   code: string,
-  replacements: Array<{ code: string; start: number; end: number; map?: any }>
-): { code: string; map: any };
+  replacements: Array<{ code: string; start: number; end: number; map?: SourceMap }>
+): { code: string; map: SourceMap };
 ```
 
 Performs replacements at the specified positions. If a map is given, that map is adjusted to map whole content, not just the part that was processed. The result is the replaced code along with a merged map.
@@ -110,7 +122,8 @@ export function legacyPreprocessor(preprocessor) {
 
 ## How we teach this
 
-Adjust docs
+- Adjust docs
+- Write a blog post outlining the need for the change, what new capabilities it unlocks, and a migration path
 
 ## Drawbacks
 
