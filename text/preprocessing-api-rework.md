@@ -68,7 +68,7 @@ function extractStyles(code: string): Array<{
 }>;
 ```
 
-extracts the style tags from the source code, each with start/end position, content and attributes. `location` would require a parser which has to make some assumptions about the code being "standard JS/HTML-syntax compliant" (in the sense of opening closing brackets match etc). Pending PR for such a parser here: https://github.com/sveltejs/svelte/pull/6611 . We could make using that parser the default, with a fallback to the old regex-approach in case of an error, in which case `location` would be `unknown`, not `top` or `nested`.
+extracts the style tags from the source code, each with start/end position, content and attributes. `location` would require a parser which has to make some assumptions about the code being "standard JS/HTML-syntax compliant" (in the sense of opening closing brackets match etc). Pending PR for such a parser here: https://github.com/sveltejs/svelte/pull/6611 . We could make using that parser the default, with a fallback to the old regex-approach in case of an error, in which case `location` would be `unknown`, not `top` or `nested`. Preprocessors could use this to only transpile top level scripts.
 
 ### extractScripts
 
@@ -135,6 +135,5 @@ None that I can think of right now
 
 ## Unresolved questions
 
-- We could expand the functionality of `extractScripts`/`extractStyles`. Right now, every script/style is processed, not just the top level ones. Enhance the Svelte parser with a mode that only parses the top level script/style locations, but not its contents?
-- What about preprocessors inside moustache tags? Should the Svelte parser be adjusted for an opt-in parsing mode where a Javascript-like syntax for moustache tags is assumed to extract its contents and provide this as another utility function for preprocessing? (https://github.com/sveltejs/svelte/issues/4701)
+- What about preprocessors inside mustache tags? Should the Svelte parser be adjusted for an opt-in parsing mode where a Javascript-like syntax for mustache tags is assumed to extract its contents and provide this as another utility function for preprocessing? (https://github.com/sveltejs/svelte/issues/4701) - _Update_: The pending parser PR would partly adress this by giving back location infos for mustache tags as well: https://github.com/sveltejs/svelte/pull/6611
 - Other preprocessor utils that are of use, for example doing the opposite of `extractScripts`/`extractStyles` and provide a `replaceMarkup` function (https://github.com/sveltejs/svelte/issues/5005)?
