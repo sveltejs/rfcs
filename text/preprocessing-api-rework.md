@@ -57,7 +57,7 @@ Additionally, `svelte/preprocess` exports new utility functions which essentiall
 function extractStyles(code: string): Array<{
   start: number;
   end: number;
-  itTopLevel?: boolean;
+  location: "top" | "nested" | "unknown";
   content: { text: string; start: number; end: number };
   attributes: Array<{
     name: string;
@@ -68,7 +68,7 @@ function extractStyles(code: string): Array<{
 }>;
 ```
 
-extracts the style tags from the source code, each with start/end position, content and attributes. `isTopLevel` would require a parser which has to make some assumptions about the code being "standard JS/HTML-syntax compliant" (in the sense of opening closing brackets match etc). Pending PR for such a parser here: https://github.com/sveltejs/svelte/pull/6611 . We could make using that parser the default, with a fallback to the old regex-approach in case of an error, in which case `isTopLevel` would be `undefined`, not `true` or `false`.
+extracts the style tags from the source code, each with start/end position, content and attributes. `location` would require a parser which has to make some assumptions about the code being "standard JS/HTML-syntax compliant" (in the sense of opening closing brackets match etc). Pending PR for such a parser here: https://github.com/sveltejs/svelte/pull/6611 . We could make using that parser the default, with a fallback to the old regex-approach in case of an error, in which case `location` would be `unknown`, not `top` or `nested`.
 
 ### extractScripts
 
