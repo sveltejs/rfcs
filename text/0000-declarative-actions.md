@@ -591,4 +591,6 @@ More:
 
 8. Should custom CSS properties set inside the Action be available to the children of the component the Action is applied to?
 
+9. [Prinzhorn's comment](https://github.com/sveltejs/rfcs/pull/41#issuecomment-924762831) - Is `<target />` a good tag? Should we use `<svelte:target />` since `<target />` isn't standard? Any other name?
+
 ##### I will add more as/if they rise in the pull request.
