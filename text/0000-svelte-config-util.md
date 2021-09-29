@@ -9,7 +9,6 @@
 Introduce a new utility package `@sveltejs/config` to offer tools in the svelte ecosystem a common way
 to read and validate svelte config files and provide config features to users in a consistent manner.
 
-
 ## Motivation
 
 Currently, tools implement config reading separately (or not at all),
@@ -20,11 +19,85 @@ and implement new features is the main motivation of this RFC,
 resulting in a better dx for both users writing svelte config files
 and tool authors consuming them via a simple common api.
 
-#### Prior Art
-* [postcss-load-config](https://github.com/postcss/postcss-load-config)
-* sveltekit / vite-plugin-svelte implementations of config read and validate
+### Features
 
-#### New Features
+#### for tools
+* async `loadConfig` function
+* defined namespacing (top-level keys owned by a tool)
+* validation utilities
+
+#### for users
+* `defineConfig` helper for intellisense like in [vite config](https://vitejs.dev/config/#config-intellisense)
+* `async` config support like in [vite config](https://vitejs.dev/config/#async-config)
+* allow `svelte.config.ts`
+
+
+## Detailed design
+
+### Technical Background
+
+### Prior Art
+* [postcss-load-config](https://github.com/postcss/postcss-load-config)
+* [sveltekit](https://github.com/sveltejs/kit/tree/master/packages/kit/src/core/config)
+* [vite-plugin-svelte](https://github.com/sveltejs/vite-plugin-svelte/blob/main/packages/vite-plugin-svelte/src/utils/load-svelte-config.ts)
+
+### Implementation
+
+The implementation is going to be fully compatible to existing usage of svelte.config.js (cjs/mjs) files.
+
+Tools can opt in by adopting `@sveltejs/config`
+
+New config features for users could potentially introduce changes that are not backwards compatible
+to tools reading svelte config without `@sveltejs/config`.
+To reduce friction, v1.0 of @sveltejs/config could be limited to features that are explicitly backwards compatible
+and features that would break will only be released after our tools adopted it
+
+#### New Features for tool authors
+
+##### async `loadConfig` function
+```js
+import { loadConfig } from '@sveltejs/config';
+//...
+const config = await load_config();
+```
+
+loadConfig accepts an optional `options` argument with the following options:
+```js
+options = {
+    fromDir: '/some/path', // process.cwd by default, tools can pass what they need, eg vite root
+    inlineConfig: {/*...*/}, // svelte config object built from inline options eg cli args passed to the tool. merged in
+    namespace: 'kit', // namespace for the tool loading the config, useful for advanced features
+    //...
+}
+```
+
+##### defined namespacing (top-level keys owned by a tool)
+
+Currently, namespaces in svelte.config.js are loosely agreed upon. 
+`compilerOptions`, `preprocess`, `extensions` and `kit` are used by SvelteKit.
+
+Each tool will get its own namespace, e.g. `vitePlugin`, `rollupPlugin`, `webpackLoader`, `languageTools`.
+
+Community provided tools will be allowed to use their own namespaces (e.g. `elder` or `routify`),
+but these are not supported beyond being tolerated by `@sveltejs/config`
+
+##### validation utilities
+
+SvelteKit contains [code](https://github.com/sveltejs/kit/blob/master/packages/kit/src/core/config/options.js) to validate config options and output helpful messages. 
+Refactor this code to be of general use and provide an api
+
+```js
+import { loadConfig ,validateConfig } from '@sveltejs/config';
+//...
+const config = await load_config();
+const rules = {
+    //TBD, use sveltekit options as a base
+}
+// throws on error
+validateConfig(config, rules);
+```
+
+#### New Features for users
 
 ##### `defineConfig` helper for intellisense like in [vite config](https://vitejs.dev/config/#config-intellisense)
 ```js
@@ -47,86 +120,46 @@ export default defineConfig(async () => {
 
 ##### allow `svelte.config.ts` and transpile automatically
 
-Typescript config files are becoming more popular and users coming from vite sometimes wonder
-why svelte.config.ts does not work
+Transpilation is done via lazy dynamic import of `typescript` or `esbuild`. If neither is available, this fails.
+It allows users of typescript projects to fully embrace ts without burdening js projects with a typescript dependency.
 
-> Please provide specific examples. If you say "this would be more flexible" then
-> give an example of something that becomes easier. If you say "this would be make
-> it easier to do X" then give an example of what that looks like today and what's
-> hard about it.
-
-> Don't assume that others recognize the problem is one that needs to be solved
-> Is there some concrete issue you cannot accomplish without this?
-> What does it look like to accomplish some set of goals today and how could
-> that be improved?
-> Are there any workarounds that are necessary today?
-> Are there open issues on Github where people would be helped by this?
-> Will the change have performance impacts? Can you quantify them?
-
-> Please focus on explaining the motivation so that if this RFC is not accepted,
-> the motivation could be used to develop alternative solutions. In other words,
-> enumerate the constraints you are trying to solve without coupling them too
-> closely to the solution you have in mind.
-
-## Detailed design
-
-### Technical Background
-
-> There are a lot of ways Svelte is used. It's hosted on different platforms;
-> integrated with different libraries; built with different bundlers, etc. No one
-> person knows everything about all the ways Svelte is used. What does someone who
-> knows about Svelte but hasn't necessarily used anything outside of it need to
-> know? Are there docs you can share?
-
-> How do different libraries or frameworks implement this feature? We can take
-> design inspiration from others who have done this well and improve upon the
-> designs or make them better fit Svelte.
-
-### Implementation
-
-> Explain the design in enough detail for somebody familiar with the framework to
-understand, and for somebody familiar with the implementation to implement. Any
-> new terminology should be defined here.
-
-> Explain not just the final design, but also how you arrived at it. What
-> constraints did you face? Are there corner cases you've come up with solutions for?
-
-> Explain how your design fits into the larger picture. Are the other open problems
-> in this area you're familiar with? How does this design fit with potential
-> solutions for those issues?
-
-> Connect your design to the motivations you listed above. When describing a part of
-> the design, it can be useful to share an example of what it would look like to
-> utilize the implementation as solution to the problem.
 
 ## How we teach this
 
-> What names and terminology work best for these concepts and why? How is this
-idea best presented? As a continuation of existing Svelte patterns, or as a
-wholly new one?
+### To tool authors
 
-> Would the acceptance of this proposal mean the Svelte guides must be
-re-organized or altered? Does it change how Svelte is taught to new users
-at any level?
+README.md and/or docs/ in the new GitHub repo, example usage in kit and vite-plugin-svelte
 
-> How should this feature be introduced and taught to existing Svelte
-users?
+### To users
+
+Currently, svelte.config.js isn't really documented on its own. The tools show how they use it.
+Add user documentation to the GitHub repo too and link to it from svelte.dev docs.
+Alternatively: Add a new section to the svelte.dev docs directly, this would incur extra work for new features though
+
 
 ## Drawbacks
 
-> Why should we *not* do this? Please consider the impact on teaching Svelte,
-on the integration of this feature with other existing and planned features,
-on the impact of the API churn on existing apps, etc.
-
-> There are tradeoffs to choosing any path, please attempt to identify them here.
+Once a tool adopts this, it is bound to the features offered. 
+If new requirements come up it would have to be added in `@sveltejs/config`
+and create additional overhead for coordinating releases
 
 ## Alternatives
 
-> What other designs have been considered? What is the impact of not doing this?
+### use existing 3rd party tools
+[lilconfig](https://github.com/antonk52/lilconfig) is a smaller alternative to cosmiconfig for loading,
+object validation libraries exist too.
 
-> This section could also include prior art, that is, how other frameworks in the
-> same domain have solved this problem differently.
+### keep doing it separately in each tool
+
+It works as it is now, maybe the pain isn't worth the hassle.
+Just add some documentation and raise awareness of potential issues with different implementations
 
 ## Unresolved questions
 
- 
+### exact api for validation
+
+How to refactor kit validation to be of general use
+
+### caching
+
+How could we cache the config so that multiple tools being used together can share the same load
