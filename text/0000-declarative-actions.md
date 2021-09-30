@@ -537,6 +537,14 @@ Example Consumer (the Action would be the same as the Declarative Action above):
 <div use:parametersExample data:fontSizePixels>1 argument</div>
 ```
 
+EDIT | 30-09-2021
+
+## Implementation
+
+As for (Pinzhorn's suggestion)[https://github.com/sveltejs/rfcs/pull/41#issuecomment-924762831], Svelte should be able to compile Declarative Actions to imperative actions. From there, Declarative Actions would be usable as any other action. Both as a function or with `use:`. This would also mean 100% backwards compatibility and we would have the ability to mix n' match both types of actions. Declarative actions wouldn't need to replace the current ones.
+
+EDIT | END
+
 ## How we teach this
 
 We should teach this roughly the same as we teach Components with Slots. Though `<target />` "only accepts one child", since the action is applied with a directive, therefore it can alias to said child.
@@ -546,6 +554,7 @@ Current svelte guides shouldn't have to be reorganized since there should be a s
 ## Drawbacks
 
 1. This would be a breaking change. Although it may be possible to keep the old actions around (I assume, I'm not well versed in the Svelte internals), it might not be worth the complexity. Having multiple ways to write an action might be more confusing than it needs to be, specially for new users.
+EDIT | 30-09-2021 - (this may not be true anymore)
 
 2. Verbosity. For simple actions that need to be written imperatively anyway, this will be more cumbersome.
 
@@ -591,6 +600,12 @@ More:
 
 8. Should custom CSS properties set inside the Action be available to the children of the component the Action is applied to?
 
+EDIT | 28-09-2021
+
 9. [Prinzhorn's comment](https://github.com/sveltejs/rfcs/pull/41#issuecomment-924762831) - Is `<target />` a good tag? Should we use `<svelte:target />` since `<target />` isn't standard? Any other name?
+
+EDIT | END
+
+
 
 ##### I will add more as/if they rise in the pull request.
