@@ -153,7 +153,7 @@ In this example, the `use` directive would be both forwarded to parent context a
 
 ## Potential Changes with Svelte 4
 
-It has been further proposed to completely replace the typical event forwarding syntax in the past for Svelte 4, this additional proposal would also cover that:
+It has been further proposed to completely replace the typical event forwarding syntax in the past for Svelte 4. This additional proposal could also cover that:
 
 ```html
 <button on:click></button>
