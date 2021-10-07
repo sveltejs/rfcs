@@ -6,7 +6,7 @@
 
 ## Summary
 
-This RFC proposes a new `forward` directive, which lets you forward directives used on a component instance to a DOM element in said component. This allows you to call directives such as `use`, `transition`, `animation`, etc... on a component declaration. It also allows you to delegate all events to a certain element in a component.
+This RFC proposes a new `forward` directive, which lets you forward directives used on a component instance to a DOM element in said component. This allows you to call directives such as `use`, `transition`, `animation`, etc... on a component declaration. It also allows you to delegate all events to a certain element in a component's template.
 
 ## Motivation
 
