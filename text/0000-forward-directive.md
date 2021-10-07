@@ -95,3 +95,74 @@ The directive should be taught as a method of using directives such as `use` or 
 ## Unresolved questions
 
 - How should the `bind` directive be implemented in this context?
+- How should `forward:on` or `forward:use` interact with existing `on:` or `use` directives?
+
+## Additional Proposal - `foward` effects and singular event forwarding
+
+Another common problem that people run into is adding side-effects to forwarded events. Suppose a developer had the aforementioned `<Button>` component that forwarded the `click` event, but wanted to execute their own code along with the parent's click callback. The go-to solution would be event dispatchers:
+
+```html
+<script>
+    import { createEventDispatcher } from "svelte";
+    
+    const dispatch = createEventDispatcher();
+    
+    function handleClick(event) {
+        console.log(event.target);
+    
+        dispatch("click");
+    }
+</script>
+
+<button on:click={handleClick}>
+    <slot />
+</button>
+```
+This solution has underlying issues:
+- Event dispatchers lose the properties of `MouseEvent`.
+- This is a lot of boilerplate to perform a simple action.
+
+Instead of using dispatchers to add side-effects to events, we can extend the forward event to bubble singular event types as well. This could be done like so:
+
+```html
+<script>    
+    function handleClick(event) {
+        console.log(event.target);
+    }
+</script>
+
+<button forward:on:click={handleClick}>
+    <slot />
+</button>
+```
+
+This pattern could be similarly applied to actions:
+
+```html
+
+<script>
+    function internalAction(node) {
+        // do something with `node`
+    }
+</script>
+
+<button forward:use={internalAction}></button>
+```
+
+In this example, the `use` directive would be both forwarded to parent context as well as `internalAction` being applied. A possible pitfall would be how the animation API would play into this, as it's unclear how the compiler would deal with multiple animations.
+
+## Potential Changes with Svelte 4
+
+It has been further proposed to completely replace the typical event forwarding syntax in the past for Svelte 4, this additional proposal would also cover that:
+
+```html
+<button on:click></button>
+```
+
+would be changed to
+
+```html
+<button forward:on:click></button>
+```
+
+This is a breaking change, and likely out-of-scope.
