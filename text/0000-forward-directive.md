@@ -10,7 +10,7 @@ This RFC proposes a new `forward` directive, which lets you forward directives u
 
 ## Motivation
 
-At the moment, there are a long list of pitfalls with community-provided component libraries. Designing a "one-size-fits-all" component in svelte can be rather tedious in the current enviornment, notably when dealing with directives. For example, if you wish to forward commonly used events to a reusable <Button> component, you'll have to retype a long list of events like so:
+At the moment, there are a long list of pitfalls with community-provided component libraries. Designing a "one-size-fits-all" component in svelte can be rather tedious in the current enviornment, notably when dealing with directives. For example, if you wish to forward commonly used events to a reusable `<Button>` component, you'll have to retype a long list of events like so:
 
 ```html
 <button
@@ -51,7 +51,7 @@ While this also is effective in solving the issue, it adds further boilerplate a
 
 ### Forwarding all events to an element
 
-This example uses the same <Button> component described earlier.
+This example uses the same `<Button>` component described earlier.
   
 ```html
 <button forward:on class="button {customClass || ''}" {...$$restProps}>
