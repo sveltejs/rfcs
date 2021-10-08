@@ -148,7 +148,7 @@ This pattern could be similarly applied to actions:
     }
 </script>
 
-<button forward:use={internalAction}></button>
+<button forward:use:internalAction></button>
 ```
 
 In this example, the `use` directive would be both forwarded to parent context as well as `internalAction` being applied. A possible pitfall would be how the animation API would play into this, as it's unclear how the compiler would deal with multiple animations.
