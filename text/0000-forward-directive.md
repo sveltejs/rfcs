@@ -81,7 +81,7 @@ The `forward` directive's syntax would take in the name of the directive to be f
 
 ## How we teach this
 
-The directive should be taught as a method of using directives such as `use` or `transition` through the parent context of a component. It should be taught as a relatively advanced feature towwards the end of the tutorial, mainly intended for package authors. It wouldn't majorly affect other documentation topics, although it might be worth noting on the [Event Forwarding](https://svelte.dev/tutorial/event-forwarding) topic of the tutorial.
+The directive should be taught as a method of using directives such as `use` or `transition` through the parent context of a component. It should be taught as a relatively advanced feature towards the end of the tutorial, mainly intended for package authors. It wouldn't majorly affect other documentation topics, although it might be worth noting on the [Event Forwarding](https://svelte.dev/tutorial/event-forwarding) topic of the tutorial.
 
 ## Drawbacks
 
@@ -95,9 +95,11 @@ The directive should be taught as a method of using directives such as `use` or 
 ## Unresolved questions
 
 - How should the `bind` directive be implemented in this context?
-- How should `forward:on` or `forward:use` interact with existing `on:` or `use` directives?
+- How should `forward` interact with existing `on`/`use`/`transition`/etc directives?
 
 ## Additional Proposal - `foward` effects and singular event forwarding
+
+This section provides a possible answer to the second unresolved question, as well as a discussion of how `forward` can be integrated into Svelte 4 and onward.
 
 Another common problem that people run into is adding side-effects to forwarded events. Suppose a developer had the aforementioned `<Button>` component that forwarded the `click` event, but wanted to execute their own code along with the parent's click callback. The go-to solution would be event dispatchers:
 
