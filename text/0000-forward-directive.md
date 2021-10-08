@@ -59,6 +59,20 @@ This example uses the same `<Button>` component described earlier.
 </button>
 ```
 
+This version of the component has an internal click handler that will run along with the forwarded `click` event.
+
+```html
+<script>
+    function internalFunction() {
+        console.log("Button Clicked!");
+    }
+</script>
+
+<button forward:on on:click={internalFunction}" {...$$restProps}>
+  <slot />
+</button>
+```
+
 ## Forwarding actions and transitions
 
 The `forward` directive can be similarly used to forward actions and transitions using the native syntax:
@@ -73,6 +87,13 @@ Using the above component in parent context would look like this:
 
 ```html
 <Button use:myAction>I'm a button with an action!</Button>
+```
+
+Similarly to the `on` forwarding, internal actions and transitions may be used along with the `forward` directive:
+```
+<button forward:use forward:transition transition:internalTransition use:internalAction>
+  <slot />
+</button>
 ```
 
 ### Implementation
@@ -95,63 +116,7 @@ The directive should be taught as a method of using directives such as `use` or 
 ## Unresolved questions
 
 - How should the `bind` directive be implemented in this context?
-- How should `forward` interact with existing `on`/`use`/`transition`/etc directives?
-
-## Additional Proposal - `foward` effects and singular event forwarding
-
-This section provides a possible answer to the second unresolved question, as well as a discussion of how `forward` can be integrated into Svelte 4 and onward.
-
-Another common problem that people run into is adding side-effects to forwarded events. Suppose a developer had the aforementioned `<Button>` component that forwarded the `click` event, but wanted to execute their own code along with the parent's click callback. The go-to solution would be event dispatchers:
-
-```html
-<script>
-    import { createEventDispatcher } from "svelte";
-    
-    const dispatch = createEventDispatcher();
-    
-    function handleClick(event) {
-        console.log(event.target);
-    
-        dispatch("click");
-    }
-</script>
-
-<button on:click={handleClick}>
-    <slot />
-</button>
-```
-This solution has underlying issues:
-- Event dispatchers lose the properties of `MouseEvent`.
-- This is a lot of boilerplate to perform a simple action.
-
-Instead of using dispatchers to add side-effects to events, we can extend the forward event to bubble singular event types as well. This could be done like so:
-
-```html
-<script>    
-    function handleClick(event) {
-        console.log(event.target);
-    }
-</script>
-
-<button forward:on:click={handleClick}>
-    <slot />
-</button>
-```
-
-This pattern could be similarly applied to actions:
-
-```html
-
-<script>
-    function internalAction(node) {
-        // do something with `node`
-    }
-</script>
-
-<button forward:use:internalAction></button>
-```
-
-In this example, the `use` directive would be both forwarded to parent context as well as `internalAction` being applied. A possible pitfall would be how the animation API would play into this, as it's unclear how the compiler would deal with multiple animations.
+- How should svelte handle multiple transitions at once? Using an "internal transition" along with forwarding might result in some unexpected behavior.
 
 ## Potential Changes with Svelte 4
 
