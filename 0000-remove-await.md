@@ -197,7 +197,7 @@ export let query;
 import { promisable } from 'svelte/store';
 import { suggestUserNames } from './api.js';
 
-$: details = promisable(suggestUserNames(query), []);
+$: details = promisable(signal => getUserDetails(id, { signal }), []);
 </script>
 
 <ul class:spinner={$details.pending}>
