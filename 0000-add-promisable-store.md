@@ -197,7 +197,7 @@ export let query;
 import { promisable } from 'svelte/store';
 import { suggestUserNames } from './api.js';
 
-$: details = promisable(signal => getUserDetails(id, { signal }), []);
+$: details = promisable(signal => suggestUserNames(query, { signal }), []);
 </script>
 
 <ul class:spinner={$details.pending}>
@@ -227,7 +227,7 @@ import { suggestUserNames } from './api.js';
 const details = preservedPromisable([]);
 
 // This keeps using the previous `value` until the new Promise has resolved.
-$: details.await(signal => getUserDetails(id, { signal }));
+$: details.await(signal => suggestUserNames(query, { signal }));
 </script>
 
 <ul class:spinner={$details.pending}>
