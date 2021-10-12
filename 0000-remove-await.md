@@ -2,11 +2,11 @@
 - RFC PR: (leave this empty)
 - Svelte Issue: (leave this empty)
 
-# Remove `{#await}`, add a `promisable` store
+# Add a `promisable` store to potentially supersede `{#await}`
 
 ## Summary
 
-Bear with me, this is not click-bait. I present a (in my opinion) better alternative to `{#await}` that already works _right now_ without any breaking changes to Svelte. I present a `promisable` and a `preservedPromisable` store that are more powerful than `{#await}` in every single way.
+I present a (in my opinion) better alternative to `{#await}` that already works _right now_ without any breaking changes to Svelte. I present a `promisable` and a `preservedPromisable` store that are more powerful than `{#await}` in every single way.
 
 ## Motivation
 
