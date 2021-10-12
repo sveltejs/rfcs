@@ -243,6 +243,12 @@ $: details.await(signal => getUserDetails(id, { signal }));
 </ul>
 ```
 
+### Demo
+
+Showcasing basically all the things.
+
+https://svelte.dev/repl/54a1377577ed450ca112c9b4b0535084?version=3.43.1
+
 # Implementation
 
 ```js
@@ -344,12 +350,6 @@ export const preservedPromisable = function (initialValue) {
   };
 };
 ```
-
-### Demo
-
-Showcasing basically all the things.
-
-https://svelte.dev/repl/54a1377577ed450ca112c9b4b0535084?version=3.43.1
 
 ## How we teach this
 
