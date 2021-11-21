@@ -39,20 +39,30 @@ A [solution](https://github.com/sveltejs/svelte/pull/4599) to this event issue u
 Another common problem that comes up is when working with actions. Components are incapable of utilizing the `use` directive, meaning library authors often need to export a prop like so:
 ```html
 <script>
-    export let use = () => {};
+	export let use = [];
+	
+	const [action, options] = use;
 </script>
 
-<div use:use></div>
+<button use:action={options}>
+	<slot />
+</button>
 ```
 
-While this also is effective in solving the issue, it adds further boilerplate and nonstandard syntax that other developers are forced to work with. Similar problems arise with the `transition` and `animation` directives.
+While this also is effective in solving the issue, it adds further boilerplate and nonstandard syntax that other developers are forced to work with.
+
+```html
+<Button use={[myAction, {option: true}]}>Hi</Button>
+```
+
+Similar problems arise with the `transition` and `animation` directives.
 
 ## Detailed design
 
 ### Forwarding all events to an element
 
-This example uses the same `<Button>` component described earlier.
-  
+This example uses the same `<Button />` component described earlier.
+
 ```html
 <button forward:on class="button {customClass || ''}" {...$$restProps}>
   <slot />
@@ -117,19 +127,3 @@ The directive should be taught as a method of using directives such as `use` or 
 
 - How should the `bind` directive be implemented in this context?
 - How should svelte handle multiple transitions at once? Using an "internal transition" along with forwarding might result in some unexpected behavior.
-
-## Potential Changes with Svelte 4
-
-It has been further proposed to completely replace the typical event forwarding syntax in the past for Svelte 4. This additional proposal could also cover that:
-
-```html
-<button on:click></button>
-```
-
-would be changed to
-
-```html
-<button forward:on:click></button>
-```
-
-This is a breaking change, and likely out-of-scope.
