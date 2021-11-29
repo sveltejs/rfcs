@@ -1,5 +1,5 @@
 - Start Date: 2020-12-09
-- RFC PR: (leave this empty)
+- RFC PR: [#42](https://github.com/sveltejs/rfcs/pull/42)
 - Svelte Issue: (leave this empty)
 
 # Style Directive
