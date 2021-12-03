@@ -27,7 +27,7 @@ At the moment, there are a long list of pitfalls with community-provided compone
     on:keypress
     on:keydown
     on:keyup
-    class="button {customClass || ''}"
+    class="button {customClass ?? ''}"
     {...$$restProps}
 >
     <slot />
@@ -64,7 +64,7 @@ Similar problems arise with the `transition` and `animation` directives.
 This example uses the same `<Button />` component described earlier.
 
 ```html
-<button forward:on class="button {customClass || ''}" {...$$restProps}>
+<button forward:on class="button {customClass ?? ''}" {...$$restProps}>
   <slot />
 </button>
 ```
