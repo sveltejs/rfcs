@@ -115,6 +115,8 @@ This works the same as for typing events. You probably won't use that because it
 </script>
 ```
 
+If you define `$$Props`, all possible props need to be part of it. If you use `$$props` or `$$restProps` then that does _not_ widen the type, still only those defined in `$$Props` are allowed.
+
 ### Generics
 
 You want to specify some generic connection between props/slots/events. For example you have a component which has an input prop `item`, and an event called `itemChanged`. You want to use this component for arbitrary kinds of item, but you want to make sure that the types for `item` and `itemChanged` are the same. Generics come in handy then. You can read more about them on the [official TypeScript page](https://www.typescriptlang.org/docs/handbook/generics.html).
