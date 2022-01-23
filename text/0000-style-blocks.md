@@ -67,7 +67,7 @@ div{
 
 Exact syntax is open to bikeshedding but:
 * A child can declare a point in their css where parents can put styles with the syntax `-svelte-block: blockName`
-* A parent can put select such style blocks by writing the identifier of the svelte child  (https://developer.mozilla.org/en-US/docs/Web/CSS/Universal_selectors)[including `svelte|self` for recursive calls] ),a `-` and the block name.This should be  interpreted by the PostCSS preprocessor as a single tag name and the capital initial letter(or `svelte|` prefix) should differentiate it from actual tag names.
+* A parent can put select such style blocks by writing the identifier of the svelte child  [https://developer.mozilla.org/en-US/docs/Web/CSS/Universal_selectors](including `svelte|self` for recursive calls),a `-` and the block name.This should be  interpreted by the PostCSS preprocessor as a single tag name and the capital initial letter(or `svelte|` prefix) should differentiate it from actual tag names.
 
 In particular to pass a block style to every child a component that call itself recursively MUST write
 ```
