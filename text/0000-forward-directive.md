@@ -108,6 +108,27 @@ Similarly to the `on` forwarding, internal actions may be used along with the `f
 
 Note: A transition directive cannot be both forwarded and used internally, since [DOM elements can only have one transition](https://svelte.dev/repl/08236eb2bbc6474bad75d1aee43b2628).
 
+## Forwarding Style Directives
+
+The newly introduced [style](https://svelte.dev/docs#template-syntax-element-directives-style-property) directive can also be forwarded.
+
+```html
+<button forward:style>
+  <slot />
+</button>
+```
+
+Parent:
+```html
+<script>
+  import Button from "./Button.svelte";
+
+  let color = "red";
+</script>
+
+<Button style:color>I'm a red button!</Button>
+```
+
 ### Implementation
 
 The `forward` directive's syntax would take in the name of the directive to be forwarded. For example, to forward all events using the `on` directive, the corresponding directive would be `forward:on`.
