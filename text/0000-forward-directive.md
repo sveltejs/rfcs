@@ -99,12 +99,14 @@ Using the above component in parent context would look like this:
 <Button use:myAction>I'm a button with an action!</Button>
 ```
 
-Similarly to the `on` forwarding, internal actions and transitions may be used along with the `forward` directive:
+Similarly to the `on` forwarding, internal actions may be used along with the `forward` directive:
 ```
-<button forward:use forward:transition transition:internalTransition use:internalAction>
+<button forward:use use:internalAction>
   <slot />
 </button>
 ```
+
+Note: A transition directive cannot be both forwarded and used internally, since [DOM elements can only have one transition](https://svelte.dev/repl/08236eb2bbc6474bad75d1aee43b2628).
 
 ### Implementation
 
@@ -116,7 +118,8 @@ The directive should be taught as a method of using directives such as `use` or 
 
 ## Drawbacks
 
-- There are some directives that could not be forwarded, most notably `bind` and `class`.
+- There are some directives that could not be forwarded, most notably `bind`.
+- You cannot combine `forward:transition` and `transition:fn` on the same element, since *[An element can only have one 'transition' directive](https://svelte.dev/repl/08236eb2bbc6474bad75d1aee43b2628)*.
 
 ## Alternatives
 
@@ -125,5 +128,5 @@ The directive should be taught as a method of using directives such as `use` or 
 
 ## Unresolved questions
 
-- How should the `bind` directive be implemented in this context?
-- How should svelte handle multiple transitions at once? Using an "internal transition" along with forwarding might result in some unexpected behavior.
+- Should the `bind` directive be handled here at all?
+- Should there be a syntax to exclude certain types of a directive? e.g. *forward all events except ones with the name "keydown"*.
