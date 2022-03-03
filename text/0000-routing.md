@@ -91,8 +91,8 @@ This API is a bit complex. However, it could be greatly simplified by making the
 
 ```
 const pages = {
-	'/': () => import("../../../routes/index.svelte"
-	'/[list]/[page]': () => import("../../../routes/[list]/[page].svelte"
+	'/': () => import("../../../routes/index.svelte"),
+	'/[list]/[page]': () => import("../../../routes/[list]/[page].svelte")
 }
 
 const router = new Router({
