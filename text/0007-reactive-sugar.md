@@ -56,7 +56,7 @@ One of the drawback is that IDEs and text editors like VS Code `mark` variables 
 
 ## Alternatives
 
-I also considered to design with writing array of variables, that would be dependencies for reactive statement. The problem is, it's more bloated, and require writing variable name two times. I think `_` (prefix) idea is most ideal.
+I also considered to design with writing array of variables, that would be dependencies for reactive statement. The problem is, it's more bloated, and require writing variable name two times. I think `_` (prefix) idea is most ideal. Alternative for prefix can be `#`.
 
 ## Unresolved questions
 
