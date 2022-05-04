@@ -68,8 +68,8 @@ Child button span {
 ### Implementation
 
 Components that are
-- targeted by a selector, and
-- have at least one child element with the `inherit` attribute
+- targeted by a selector, or
+- have the `inherit` attribute
 
 ...are wrapped in a [`display: contents`](https://svelte.dev/repl/ea454b5d951141ce989bf9ce46767c71?version=3.14.0) div, which is assigned `data-svelte-this={name}`, where `{name}` is the name of the component.
 
