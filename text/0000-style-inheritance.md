@@ -1,5 +1,5 @@
 - Start Date: 2022-05-03
-- RFC PR:
+- RFC PR: [#66](https://github.com/sveltejs/rfcs/pull/66)
 - Svelte Issue:
 
 # Targeted Style Inheritance
@@ -8,8 +8,8 @@
 
 An idiomatic way to allow scoped CSS rules in parent components to target elements in child components, according to two rules intended to preserve encapsulation:
 
-1. The targeted element must have an `inherit` attribute, to signal it wants this behavior
-2. The parent CSS selector must explicitly name each component between the parent and target
+1. CSS selectors must explicitly name each component between the parent component and targeted element
+2. The targeted element must have an `inherit` attribute, to signal it wants this behavior
 
 ## Motivation
 
@@ -23,7 +23,7 @@ This proposal aims to address the following issues with style properties, `:glob
 
 ## Detailed design
 
-**Rule 1:** To be eligible for inheritance, selectors must be strictly scoped to each component between the parent component and target element.
+**Rule 1:** To be eligible for inheritance, selectors must explicitly include each component between the parent component and target element.
 
 ```html
 <!-- Parent.svelte -->
@@ -36,6 +36,9 @@ This proposal aims to address the following issues with style properties, `:glob
 /* Effective: */
 Child button {
     color: red;
+}
+Child button span {
+    font-family: "Comic Sans MS";
 }
 
 /* Ineffective, because Child is not part of the selector: */
@@ -51,15 +54,24 @@ Child button {
 <!-- Child.svelte -->
 
 <!-- Will be styled: -->
-<button inherit>Foo</button>
+<button inherit>
+    <span>Foo</span>
+</button>
 
 <!-- Will remain unstyled: -->
 <button>Bar</button>
+
+<!-- Allow the parent to style eligible elements in MenuItem: -->
+<MenuItem inherit />
 ```
 
 ### Implementation
 
-Components that are targeted by a selector and have at least one child element with the `inherit` attribute are wrapped in a `display: contents` div, which is assigned `data-svelte-this={name}`, where `{name}` is the name of the component.
+Components that are
+- targeted by a selector, and
+- have at least one child element with the `inherit` attribute
+
+...are wrapped in a [`display: contents`](https://svelte.dev/repl/ea454b5d951141ce989bf9ce46767c71?version=3.14.0) div, which is assigned `data-svelte-this={name}`, where `{name}` is the name of the component.
 
 Elements with `inherit` are assigned `data-svelte-inherit={name}`, where `{name}` is the parent component of that element.
 
@@ -74,7 +86,7 @@ Selectors targeting a component are automatically rewritten to use `:global` in 
 
 The new syntax is reasonably intuitive, and it helps that targeting a component in CSS is currently a no-op. It also helps that `inherit` is an existing CSS keyword with similar semantics.
 
-This would require a new tutorial chapter and updated documentation.
+This would require a new tutorial chapter and updated documentation. Overuse of `inherit` should be discouraged, just as overuse of style properties and `:global` is discouraged. We should recommend that it be used sparingly: either on a container element, or on specific elements intended to be targeted for theming purposes.
 
 Potentially, linters could warn if a CSS selector satisfies rule 2 but not rule 1. (The reverse is likely too noisy.)
 
