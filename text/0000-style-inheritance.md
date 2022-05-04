@@ -88,7 +88,7 @@ This issue has been discussed to near-death and similar proposals have been floa
 
 | Suggestion | RFC or Issue | Feedback |
 | ---------- | ---------- | -------- |
-| Allow parent to impact child component CSS | [#13](https://github.com/sveltejs/rfcs/pull/13) | Violates the principles of CSS encapsulation and components being their own boss. Does not prevent uncontrolled cascade. |
+| Allow parent to impact child component CSS | [#22](https://github.com/sveltejs/rfcs/pull/22) | Violates the principles of CSS encapsulation and components being their own boss. Does not prevent uncontrolled cascade. |
 | Component-scoped `<style>` | [comment in #13](https://github.com/sveltejs/rfcs/pull/13#issuecomment-553144981) | Breaks encapsulation. |
 | Unscoped CSS by default | [svelte#901](https://github.com/sveltejs/svelte/issues/901) | Scoped CSS by default is an intentionally opinionated feature, intended to avoid over-namespacing and configuration anxiety. |
 | Passing class to components | [svelte#2870](https://github.com/sveltejs/svelte/issues/2870) | Breaks encapsulation. Theming should be part of the component interface. |
