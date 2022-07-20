@@ -36,78 +36,50 @@ Update: this was completed in [#1508](https://github.com/sveltejs/sapper/pull/15
 
 Put all routing information in a single routing component. Historically, in Sapper, it has been split between `start` and `app`.
 
-Update: this has basically been completed with the router now living `packages/kit/runtime/internal/router`
+Update: this has basically been completed with the router now living `packages/kit/src/runtime/client`
 
 
 #### Step 3
 
-Parse routes at runtime to simplify API.
+Create a routing API.
 
-Right now, the generated `manifest.js` contains something like:
+Parse routes at runtime to simplify API. Update: this is now done and lives in `packages/kit/src/runtime/client/parse.js`
+
+Right now, the generated `./svelte-kit/generated/client-manifest.js` contains something like:
 
 ```
-const components = [
-	() => import("/_app/routes/index.svelte.js"),
-	() => import("/_app/routes/about.svelte.js"),
-	() => import("/_app/routes/item/[id].svelte.js"),
-	() => import("/_app/routes/user/[name].svelte.js")
+export { matchers } from './client-matchers.js';
+
+export const components = [
+	() => import("../../src/routes/__layout.svelte"),
+	() => import("../runtime/components/error.svelte"),
+	() => import("../../src/routes/[slug].svelte"),
+	() => import("../../src/routes/example/[param].svelte"),
+	() => import("../../src/routes/index.svelte")
 ];
 
-const d = decodeURIComponent;
-const empty = () => ({});
-
-export const pages = [
-	{
-		// index.svelte
-		pattern: /^\/$/,
-		params: empty,
-		parts: [components[0]]
-	},
-
-	{
-		// about.svelte
-		pattern: /^\/about\/?$/,
-		params: empty,
-		parts: [components[1]]
-	},
-
-	{
-		// item/[id].svelte
-		pattern: /^\/item\/([^/]+?)\/?$/,
-		params: (m) => ({ id: d(m[1])}),
-		parts: [components[2]]
-	},
-
-	{
-		// user/[name].svelte
-		pattern: /^\/user\/([^/]+?)\/?$/,
-		params: (m) => ({ name: d(m[1])}),
-		parts: [components[3]]
-	}
-];
+export const dictionary = {
+	"": [[0, 4], [1]],
+	"example/[param]": [[0, 3], [1]],
+	"[slug]": [[0, 2], [1]]
+};
 ```
 
-This API is a bit complex. However, it could be greatly simplified by making the route parsing be part of the router runtime instead of happening at compile time:
-
+This API is pretty compact, but not too human readable. It also requires the layouts and error components to be specified repeatedly. We could create a friendly API for this:
 ```
-const pages = {
-	'/': () => import("../../../routes/index.svelte"),
-	'/[list]/[page]': () => import("../../../routes/[list]/[page].svelte")
-}
-
-const router = new Router({
-	base: paths.base,
-	host,
-	pages,
-	ignore
-});
+const routes = new Route('/')
+	.layout(() => import("../../src/routes/__layout.svelte"))
+	.error(() => import("../runtime/components/error.svelte"))
+	.routes({
+		'': () => import('../../src/routes/index.svelte'),
+		'[slug]': () => import('../../src/routes/[slug].svelte'),
+		'example/[param]': () => import(../../src/routes/example/[param].svelte);
+	});
 ```
-
-The `pattern` is needed on the server-side too, so we will still have to include it in the manifest.
 
 #### Step 4
 
-Refactor out routes generation into separate plugin. Publish components separately.
+Refactor out routes generation into separate Vite plugin like `vite-plugin-svelte-kit:router`. Publish components separately.
 
 Review the API and make sure we like it. There's probably some minor cleanup to do before exposing the routing API more broadly
 
