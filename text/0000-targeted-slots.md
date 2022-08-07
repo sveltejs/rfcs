@@ -256,7 +256,7 @@ Passing the slot on to `SubChild`.
 <SubChild><svelte:element targeted:subname this="div"/></SubChild>
 ```
 
-Here you are not creating a slot target, but passing a slot from `Parent.svelte` to `SubChild.svelte`.  
+Here you are not creating a slot target, but passing a slot from `Parent` to `SubChild`.  
 All attributes set in `Parent`, will be assigned to `<svelte:element/>` in `SubChild`.
 
 As you can see, neither in `Parent` nor in `Child` you don't need `this="name"` in `<svelte:element/>`, just in one place, this time in `SubChild`.
@@ -545,18 +545,34 @@ This opens up the chance to use the `let:val` syntax in the other direction.
 ```svelte
 <!-- Parent.svelte -->
 <Child>
-  <svelte:element slot="name" what:callit={ {val} }/>
+  <svelte:element slot="name" what:val="val" what:val2="val2"/>
 </Child>
 ```
 
 ```svelte
 <!-- Child.svelte -->
-<svelte:element targeted:name let:val>content {val}</svelte:element>
+<svelte:element targeted:name let:val let:val2>content {val} {val2}</svelte:element>
 ```
 
 But it is not necessary, because it is possible to pass data through `Child` parameters.
 
-And still I have no idea `what:callit`.
+And still I have no idea `what:val`.
+
+---
+
+If a name could be found, it could also be used instead of the object in `targeted:name={ {val} }`.
+
+```svelte
+<!-- Parent.svelte -->
+<Child>
+  <svelte:element slot="name" let:val let:val2/>content {val} {val2}</svelte:element>
+</Child>
+```
+
+```svelte
+<!-- Child.svelte -->
+<svelte:element targeted:name what:val="val" what:val2="val2"/>
+```
 
 ---
 
