@@ -465,6 +465,11 @@ I'm writing this just so you know that I have different thoughts.
 
 ## Unresolved questions
 
+Someone sees `<svelte:element slot="name"/>` and thinks it's a simple slot. And it is a Targeted Slot.  
+Therefore, perhaps the name of the `slot` attribute should be changed into another one. But I don't know into which one?
+
+---
+
 The attribute value written in `Parent`, should overwrite the attribute value written in `Child`.  
 Maybe it should be possible to decide the order of overwriting?
 
@@ -550,7 +555,7 @@ This opens up the chance to use the `let:val` syntax in the other direction.
 
 But it is not necessary, because it is possible to pass data through `Child` parameters.
 
-A i tak nie mam pomysłu `whatto:callit`.
+And still I have no idea `whatto:callit`.
 
 ---
 
