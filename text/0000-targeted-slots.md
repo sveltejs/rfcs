@@ -109,13 +109,12 @@ Using `let:val`.
 
 Reading the value of `$$slots.name` in `Child`.
 
+---
+
+The tag `<svelte:fragment slot="name"></svelte:fragment>` will not find any benefit in Targeted Slots, but it too can be used in the same way as before.
+
 
 #### **Differences from slots**
-
-No possibility to use unnamed slots - for great simplicity and to avoid collision of component and element attribute names.  
-(if you read to the end, you'll know, probably no need to explain separately)
-
----
 
 In `Child` using the `<svelte:element/>` tag, instead of the `<slot/>` tag, with the necessary `targeted:name` attribute instead of `name="name"`.
 
@@ -183,7 +182,7 @@ To be able to use in `<svelte:element targeted:name/>` other special attributes 
 
 ```svelte
 <!-- Child.svelte -->
-<svelte:element targeted:name={ {val} }/>
+<svelte:element targeted:name={ {val} } this="div"/>
 ```
 
 It's less pretty, but it's a compromise worth making.
@@ -192,7 +191,7 @@ This will make it possible to write something like this.
 
 ```svelte
 <!-- Child.svelte -->
-<svelte:element targeted:name={ {val} } name="some-name" val="simple" />
+<svelte:element targeted:name={ {val} } this="div" name="some-name" val="simple" />
 ```
 ...where the attributes `name="some-name"` and `val="simple"`, are simple HTML attributes, not things passed to `let:val`, nor the slot name.
 
@@ -207,7 +206,7 @@ No `<!-- optional fallback -->`(fallback of the whole element). It's important t
 
 ```svelte
 <!-- Child.svelte -->
-<svelte:element targeted:name/>Content that <span>will not disappear</span>.</svelte:element>
+<svelte:element targeted:name this="div"/>Content that <span>will not disappear</span>.</svelte:element>
 ```
 
 If there is no content in `Parent` in `<svelte:element/>`, the content from `Child` is visible. That is, as if the fallback is for the content, not for the whole element.
@@ -218,6 +217,11 @@ If one needs, the fallback of the whole element can be done with `$$slots.name` 
 
 
 Using the special attribute `bind:this={target}` in the slot. This was not present in simple slots at all.
+
+```svelte
+<!-- Parent.svelte -->
+<Child><svelte:element targeted:name this="div"/></Child>
+```
 
 ```svelte
 <!-- Child.svelte -->
@@ -248,11 +252,13 @@ Passing the slot on to `SubChild`.
 
 ```svelte
 <!-- SubChild.svelte -->
-<SubChild><svelte:element this="div" targeted:subname/></SubChild>
+<SubChild><svelte:element targeted:subname this="div"/></SubChild>
 ```
 
 Here you are not creating a slot target, but passing a slot from `Parent.svelte` to `SubChild.svelte`.  
 All attributes set in `Parent`, will be assigned to `<svelte:element/>` in `SubChild`.
+
+As you can see, neither in `Parent` nor in `Child` you don't need `this="name"` in `<svelte:element/>`, just in one place, this time in `SubChild`.
 
 Simplified syntax when same name in `slot:name="name"` simplified to `slot:name`.
 
@@ -402,7 +408,7 @@ Ability to mix simple slots, with Targeted Slots.
 
 ```svelte
 <!-- Child.svelte -->
-<svelte:element targeted:name/>
+<svelte:element targeted:name this="div"/>
 <slot name="name"/>
 ```
 
@@ -418,8 +424,39 @@ Ability to mix simple slots, with Targeted Slots.
 
 ```svelte
 <!-- Child.svelte -->
-<svelte:element targeted:name/>
+<svelte:element targeted:name this="div"/>
 <slot name="name2"/>
+```
+
+...or...
+
+```svelte
+<!-- Parent.svelte -->
+<Child>
+  <svelte:element slot="name"/>
+  <Component slot="name2"></Component>
+</Child>
+```
+
+```svelte
+<!-- Child.svelte -->
+<svelte:element targeted:name this="div"/>
+<slot name="name2"/>
+```
+
+Also You will be able to use the unnamed slot, and at the same time inside the Targeted Slot.
+
+```svelte
+<!-- Parent.svelte -->
+<Child let:val>
+  <svelte:element slot="name">{val}</svelte:element>
+</Child>
+```
+
+```svelte
+<!-- Child.svelte -->
+<slot val="val"/>
+<svelte:element targeted:name this="div"/>
 ```
 
 And many other forms of mixing.  
@@ -570,7 +607,6 @@ And still I have no idea `whatto:callit`.
 
 Also for the reason that in this proposal there is no fallback for the element, only for the content of the element, you can do it.
 
-
 ```svelte
 <!-- Parent.svelte -->
 <Child>
@@ -585,3 +621,47 @@ Also for the reason that in this proposal there is no fallback for the element, 
 ```
 
 But perhaps it's too complicated?
+
+---
+
+`Component` as Targeted Slot?  
+I don't know how this could be handled.
+
+```svelte
+<!-- Parent.svelte -->
+<Child>
+  <svelte:component slot="name"/>
+</Child>
+```
+
+```svelte
+<!-- Child.svelte -->
+<svelte:component this="Component"/>
+```
+
+...?
+
+I don't know if this is good.  
+But it could be useful (example needed)
+
+---
+
+If `Component` can be a unnamed Targetet Slot, then you can think about a unnamed Targetet Slot, with `Component`.
+
+```svelte
+<!-- Parent.svelte -->
+<svelte:component this="Child"/>
+```
+
+```svelte
+<!-- Child.svelte -->
+<svelte:component targeted />
+```
+
+...?
+
+I have no idea about the syntax nor destination.
+
+In the comments on the Forward Directive proposal, there is a desire to cross-mix attributes (between `Component` and `element`), but that would be even more strange.
+
+This is another oddity that I wrote just for the record.
