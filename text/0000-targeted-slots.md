@@ -607,7 +607,7 @@ I don't know how this could be handled.
 
 ```svelte
 <!-- Child.svelte -->
-<svelte:component this="Component"/>
+<svelte:component targeted:name this={Component}/>
 ```
 
 ...?
