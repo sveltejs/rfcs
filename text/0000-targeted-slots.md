@@ -233,7 +233,7 @@ It's **very important** because it's essential for solving the problems describe
 
 Allows to hide complex logic in `Child`, hidden under a simple element visible in `Parent`.
 
-Declarative Actions is the idea that for `use:action` you can use a Component, with `<target bind:this={target}>` in the component, to be able to use the advantages of SvelteJS syntax, and at the same time use the advantages of actions. 
+Declarative Actions is the idea that for `use:Component` you can use a `Component`, with `<target bind:this={target}>` in the `Component`, to be able to use the advantages of SvelteJS syntax, and at the same time use the advantages of actions. 
 
 My proposal also does this, but in a different (more universal and without using the action attribute) way.
 
@@ -256,7 +256,7 @@ Passing the slot on to `SubChild`.
 <SubChild><svelte:element targeted:subname this="div"/></SubChild>
 ```
 
-Here you are not creating a slot target, but passing a slot from `Parent` to `SubChild`.  
+Here you are not creating a slot target in `Child`, but passing a slot from `Parent` to `SubChild`.  
 All attributes set in `Parent`, will be assigned to `<svelte:element/>` in `SubChild`.
 
 As you can see, neither in `Parent` nor in `Child` you don't need `this="name"` in `<svelte:element/>`, just in one place, this time in `SubChild`.
@@ -494,6 +494,10 @@ Therefore, perhaps the name of the `slot` attribute should be changed into anoth
 What part of attributes and special attributes can be easily handled with this API. This is known to the maintainers who directly work on SvelteJS.
 
 ---
+ 
+The issue of the order in which CSS classes are overridden isn't certain either, as it depends on which component is initialized first, or something like that.... It's also for the SvelteJS engine specialis.
+
+---
 
 Styles for the element-child slot.
 
@@ -527,56 +531,6 @@ But it is required by the **Targeted style** proposal.
 ---
 
 For the reason that in this proposal there is no fallback for the element, only for the content of the element, you can do it.
-
-```svelte
-<!-- Parent.svelte -->
-<Child>
-  <svelte:element slot="name"/>
-</Child>
-```
-
-```svelte
-<!-- Child.svelte -->
-<svelte:element targeted:name>content</svelte:element>
-```
-
-This opens up the chance to use the `let:val` syntax in the other direction.
-
-```svelte
-<!-- Parent.svelte -->
-<Child>
-  <svelte:element slot="name" what:val="val" what:val2="val2"/>
-</Child>
-```
-
-```svelte
-<!-- Child.svelte -->
-<svelte:element targeted:name let:val let:val2>content {val} {val2}</svelte:element>
-```
-
-But it is not necessary, because it is possible to pass data through `Child` parameters.
-
-And still I have no idea `what:val`.
-
----
-
-If a name could be found, it could also be used instead of the object in `targeted:name={ {val} }`.
-
-```svelte
-<!-- Parent.svelte -->
-<Child>
-  <svelte:element slot="name" let:val let:val2/>content {val} {val2}</svelte:element>
-</Child>
-```
-
-```svelte
-<!-- Child.svelte -->
-<svelte:element targeted:name what:val="val" what:val2="val2"/>
-```
-
----
-
-Also for the reason that in this proposal there is no fallback for the element, only for the content of the element, you can do it.
 
 ```svelte
 <!-- Parent.svelte -->
@@ -649,7 +603,55 @@ Passing more than one `targeted:name` to one target and to `slot:subname`.
 
 I don't know if it would be useful for anything, and if it wouldn't cause too much complication.
 
+---
 
+For the reason that in this proposal there is no fallback for the element, only for the content of the element, you can do it.
+
+```svelte
+<!-- Parent.svelte -->
+<Child>
+  <svelte:element slot="name"/>
+</Child>
+```
+
+```svelte
+<!-- Child.svelte -->
+<svelte:element targeted:name>content</svelte:element>
+```
+
+This opens up the chance to use the `let:val` syntax in the other direction.
+
+```svelte
+<!-- Parent.svelte -->
+<Child>
+  <svelte:element slot="name" pass:val="val" pass:val2="val2"/>
+</Child>
+```
+
+```svelte
+<!-- Child.svelte -->
+<svelte:element targeted:name let:val let:val2>content {val} {val2}</svelte:element>
+```
+
+New special attribute `pass:val="val"`.
+
+But it is not necessary, because it is possible to pass data through `Child` parameters.
+
+---
+
+If a name could be found, it could also be used instead of the object in `targeted:name={ {val} }`.
+
+```svelte
+<!-- Parent.svelte -->
+<Child>
+  <svelte:element slot="name" let:val let:val2/>content {val} {val2}</svelte:element>
+</Child>
+```
+
+```svelte
+<!-- Child.svelte -->
+<svelte:element targeted:name pass:val="val" pass:val2="val2"/>
+```
 
 ---
 
