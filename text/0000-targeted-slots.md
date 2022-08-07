@@ -15,7 +15,7 @@ The original SvelteJS slots can only do in parent component.
 
 Instead of a fallback for an element that is in simple slots, there will be a fallback for content and some attributes.
 
-Generally - gives superpowers of combining to... `<svelte:element>`, and improves the performance of slots.
+Generally - gives superpowers of combining to... `<svelte:element/>`, and improves the performance of slots.
 
 ## Motivation
 
@@ -29,12 +29,12 @@ In short - the same as in these RFCs:
 
 I wrote the first glimpses of this idea here:
 
-- that Declarative Actions are a bit like `svelte:element` + slots - https://github.com/sveltejs/rfcs/pull/41#issuecomment-934364393
-- the first idea to implement `svelte:element` + slots - https://github.com/sveltejs/rfcs/pull/41#issuecomment-1126434719
+- that Declarative Actions are a bit like `<svelte:element/>` + slots - https://github.com/sveltejs/rfcs/pull/41#issuecomment-934364393
+- the first idea to implement `<svelte:element/>` + slots - https://github.com/sveltejs/rfcs/pull/41#issuecomment-1126434719
 - the idea of grouping attributes in Forward Directive - https://github.com/sveltejs/rfcs/pull/60#issuecomment-1073263370
 - discovery that an idea useful in Declarative Actions, can be useful in Forward Directive - https://github.com/sveltejs/rfcs/pull/60#issuecomment-1204651747
-- discovery that the same idea can also work in Targeted Style - https://github.com/sveltejs/rfcs/pull/66#issuecomment-1207270679
-  (funnily enough, the name is similar, although mine was taken from the `<target>` tag in Declarative Actions)
+- discovery that the same idea can also work in Targeted Style - https://github.com/sveltejs/rfcs/pull/66#issuecomment-1207270679  
+  (funnily enough, the name is similar, although mine was taken from the `<target/>` tag in Declarative Actions)
 
 ## Detailed design
 
@@ -117,7 +117,7 @@ No possibility to use unnamed slots - for great simplicity and to avoid collisio
 
 ---
 
-In `Child` using the `<svelte:element/>` tag, instead of the `<slot>` tag, with the necessary `targeted:name` attribute instead of `name="name"`.
+In `Child` using the `<svelte:element/>` tag, instead of the `<slot/>` tag, with the necessary `targeted:name` attribute instead of `name="name"`.
 
 ```svelte
 <!-- Child.svelte -->
@@ -127,7 +127,7 @@ In `Child` using the `<svelte:element/>` tag, instead of the `<slot>` tag, with 
 This is because the `name` attribute can be useful in `<svelte:element/>`, because it is a simple HTML attribute, it is not just for slots.  
 You will be able to use the `name` attribute in this sense - https://www.w3schools.com/tags/att_name.asp
 
-The name `targeted` came from the name of the `<target>` tag, from the **Declarative Directive** proposal.
+The name `targeted` came from the name of the `<target/>` tag, from the **Declarative Directive** proposal.
 
 ---
 
@@ -448,10 +448,10 @@ And everything written in the "Alternatives" section of these RFCs.
 
 ---
 
-Using `<target>` or simple `<slot>`, instead of `<svelte:element targeted:name/>`.  
+Using `<target/>` or simple `<slot/>`, instead of `<svelte:element targeted:name/>`.  
 The first introduces an unnecessary new basic tag. The second can be confusing.  
 
-The `<svelte:element>` better reflects a situation where attributes from two elements are combined.
+The `<svelte:element/>` better reflects a situation where attributes from two elements are combined.
 
 ---
 
