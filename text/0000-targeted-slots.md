@@ -639,7 +639,7 @@ But it is not necessary, because it is possible to pass data through `Child` par
 
 ---
 
-If a name could be found, it could also be used instead of the object in `targeted:name={ {val} }`.
+If we adopt the syntax `pass:val="val", it could also be used instead of the object in `targeted:name={ {val} }`.
 
 ```svelte
 <!-- Parent.svelte -->
@@ -666,24 +666,6 @@ I'm writing this just so you know that I have different thoughts.
 
 ---
 
-If `Component` can be a unnamed Targetet Slot, then you can think about a unnamed Targetet Slot, with `Component`.
-
-```svelte
-<!-- Parent.svelte -->
-<svelte:component this={Child}/>
-```
-
-```svelte
-<!-- Child.svelte -->
-<svelte:component targeted />
-```
-
-...?
-
-I have no idea about the syntax nor destination.
-
----
-
-In the comments on the Forward Directive proposal, there is a desire to cross-mix attributes (between `Component` and `element`), but that would be even more strange.
+In the comments on the Forward Directive proposal, there is a desire to cross-mix attributes (between `Component` and `element`), but that would be strange. Although sometimes, in special cases, it would look more graceful.
 
 This is another oddity that I wrote just for the record.
