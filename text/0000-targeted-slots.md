@@ -193,6 +193,7 @@ This will make it possible to write something like this.
 <!-- Child.svelte -->
 <svelte:element targeted:name={ {val} } this="div" name="some-name" val="simple" />
 ```
+
 ...where the attributes `name="some-name"` and `val="simple"`, are simple HTML attributes, not things passed to `let:val`, nor the slot name.
 
 ---
@@ -444,7 +445,7 @@ Ability to mix simple slots, with Targeted Slots.
 <slot name="name2"/>
 ```
 
-Also You will be able to use the unnamed slot, and at the same time inside the Targeted Slot.
+Also you will be able to use the unnamed slot, and at the same time inside the Targeted Slot.
 
 ```svelte
 <!-- Parent.svelte -->
@@ -567,7 +568,7 @@ Styles for the element-child slot.
 ```
 
 I don't know how the SvelteJS compiler would handle this. Is the fact that `.button` was set in `Parent` enough to make the style for `.button span` work?  
-But it is required by the **Targetes style** proposal.
+But it is required by the **Targeted style** proposal.
 
 ---
 
@@ -590,7 +591,7 @@ This opens up the chance to use the `let:val` syntax in the other direction.
 ```svelte
 <!-- Parent.svelte -->
 <Child>
-  <svelte:element slot="name" whatto:callit={ {val} }/>
+  <svelte:element slot="name" what:callit={ {val} }/>
 </Child>
 ```
 
@@ -601,7 +602,7 @@ This opens up the chance to use the `let:val` syntax in the other direction.
 
 But it is not necessary, because it is possible to pass data through `Child` parameters.
 
-And still I have no idea `whatto:callit`.
+And still I have no idea `what:callit`.
 
 ---
 
