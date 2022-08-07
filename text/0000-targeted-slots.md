@@ -484,31 +484,6 @@ This is the dilemma.
 
 And everything written in the "Alternatives" section of these RFCs.
 
----
-
-Using `<target/>` or simple `<slot/>`, instead of `<svelte:element targeted:name/>`.  
-The first introduces an unnecessary new basic tag. The second can be confusing.  
-
-The `<svelte:element/>` better reflects a situation where attributes from two elements are combined.
-
----
-
-Perhaps allowing the use of simple `<div/>` etc., instead of `<svelte:element/>` - Both in `Parent` (with `slot="name"`) and in `Child`(with `targeted:name`) - this will give a slightly nicer look, but maybe it is technically impossible?  
-Then you have to rely on the `targeted:name` `slot`, `slot:subname` attributes themselves - they would be the ones that would cause the dynamic behavior of the slots.
-
-This fits more with "Unresolved questions", but I don't know myself.
-
----
-
-Leaving the fallback element, and passing the content in this complicated and stupid way:
-
-```svelte
-<!-- Child.svelte -->
-<svelte:element this="div" ><content:slot>only content fallback</content:slot> whole element fallback</svelte:element>
-```
-
-I'm writing this just so you know that I have different thoughts.
-
 ## Unresolved questions
 
 Someone sees `<svelte:element slot="name"/>` and thinks it's a simple slot. And it is a Targeted Slot.  
@@ -516,28 +491,7 @@ Therefore, perhaps the name of the `slot` attribute should be changed into anoth
 
 ---
 
-The attribute value written in `Parent`, should overwrite the attribute value written in `Child`.  
-Maybe it should be possible to decide the order of overwriting?
-
----
-
 What part of attributes and special attributes can be easily handled with this API. This is known to the maintainers who directly work on SvelteJS.
-
----
-
-Passing more than one `targeted:name` to one target and to `slot:subname`.
-
-```svelte
-<!-- Child.svelte -->
-<svelte:element targeted:name targeted:name2/>
-```
-
-```svelte
-<!-- Child.svelte -->
-<SubChild><svelte:element slot:subname="name" slot:subname2="name2" /></SubChild>
-```
-
-I don't know if it would be useful for anything, and if it wouldn't cause too much complication.
 
 ---
 
@@ -644,6 +598,53 @@ I don't know how this could be handled.
 
 I don't know if this is good.  
 But it could be useful (example needed)
+
+
+### Rejected at this time
+
+The attribute value written in `Parent`, should overwrite the attribute value written in `Child`.  
+Maybe it should be possible to decide the order of overwriting?
+
+---
+
+Perhaps allowing the use of simple `<div/>` etc., instead of `<svelte:element/>` - Both in `Parent` (with `slot="name"`) and in `Child`(with `targeted:name`) - this will give a slightly nicer look, but maybe it is technically impossible?  
+Then you have to rely on the `targeted:name` `slot`, `slot:subname` attributes themselves - they would be the ones that would cause the dynamic behavior of the slots.
+
+---
+
+Using `<target/>` or simple `<slot/>`, instead of `<svelte:element targeted:name/>`.  
+The first introduces an unnecessary new basic tag. The second can be confusing.  
+
+The `<svelte:element/>` better reflects a situation where attributes from two elements are combined.
+
+---
+
+Passing more than one `targeted:name` to one target and to `slot:subname`.
+
+```svelte
+<!-- Child.svelte -->
+<svelte:element targeted:name targeted:name2/>
+```
+
+```svelte
+<!-- Child.svelte -->
+<SubChild><svelte:element slot:subname="name" slot:subname2="name2" /></SubChild>
+```
+
+I don't know if it would be useful for anything, and if it wouldn't cause too much complication.
+
+
+
+---
+
+Leaving the fallback element, and passing the content in this complicated and stupid way:
+
+```svelte
+<!-- Child.svelte -->
+<svelte:element this="div" ><content:slot>only content fallback</content:slot> whole element fallback</svelte:element>
+```
+
+I'm writing this just so you know that I have different thoughts.
 
 ---
 
