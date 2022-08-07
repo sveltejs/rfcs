@@ -668,7 +668,7 @@ If `Component` can be a unnamed Targetet Slot, then you can think about a unname
 
 ```svelte
 <!-- Parent.svelte -->
-<svelte:component this="Child"/>
+<svelte:component this={Child}/>
 ```
 
 ```svelte
@@ -679,6 +679,8 @@ If `Component` can be a unnamed Targetet Slot, then you can think about a unname
 ...?
 
 I have no idea about the syntax nor destination.
+
+---
 
 In the comments on the Forward Directive proposal, there is a desire to cross-mix attributes (between `Component` and `element`), but that would be even more strange.
 
