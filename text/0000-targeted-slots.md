@@ -131,7 +131,7 @@ The name `targeted` came from the name of the `<target/>` tag, from the **Declar
 ---
 
 Targeted Slots can only work with `svelte:element`, e.g. `<svelte:element slot="name"/>`. Therefore, to emphasize that there is something dynamic going on here.  
-(although in "Alternatives" I wonder about that)
+(although in "Rejected at this time" I wonder about that)
 
 ---
 
