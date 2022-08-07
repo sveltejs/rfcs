@@ -359,7 +359,7 @@ Not counting the case of "Styles for the element-child slot", about which in "Un
 
 In **Forward Directive** they propose a complex system of attribute exceptions.  
 With Targeted Slots, you can freely place attributes in separate named slots.  
-This will completely replace this complicated exclusion system.
+This will completely replace this complicated exceptions system.
 
 
 ```svelte
@@ -379,7 +379,7 @@ This will completely replace this complicated exclusion system.
 <svelte:element targeted:name2 this="div">Foo</svelte:element>
 ```
 
-This is an example of simple exclusion, by using a separate name.  
+This is an example of simple exception, by using a separate name.  
 In one place there is both `click` and `mouseover`, and in another place there is only `click`.
 
 
