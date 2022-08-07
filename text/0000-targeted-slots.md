@@ -177,16 +177,24 @@ When it is not added either in `Parent` or in `Child`, it is like adding `this={
 To be able to use in `<svelte:element targeted:name/>` other special attributes and simple HTML attributes, you need to implement `<slot key={value}>` differently - through an object.
 
 ```svelte
-<!-- Child.svelte -->
-<svelte:element targeted:name={ {val} }/>
-```
-
-```svelte
 <!-- Parent.svelte -->
 <Child><svelte:element slot="name" let:val>{val}</svelte:element></Child>
 ```
 
+```svelte
+<!-- Child.svelte -->
+<svelte:element targeted:name={ {val} }/>
+```
+
 It's less pretty, but it's a compromise worth making.
+
+This will make it possible to write something like this.
+
+```svelte
+<!-- Child.svelte -->
+<svelte:element targeted:name={ {val} } name="some-name" val="simple" />
+```
+...where the attributes `name="some-name"` and `val="simple"`, are simple HTML attributes, not things passed to `let:val`, nor the slot name.
 
 ---
 
@@ -447,7 +455,7 @@ The `<svelte:element>` better reflects a situation where attributes from two ele
 
 ---
 
-Perhaps allowing the use of simple `div` etc., instead of `<svelte:element/>` - Both in `Parent` and in `Child` - this will give a slightly nicer look, but maybe it is technically impossible?  
+Perhaps allowing the use of simple `<div/>` etc., instead of `<svelte:element/>` - Both in `Parent` (with `slot="name"`) and in `Child`(with `targeted:name`) - this will give a slightly nicer look, but maybe it is technically impossible?  
 Then you have to rely on the `targeted:name` `slot`, `slot:subname` attributes themselves - they would be the ones that would cause the dynamic behavior of the slots.
 
 This fits more with "Unresolved questions", but I don't know myself.
@@ -521,7 +529,8 @@ Styles for the element-child slot.
 </svelte:element>
 ```
 
-I don't know how the SvelteJS compiler would handle this. Is the fact that `.button` was set in `Parent` enough to make the style for `.button span` work?
+I don't know how the SvelteJS compiler would handle this. Is the fact that `.button` was set in `Parent` enough to make the style for `.button span` work?  
+But it is required by the **Targetes style** proposal.
 
 ---
 
