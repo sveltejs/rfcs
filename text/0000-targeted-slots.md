@@ -143,6 +143,8 @@ Using in `Child` multiple slots with the same name, but with a new syntax. This 
 <svelte:element targeted:name/>
 ```
 
+(With that case, there are some "Unresolved questions" about bindings}
+
 ---
 
 The ability to not add `this="tagName"` for `<svelte:element/>` - because `this="tagName"` can be added in `Parent`, or in `Child`.
@@ -569,6 +571,44 @@ I don't know how this could be handled.
 I don't know if this is good.  
 But it could be useful (example needed)
 
+---
+
+What about this? What does `el` refer to, in `Parent`?
+
+```svelte
+<!-- Parent.svelte -->
+<script>
+  let el;
+</script>
+<Child><svelte:element slot="name" bind:this={el}/></Child>
+```
+
+```svelte
+<!-- Child.svelte -->
+<script>
+  let el1;
+  let el2;
+  let el3;
+</script>
+<svelte:element targeted:name bind:this={el1}/>
+<svelte:element targeted:name bind:this={el1}/>
+<svelte:element targeted:name bind:this={el2}/>
+```
+
+It seems that in `Parent`, `el` should be an array.
+
+Perhaps a new syntax `bind:these={els]` is needed?
+
+```svelte
+<!-- Parent.svelte -->
+<script>
+  let els;
+  let el1 = els[0];
+  let el2 = els[1];
+  let el3 = els[2];
+</script>
+<Child><svelte:element slot="name" bind:these={els}/></Child>
+```
 
 ### Rejected at this time
 
