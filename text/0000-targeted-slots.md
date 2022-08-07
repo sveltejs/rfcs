@@ -29,8 +29,8 @@ In short - the same as in these RFCs:
 
 I wrote the first glimpses of this idea here:
 
-- that Declarative Actions are a bit like svelte:element + slots - https://github.com/sveltejs/rfcs/pull/41#issuecomment-934364393
-- the first idea to implement svelte:element + slots - https://github.com/sveltejs/rfcs/pull/41#issuecomment-1126434719
+- that Declarative Actions are a bit like `svelte:element` + slots - https://github.com/sveltejs/rfcs/pull/41#issuecomment-934364393
+- the first idea to implement `svelte:element` + slots - https://github.com/sveltejs/rfcs/pull/41#issuecomment-1126434719
 - the idea of grouping attributes in Forward Directive - https://github.com/sveltejs/rfcs/pull/60#issuecomment-1073263370
 - discovery that an idea useful in Declarative Actions, can be useful in Forward Directive - https://github.com/sveltejs/rfcs/pull/60#issuecomment-1204651747
 - discovery that the same idea can also work in Targeted Style - https://github.com/sveltejs/rfcs/pull/66#issuecomment-1207270679
