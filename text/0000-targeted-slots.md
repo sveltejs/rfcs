@@ -111,7 +111,8 @@ Reading the value of `$$slots.name` in `Child`.
 
 ---
 
-The tag `<svelte:fragment slot="name"></svelte:fragment>` will not find any benefit in Targeted Slots, but it too can be used in the same way as before.
+The tag `<svelte:fragment slot="name"></svelte:fragment>` will not find any benefit in Targeted Slots, but it too can be used in the same way as before.  
+(there is a variant of `<svelte:fragment slot="name"/>` that you will use to pass styles for element-child slot, in a special case, but about it in "Differences from slots")
 
 
 #### **Differences from slots**
@@ -370,7 +371,91 @@ The class name of targeted element can be the same in `Parent` and `Child`, beca
 ---
 
 The last few descriptions, exhaust the subject of **Targeted style inheritance** proposal.  
-Not counting the case of "Styles for the element-child slot", about which in "Unresolved questions".
+Only one more challenging case remains.
+
+Pass styles for the element-child slot.
+
+To get this, you need a specific selector.
+
+Attribute `svelte:selector` for `<svelte:element slot="name"/>`.
+
+It is done like this:
+
+```svelte
+<!-- Parent.svelte -->
+
+<div class="blue">
+    <Child><svelte:element slot="button" svelte:selector=".button span" class="button"/></Child>
+</div>
+
+<style>
+/* Effective */
+.button span {
+  font-family: "Comic Sans MS";
+}
+</style>
+```
+
+```svelte
+<!-- Child.svelte -->
+
+<svelte:element targeted:button this="button">
+  <!-- Will be styled font-family: "Comic Sans MS"; -->
+  <span>Foo</span>
+</svelte:element>
+```
+
+Then any style from `Parent` that is matched in some `svelte:selector` will be remembered.  
+When `Child` is called, it will be searched with the selector from `svelte:selector` and the found elements will get the corresponding hashes.
+
+You can list multiple selectors in `svelte:selector`, after a comma. As for example in standard `document.querySelectorAll("selector1, selector2")`.
+
+Or more nicely:
+
+```svelte
+<svelte:element slot="name"
+  svelte:selector="selector1"
+  svelte:selector="selector2"
+/>
+```
+
+Using `:scope`, e.g. `<svele:element svelte:selector=":scope > span" slot="name"/>` - when you want a direct child selector targeted slot.  
+This is standard syntax - https://developer.mozilla.org/en-US/docs/Web/CSS/:scope
+
+---
+
+The `svelte:selector` attribute can also be useful in `<svelte:fragment slot="name"/>`.
+
+```svelte
+<!-- Parent.svelte -->
+
+<div class="blue">
+    <Child><svelte:fragment slot="name" svelte:selector=".button span"/></Child>
+</div>
+
+<style>
+/* Effective */
+.button span {
+  font-family: "Comic Sans MS";
+}
+</style>
+```
+
+```svelte
+<!-- Child.svelte -->
+
+<svelte:fragment targeted:name>
+  <button class="button">
+    <!-- Will be styled font-family: "Comic Sans MS"; -->
+    <span>Foo</span>
+  </button>
+</svelte:fragment>
+```
+
+This will bypass the compulsion to use an element-container in `Parent` when you just want to pass the style to elements in `Child`.
+
+Note that it is not `<svelte:fragment></svelte:fragment>`, but `<svelte:fragment/>`.  
+The first works in the standard way, the second allows you to keep content from `Child`, and pass styles for that content.
 
 ---
 
@@ -498,37 +583,6 @@ What part of attributes and special attributes can be easily handled with this A
 ---
  
 The issue of the order in which CSS classes are overridden isn't certain either, as it depends on which component is initialized first, or something like that.... It's also for the SvelteJS engine specialis.
-
----
-
-Styles for the element-child slot.
-
-```svelte
-<!-- Parent.svelte -->
-
-<div class="blue">
-    <Child><svelte:element slot="button" class="button"/></Child>
-</div>
-
-<style>
-/* Effective? */
-.button span {
-  font-family: "Comic Sans MS";
-}
-</style>
-```
-
-```svelte
-<!-- Child.svelte -->
-
-<svelte:element targeted:button this="button">
-  <!-- Will be styled font-family: "Comic Sans MS";? -->
-  <span>Foo</span>
-</svelte:element>
-```
-
-I don't know how the SvelteJS compiler would handle this. Is the fact that `.button` was set in `Parent` enough to make the style for `.button span` work?  
-But it is required by the **Targeted style** proposal.
 
 ---
 
