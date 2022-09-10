@@ -582,7 +582,8 @@ What part of attributes and special attributes can be easily handled with this A
 
 ---
  
-The issue of the order in which CSS classes are overridden isn't certain either, as it depends on which component is initialized first, or something like that.... It's also for the SvelteJS engine specialis.
+The issue of the order in which CSS classes are overridden isn't certain either, as it depends on which component is initialized first, or something like that.... It's also for the SvelteJS engine specialis.  
+This can be solved, it seems to me, by double using .hashParent.hashParent from Parent to override .hashChild from Child. I think such a method is used somewhere in Svelte.
 
 ---
 
@@ -678,6 +679,7 @@ Then you have to rely on the `targeted:name` `slot`, `slot:subname` attributes t
 
 Using `<target/>` or simple `<slot/>`, instead of `<svelte:element targeted:name/>`.  
 The first introduces an unnecessary new basic tag. The second can be confusing.  
+There is an option with `<svelte:target targeted:name/>`. I don't know if it's worth it.
 
 The `<svelte:element/>` better reflects a situation where attributes from two elements are combined.
 
@@ -733,7 +735,7 @@ But it is not necessary, because it is possible to pass data through `Child` par
 
 ---
 
-If we adopt the syntax `pass:val="val", it could also be used instead of the object in `targeted:name={ {val} }`.
+If we adopt the syntax `pass:val="val"`, it could also be used instead of the object in `targeted:name={ {val} }`.
 
 ```svelte
 <!-- Parent.svelte -->
