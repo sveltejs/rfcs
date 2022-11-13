@@ -1,4 +1,4 @@
-- Start Date: 2022-11-12
+- Start Date: 2022-11-13
 - RFC PR: (leave this empty)
 - Svelte Issue: (leave this empty)
 
@@ -9,8 +9,7 @@
 This RFC is a proposal for enhancing the existing control
 flow blocks (`{#if}`, `{#each}`, and `{#await}`) and tags
 (`{@html}` and `{@const}`), and add support for custom
-blocks and tags. The potential solution will use a developer
-friendly API, and the solution will use a standardized
+blocks and tags. The potential solution will use a standardized
 block and tag syntax.
 
 ## Motivation
@@ -98,66 +97,124 @@ Here is what the above Handlebars example looks like in Svelte:
 
 The syntactic similarities are very prominent with one exception:
 with Handlebars, custom block helpers can be defined while Svelte cannot (yet).
-That difference could be taken care of with this RFC.
-
----
-
-At this point, for some more background, I would like to point out that Angular has a special
-[micro-syntax for structural directives](https://angular.io/guide/structural-directives#structural-directive-syntax-reference);
-this syntax makes the usage of structural directives at times more like writing JavaScript or TypeScript inside the directive.
-Below is what the last two examples would look like in Angular:
-
-```html
-<p *ngFor="let name of names">Hello, {{names}}!</p>
-```
-
-The implementation below goes into detail about how a block and tag syntax could be implemented.
+That difference could be taken care of with the implementation below
 
 ### Implementation
 
-> Explain the design in enough detail for somebody familiar with the framework to
-understand, and for somebody familiar with the implementation to implement. Any
-> new terminology should be defined here.
+#### Syntax
 
-> Explain not just the final design, but also how you arrived at it. What
-> constraints did you face? Are there corner cases you've come up with solutions for?
+On the syntax side, the syntax for the main block would look like this:
 
-> Explain how your design fits into the larger picture. Are the other open problems
-> in this area you're familiar with? How does this design fit with potential
-> solutions for those issues?
+```
+{#blockName [|param1[, param2[, param3[, ..., paramN]]]|] [ arg1[, arg2[, arg3[, ..., argN]]]] [ key1: value1[, key2: value2[, key3: value3[, keyN: valueN]]]]}
+  content
+{/blockName}
+```
 
-> Connect your design to the motivations you listed above. When describing a part of
-> the design, it can be useful to share an example of what it would look like to
-> utilize the implementation as solution to the problem.
+- `blockName`: a JavaScript identifier to identify the block.
+- `|param1[, param2[, param3[, ..., paramN]]]|`: a parameter list for the content inside the block.
+  The parameters are scoped to content and cannot be used in in the arguments of the block.
+- `[ arg1[, arg2[, arg3[, ..., argN]]]]` and `[ key1: value1[, key2: value2[, key3: value3[, keyN: valueN]]]]`: Those are the arguments supplied to the the block; the latter are named arguments in the form of `key: value`.
+- `content`: The block's *main* content that begins after a `{#block ...}` and ends before a `{/block}` or a sub-block (`{:subBlock ...}`).
+
+The syntax for sub-blocks (`{:else}`, `{:then}`, `{:catch}`, etc.) is very similar to regular blocks with a few differences:
+1. The `#` is replaced with `:`.
+2. Parameters used in the main content (before the first `{:subBlock ...}`) cannot be used as the parameter in each sub-block.
+3. The content is now between a `{:subBlock}` and a `{/block}` or another `{:subBlock}`.
+
+Finally, the syntax for a tag (e.g. `{@html}`) would look like a block without content to render and no parameters.
+
+As can be seen, the syntax is more regular, which allows it to be parsed by development tools.
+
+#### Under the Hood
+
+As the Svelte compiler is very complex, the only part that will be proposed is how the block would work under the hood.
+Blocks are just functions that have the following signature:
+```ts
+type SvelteBlock = (context: {
+  args: () => any[], // from `[ arg1[, arg2[, arg3[, ..., argN]]]]`
+  kwargs: () => Record<string, any>, // from `[ key1: value1[, key2: value2[, key3: value3[, keyN: valueN]]]]`
+  content : SvelteFragment, // from `|param1[, param2[, param3[, ..., paramN]]]|` and `content`
+  subBlocks: {
+    name: string, // from `:subBlock`
+    args: () => any[],
+    kwargs: () => Record<string, any>,
+    content : SvelteFragment,
+  }[]
+}) => SvelteFragment
+```
+
+Note that `SvelteFragment` needs to be discussed.
 
 ## How we teach this
 
-> What names and terminology work best for these concepts and why? How is this
-idea best presented? As a continuation of existing Svelte patterns, or as a
-wholly new one?
+Teaching how to build custom blocks needs to be discussed (see note above); however the new syntax can be taught with the tutorial and docs.
+Here are a few examples:
 
-> Would the acceptance of this proposal mean the Svelte guides must be
-re-organized or altered? Does it change how Svelte is taught to new users
-at any level?
+#### `{#if}`
+```
+{#if name && admin}
+<p>Welcome, {name}. Here is your dashboard:</p>
+{:elseif name}
+<p>Welcome, {name}!</p>
+{:else}
+<p><a href="/sign-in">Sign in &rarr;</a></p>
+{/if}
+```
 
-> How should this feature be introduced and taught to existing Svelte
-users?
+#### `{#each}`
+```
+<script>
+  // ...
+  const trackById = ({id}) => id
+</script>
+...
+<ul>
+{#each |{name}, index| in: items, trackBy: trackById}
+  <li>{index + 1}: {name}</li>
+{/each}
+</ul>
+```
+
+#### `{#await}`
+```
+{#await somePromise}
+  <p>Loading...</p>
+{:then |value|}
+  <p>{value}</p>
+{:catch |error|}
+  <p>Uh-oh: {error}</p>
+{/await}
+```
+
+#### [New] `{#try}` (error boundaries)
+```
+{#try}
+  <BreakApp/>
+{:catch |error|}
+  <p>Uh-oh: {error}</p>
+{/try}
+```
 
 ## Drawbacks
 
-> Why should we *not* do this? Please consider the impact on teaching Svelte,
-on the integration of this feature with other existing and planned features,
-on the impact of the API churn on existing apps, etc.
-
-> There are tradeoffs to choosing any path, please attempt to identify them here.
+1. *This is a **breaking change.***
+2. Moving the compiled logic to block functions may be less efficient.
+3. Depending on the implementation of `SvelteFragment`, the API may be hard to maintain and understand.
 
 ## Alternatives
 
-> What other designs have been considered? What is the impact of not doing this?
+Besides preprocessors, many other frameworks take care of this differently.
 
-> This section could also include prior art, that is, how other frameworks in the
-> same domain have solved this problem differently.
+- Angular has a special [micro-syntax for structural directives](https://angular.io/guide/structural-directives#structural-directive-syntax-reference);
+  this syntax makes the usage of structural directives at times more like writing JavaScript or TypeScript inside the directive.
+  ```html
+  <p *ngFor="let name of names">Hello, {{names}}!</p>
+  ```
+- [Marko](https://markojs.com/) is previewing a new API [built only with HTML tags](https://dev.to/ryansolid/introducing-the-marko-tags-api-preview-37o4).
+
+If neither of these API ideas were considered, Svelte could use components for control flow, but that would be clunky and error-prone.
 
 ## Unresolved questions
 
-> Optional, but suggested for first drafts. What parts of the design are still TBD?
+- How should blocks and `SvelteFragment`s be implemented?
