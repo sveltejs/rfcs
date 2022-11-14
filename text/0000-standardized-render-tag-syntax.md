@@ -218,3 +218,4 @@ If neither of these API ideas were considered, Svelte could use components for c
 ## Unresolved questions
 
 - How should blocks and `SvelteFragment`s be implemented?
+- How should custom blocks be made available?
