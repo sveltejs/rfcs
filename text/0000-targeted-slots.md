@@ -102,7 +102,7 @@ Using `let:val`.
 
 ```svelte
 <!-- Parent.svelte -->
-<Child><svelte:element slot="name"/ let:val>{val}</svelte:element></Child>
+<Child><svelte:element slot="name" let:val>{val}</svelte:element></Child>
 ```
 
 ---
@@ -238,7 +238,8 @@ Allows to hide complex logic in `Child`, hidden under a simple element visible i
 
 Declarative Actions is the idea that for `use:Component` you can use a `Component`, with `<target bind:this={target}>` in the `Component`, to be able to use the advantages of SvelteJS syntax, and at the same time use the advantages of actions. 
 
-My proposal also does this, but in a different (more universal and without using the action attribute) way.
+My proposal also does this, but in a different (more universal and without using the action attribute) way.  
+But I found that Targeted Slots does not have the equivalent of using multiple `use:action1 use:action2` in a single element. This is one of the Unresolved questions.
 
 ---
 
@@ -664,6 +665,13 @@ Perhaps a new syntax `bind:these={els]` is needed?
 </script>
 <Child><svelte:element slot="name" bind:these={els}/></Child>
 ```
+
+---
+
+Targeted Slots does not have the equivalent of using multiple `use:action1 use:action2` in a single element.  
+This was pointed out by user mimbrown.  
+
+So far I have no idea how to solve this.
 
 ### Rejected at this time
 
