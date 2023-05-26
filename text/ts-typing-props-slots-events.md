@@ -122,6 +122,24 @@ If you define `$$Props`, all possible props need to be part of it. If you use `$
 You want to specify some generic connection between props/slots/events. For example you have a component which has an input prop `item`, and an event called `itemChanged`. You want to use this component for arbitrary kinds of item, but you want to make sure that the types for `item` and `itemChanged` are the same. Generics come in handy then. You can read more about them on the [official TypeScript page](https://www.typescriptlang.org/docs/handbook/generics.html).
 
 #### Solution
+
+You use a new `<script>` attribute called `generics`. The contents of that attribute have to be valid generic typings.
+
+```html
+<script lang="ts" generics="T extends boolean, X">
+    import {createEventDispatcher} from "svelte";
+
+    export let array1: T[];
+    export let item1: T;
+    export let array2: X[];
+
+    const dispatch = createEventDispatcher<{arrayItemClick: X}>();
+</script>
+
+...
+```
+
+##### Discarded alternative 1
 You use new reserved type called `$$Generic`.
 
 ```html
@@ -143,24 +161,7 @@ You use new reserved type called `$$Generic`.
 </script>
 ```
 
-##### Discarded alternative 1
-You use a new `<script>` attribute called `generics`. The contents of that attribute have to be valid generic typings.
-
-```html
-<script lang="ts" generics="T extends boolean, X">
-    import {createEventDispatcher} from "svelte";
-
-    export let array1: T[];
-    export let item1: T;
-    export let array2: X[];
-
-    const dispatch = createEventDispatcher<{arrayItemClick: X}>();
-</script>
-
-...
-```
-
-Discarded because it is invalid TypeScript without additional transformations.
+Discarded because it is invalid TypeScript when using advanced typings such as `const T extends string` and it's harder to read. The `generics` attribute reads exactly like the generics on a function.
 
 ##### Discarded alternative 2
 You use a new reserved interface called `$$Generics` and do the typing on it, not declaring any properties on it.
