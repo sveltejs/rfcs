@@ -2,11 +2,11 @@
 - RFC PR:
 - Svelte Issue:
 
-# A way to disable unknown prop warnings
+# Silence unknown prop warnings
 
 ## Summary
 
-Make it possible to disable unknown prop warnings on a per component basis using
+Make it possible to silence unknown prop warnings on a per component basis using
 
 ```svelte
 <svelte:options silenceUnknownPropWarnings={true} />
