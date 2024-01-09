@@ -77,7 +77,11 @@ The idea of this RFC is to have the possibility to set this at the top of a comp
 <svelte:options silenceUnknownPropWarnings={true} />
 ```
 
-which suppresses all unknown prop warnings.
+which suppresses all unknown prop warnings for possibly unsound calls to children.
+
+Concerning the question: where should prop warnings be silenced? Should the parent silence prop warnings (parent accepts improper use of child components) or should the child silence them(child accepts unproper calls by parent component)?
+
+To keep the goal of the unknown prop warning, which is to raise awareness to the improper usage of child components, the proposed option should be provided to the parent component.
 
 As already discussed, having unknown prop warnings as a default is sensible, but disabling it globally would defeat its purpose. Having a way to opt-in on specific components (ones that are expected to have unknown props) would be a good way forward.
 
@@ -92,10 +96,3 @@ Two other possible names for this option include:
 ```svelte
 <svelte:options disableUnknownPropWarnings={true} />
 ```
-
-## Unresolved Questions
-
-In genral, the goal of the warning is to raise awareness to improper usage of child components. However, the motivation for this change stems from a architectural design, where the parent component acts as a black box and the control of the user is acted out inside of child components.
-This raises the question where to silence the prop warnings? Does the parent silence the prop warnings (parent accepts unproper usage of child components) or does the child silence them(child accepts unproper calls by parent component)?
-
-I prefer the former.
