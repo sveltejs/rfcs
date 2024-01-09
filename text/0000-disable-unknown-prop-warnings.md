@@ -22,7 +22,7 @@ As of now, when a parent component renders a child component with props that are
 import Child from './Child.svelte'
 </script>
 
-<Child foo={'foo'} bar={'bar'}>
+<Child foo="foo" bar="bar" />
 ```
 
 ```svelte
@@ -71,8 +71,6 @@ Here is [a more extreme example in the svelte flow documentation.](https://svelt
 
 ### Implementation
 
-- [] Should the parent do it? (peter)
-
 The idea of this RFC is to have the possibility to set this at the top of a component:
 
 ```svelte
@@ -95,3 +93,9 @@ Two other possible names for this option include:
 <svelte:options disableUnknownPropWarnings={true} />
 ```
 
+## Unresolved Questions
+
+In genral, the goal of the warning is to raise awareness to improper usage of child components. However, the motivation for this change stems from a architectural design, where the parent component acts as a black box and the control of the user is acted out inside of child components.
+This raises the question where to silence the prop warnings? Does the parent silence the prop warnings (parent accepts unproper usage of child components) or does the child silence them(child accepts unproper calls by parent component)?
+
+I prefer the former.
