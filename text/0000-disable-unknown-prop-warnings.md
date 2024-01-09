@@ -63,7 +63,7 @@ a warning is printed to the console
 This is a sensible default behaviour in most cases and this RFC does not intend to change any of this.
 
 However, it poses issues for libraries that allow users to provide components that will be mounted by a library.
-Take for example our use case at [svelte flow](https://svelteflow.dev/), a library that renders flowgraphs. With our architecture it is possible to mount any user provided Svelte components as either nodes or edges. These nodes receive information about their current state (which is managed by our library) over a number of props (its position, its label, if its it selected or not ...). Depending of the use case of the user it is not mandotory to implment all of these props, some are only needed in special situations.
+Take for example our use case at [svelte flow](https://svelteflow.dev/), a library that renders flowgraphs. With our architecture it is possible to mount any user provided Svelte component as either a node or an edge. Such nodes receive information (which is managed by our library) about their current state in the flow (its position, its label, if its it selected or not ...) over a number of props. Depending on the use case it is not mandotory to implment all of these props - some are only needed in special situations.
 
 So in case we want to render 10 custom node components, where the component only uses 5 of the 10 possible props, the browser console is flooded by 50 unknown prop warnings.
 
